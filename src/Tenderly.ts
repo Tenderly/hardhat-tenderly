@@ -1,9 +1,6 @@
 import {BuidlerRuntimeEnvironment} from "@nomiclabs/buidler/types";
 import {NetworkMap, PluginName} from "./index";
-import {
-  verifyContract as verifyTenderlyContracts,
-  pushContract as pushTenderlyContracts
-} from "./tenderly/TenderlyService"
+import {TenderlyService} from "./tenderly/TenderlyService"
 
 import {ContractByName, TenderlyContract, TenderlyContractUploadRequest} from "./tenderly/types";
 
@@ -25,7 +22,7 @@ export class Tenderly {
     }
 
     try {
-      await verifyTenderlyContracts(requestData)
+      await TenderlyService.verifyContracts(requestData)
     } catch (err) {
       console.log(err.message)
     }
@@ -52,7 +49,7 @@ export class Tenderly {
     }
 
     try {
-      await pushTenderlyContracts(requestData, this.env.config["projectSlug"], this.env.config["tenderlyUsername"])
+      await TenderlyService.pushContracts(requestData, this.env.config["projectSlug"], this.env.config["tenderlyUsername"])
     } catch (err) {
       console.log(err.message)
     }

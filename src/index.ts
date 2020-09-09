@@ -5,10 +5,7 @@ import {ActionType, ResolvedBuidlerConfig} from "@nomiclabs/buidler/types";
 import {task} from "@nomiclabs/buidler/config";
 
 import {Tenderly} from "./Tenderly";
-import {
-  verifyContract as verifyTenderlyContracts,
-  pushContract as pushTenderlyContracts
-} from "./tenderly/TenderlyService"
+import {TenderlyService} from "./tenderly/TenderlyService"
 import {TenderlyContract} from "./tenderly/types";
 
 export const PluginName = "buidler-tenderly"
@@ -96,7 +93,7 @@ const verifyContract: ActionType<VerifyArguments> = async (
     optimizations_count: config.solc.optimizer.runs,
   }
 
-  await verifyTenderlyContracts({
+  await TenderlyService.verifyContracts({
     config: solcConfig,
     contracts: requestContracts,
   })
@@ -128,7 +125,7 @@ const pushContracts: ActionType<VerifyArguments> = async (
     throw new BuidlerPluginError(PluginName, `Please provide the tenderlyUsername field in buidler.config.js`)
   }
 
-  await pushTenderlyContracts({
+  await TenderlyService.pushContracts({
     config: solcConfig,
     contracts: requestContracts,
   }, config["projectSlug"], config["tenderlyUsername"])
