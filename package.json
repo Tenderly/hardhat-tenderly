@@ -39,14 +39,14 @@
     "tslint": "^5.16.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.0.1",
-    "typescript": "^3.4.5"
+    "typescript": "^3.4.5",
+    "@types/find-up": "^4.0.0",
+    "@types/js-yaml": "^3.12.5"
   },
   "peerDependencies": {
     "@nomiclabs/buidler": "^1.0.1"
   },
   "dependencies": {
-    "@types/find-up": "^4.0.0",
-    "@types/js-yaml": "^3.12.5",
     "axios": "^0.20.0",
     "js-yaml": "^3.14.0"
   }

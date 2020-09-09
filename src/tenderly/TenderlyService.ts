@@ -6,7 +6,8 @@ import * as yaml from "js-yaml"
 import fs from "fs"
 import {PluginName} from "../index"
 
-const TENDERLY_BASE_URL = "https://api.tenderly.co"
+const TENDERLY_API_BASE_URL = "https://api.tenderly.co"
+const TENDERLY_DASHBOARD_BASE_URL = "https://dashboard.tenderly.co"
 
 export const verifyContract = async (
   request: TenderlyContractUploadRequest
@@ -14,7 +15,7 @@ export const verifyContract = async (
   const yamlData = getTenderlyConfig()
 
   const tenderlyApiInstance = axios.create({
-    baseURL: TENDERLY_BASE_URL,
+    baseURL: TENDERLY_API_BASE_URL,
     headers: {"x-access-key": yamlData.access_key}
   })
 
@@ -23,7 +24,7 @@ export const verifyContract = async (
       "/api/v1/account/me/verify-contracts",
       {...request}
     )
-    const dashLink = "https://dashboard.tenderly.co/explorer"
+    const dashLink = `${TENDERLY_DASHBOARD_BASE_URL}/explorer`
 
     console.log(`Smart Contracts successfully verified. You can view your contracts at ${dashLink}`)
   } catch (error) {
@@ -39,7 +40,7 @@ export const pushContract = async (
   const yamlData = getTenderlyConfig()
 
   const tenderlyApiInstance = axios.create({
-    baseURL: TENDERLY_BASE_URL,
+    baseURL: TENDERLY_API_BASE_URL,
     headers: {"x-access-key": yamlData.access_key}
   })
 
@@ -49,7 +50,7 @@ export const pushContract = async (
       {...request}
     )
 
-    const dashLink = `https://dashboard.tenderly.co/${username}/${projectSlug}/contracts`
+    const dashLink = `${TENDERLY_DASHBOARD_BASE_URL}/${username}/${projectSlug}/contracts`
 
     console.log(`Successfully pushed Smart Contracts for project ${projectSlug}. You can view your contracts at ${dashLink}`)
   } catch (error) {
@@ -64,8 +65,8 @@ const getTenderlyConfig = (): TenderlyConfig => {
   const yamlData: TenderlyConfig = yaml.load(fileData.toString())
 
   if (yamlData.access_key == null) {
-    throw new BuidlerPluginError(PluginName, `Access key not provided at filepath ${filepath}.\n` +
-      `You can find the key at https://dashboard.tenderly.co/account/authorization`)
+    throw new BuidlerPluginError(PluginName, `Access token not provided at filepath ${filepath}.\n` +
+      `You can find the token at ${TENDERLY_DASHBOARD_BASE_URL}/account/authorization`)
   }
 
   return yamlData
