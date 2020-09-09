@@ -1,0 +1,52 @@
+{
+  "name": "tenderly-buidler",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "keywords": [
+    "ethereum",
+    "smart-contracts",
+    "buidler",
+    "buidler-plugin"
+  ],
+  "scripts": {
+    "lint:fix": "prettier --write 'src/**/*.{js,ts}' 'test/**/*.{js,ts}' && tslint --fix --config tslint.json --project tsconfig.json",
+    "lint": "tslint --config tslint.json --project tsconfig.json",
+    "test": "mocha --exit",
+    "build": "tsc",
+    "buidl": "tsc",
+    "watch": "tsc -w"
+  },
+  "files": [
+    "dist/src/",
+    "src/",
+    "LICENSE",
+    "README.md"
+  ],
+  "devDependencies": {
+    "@nomiclabs/buidler": "^1.0.1",
+    "@types/chai": "^4.1.7",
+    "@types/fs-extra": "^5.0.4",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^8.10.38",
+    "chai": "^4.2.0",
+    "dotenv": "^6.2.0",
+    "mocha": "^5.2.0",
+    "prettier": "^1.17.0",
+    "source-map-support": "^0.5.12",
+    "ts-node": "^8.1.0",
+    "tslint": "^5.16.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
+    "typescript": "^3.4.5"
+  },
+  "peerDependencies": {
+    "@nomiclabs/buidler": "^1.0.1"
+  },
+  "dependencies": {
+    "@types/find-up": "^4.0.0",
+    "@types/js-yaml": "^3.12.5",
+    "axios": "^0.20.0",
+    "js-yaml": "^3.14.0"
+  }
+}
