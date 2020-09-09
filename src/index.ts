@@ -25,6 +25,13 @@ interface VerifyArguments {
 
 export const NetworkMap: Record<string, string> = {
   "kovan": "42",
+  "goerli": "5",
+  "mainnet": "1",
+  "rinkeby": "4",
+  "ropsten": "3",
+  "mumbai": "80001",
+  "xDai": "100",
+  "POA": "99",
 }
 
 const extractContractData = async (
