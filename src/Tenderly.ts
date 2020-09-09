@@ -1,5 +1,5 @@
 import {BuidlerRuntimeEnvironment} from "@nomiclabs/buidler/types";
-import {NetworkMap} from "./index";
+import {NetworkMap, PluginName} from "./index";
 import {
   verifyContract as verifyTenderlyContracts,
   pushContract as pushTenderlyContracts
@@ -37,12 +37,12 @@ export class Tenderly {
     const requestData = await this.filterContracts(flatContracts)
 
     if (this.env.config["projectSlug"] == undefined) {
-      console.log("Error in tenderly-buidler: Please provide the projectSlug field in buidler.config.js")
+      console.log(`Error in ${PluginName}: Please provide the projectSlug field in buidler.config.js`)
       return
     }
 
     if (this.env.config["tenderlyUsername"] == undefined) {
-      console.log("Error in tenderly-buidler: Please provide the tenderlyUsername field in buidler.config.js")
+      console.log(`Error in ${PluginName}: Please provide the tenderlyUsername field in buidler.config.js`)
       return
     }
 
@@ -65,7 +65,7 @@ export class Tenderly {
     for (contract of flatContracts) {
       let network = this.env.buidlerArguments.network != "buidlerevm" ? this.env.buidlerArguments.network : contract.network
       if (network == undefined) {
-        console.log("Error in tenderly-buidler: Please provide a network via the buidler --network argument or directly in the contract")
+        console.log(`Error in ${PluginName}: Please provide a network via the buidler --network argument or directly in the contract`)
         return null
       }
 

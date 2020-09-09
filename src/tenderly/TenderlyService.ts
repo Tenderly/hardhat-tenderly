@@ -31,7 +31,7 @@ export const verifyContract = async (
 
     console.log(`Smart Contracts successfully verified. You can view your contracts at ${dashLink}`)
   } catch (error) {
-    console.log("Error in tenderly-buidler: There was an error during the request. Contract verification failed")
+    console.log(`Error in ${PluginName}: There was an error during the request. Contract verification failed`)
   }
 }
 
@@ -63,7 +63,7 @@ export const pushContract = async (
 
     console.log(`Successfully pushed Smart Contracts for project ${projectSlug}. You can view your contracts at ${dashLink}`)
   } catch (error) {
-    console.log("Error in tenderly-buidler: There was an error during the request. Contract push failed")
-    console.log(error.message)
+    console.log(`Error in ${PluginName}: There was an error during the request. Contract push failed`)
+    console.log(error.response)
   }
 }
