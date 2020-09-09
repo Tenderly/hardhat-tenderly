@@ -14,7 +14,6 @@
     "esModuleInterop": true,
     "noImplicitAny": false
   },
-  // "files": [], // Any Buidler plugin's main .d.ts has to be added here
   "exclude": [
     "dist",
     "node_modules"
