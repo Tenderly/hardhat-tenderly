@@ -1,2 +1,5 @@
+[![buidler](https://buidler.dev/buidler-plugin-badge.svg?1)](https://buidler.dev)
+
 # buidler-tenderly
-Tenderly plugin for buidler
+
+[Buidler](http://buidler.dev) plugin for integration with [Tenderly](https://tenderly.co)
