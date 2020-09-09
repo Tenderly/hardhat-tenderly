@@ -6,19 +6,15 @@ import * as yaml from "js-yaml"
 import fs from "fs"
 import {PluginName} from "../index"
 
+const TENDERLY_BASE_URL = "https://api.tenderly.co"
+
 export const verifyContract = async (
   request: TenderlyContractUploadRequest
 ) => {
-  const filepath = homedir() + "/.tenderly/config.yaml"
-  const fileData = fs.readFileSync(filepath)
-  const yamlData: TenderlyConfig = yaml.load(fileData.toString())
-
-  if (yamlData.access_key == null) {
-    throw new BuidlerPluginError(PluginName, `Access key not provided at filepath ${filepath}`)
-  }
+  const yamlData = getTenderlyConfig()
 
   const tenderlyApiInstance = axios.create({
-    baseURL: "https://api.tenderly.co",
+    baseURL: TENDERLY_BASE_URL,
     headers: {"x-access-key": yamlData.access_key}
   })
 
@@ -40,16 +36,10 @@ export const pushContract = async (
   projectSlug: string,
   username: string,
 ) => {
-  const filepath = homedir() + "/.tenderly/config.yaml"
-  const fileData = fs.readFileSync(filepath)
-  const yamlData: TenderlyConfig = yaml.load(fileData.toString())
-
-  if (yamlData.access_key == null) {
-    throw new BuidlerPluginError(PluginName, `Access key not provided at filepath ${filepath}`)
-  }
+  const yamlData = getTenderlyConfig()
 
   const tenderlyApiInstance = axios.create({
-    baseURL: "https://api.tenderly.co",
+    baseURL: TENDERLY_BASE_URL,
     headers: {"x-access-key": yamlData.access_key}
   })
 
@@ -66,4 +56,17 @@ export const pushContract = async (
     console.log(`Error in ${PluginName}: There was an error during the request. Contract push failed`)
     console.log(error.response)
   }
+}
+
+const getTenderlyConfig = (): TenderlyConfig => {
+  const filepath = homedir() + "/.tenderly/config.yaml"
+  const fileData = fs.readFileSync(filepath)
+  const yamlData: TenderlyConfig = yaml.load(fileData.toString())
+
+  if (yamlData.access_key == null) {
+    throw new BuidlerPluginError(PluginName, `Access key not provided at filepath ${filepath}.\n` +
+      `You can find the key at https://dashboard.tenderly.co/account/authorization`)
+  }
+
+  return yamlData
 }
