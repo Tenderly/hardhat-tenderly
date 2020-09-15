@@ -30,3 +30,8 @@ export interface ContractByName {
   address: string;
   network: string;
 }
+
+export interface ApiContract {
+  address: string;
+  network_id: string;
+}

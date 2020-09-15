@@ -1,10 +1,5 @@
-import {BuidlerPluginError} from "@nomiclabs/buidler/plugins"
-import {TenderlyContractUploadRequest, TenderlyConfig} from "./types"
-import axios from "axios"
-import {homedir} from "os";
-import * as yaml from "js-yaml"
-import fs from "fs"
-import {PluginName} from "../index"
+import {TenderlyContractUploadRequest, ContractResponse, ApiContract} from "./types"
+import {PluginName, ReverseNetworkMap} from "../index"
 import {TenderlyApiService} from "./TenderlyApiService";
 
 export const TENDERLY_API_BASE_URL = "https://api.tenderly.co"
@@ -21,11 +16,21 @@ export class TenderlyService {
         "/api/v1/account/me/verify-contracts",
         {...request}
       )
-      const dashLink = `${TENDERLY_DASHBOARD_BASE_URL}/explorer`
 
-      console.log(`Smart Contracts successfully verified. You can view your contracts at ${dashLink}`)
+      const responseData: ContractResponse = response.data
+
+      let contract: ApiContract
+
+      console.log("Smart Contracts successfully verified")
+      console.group()
+      for (contract of responseData.contracts) {
+        const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/contract/${ReverseNetworkMap[contract.network_id]}/${contract.address}`
+        console.log(`Contract ${contract.address} verified. You can view the contract at ${contractLink}`)
+      }
+      console.groupEnd()
     } catch (error) {
       console.log(`Error in ${PluginName}: There was an error during the request. Contract verification failed`)
+      console.log(error.response)
     }
   }
 

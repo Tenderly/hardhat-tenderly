@@ -20,6 +20,10 @@ interface VerifyArguments {
   contracts: string[]
 }
 
+interface ExportArguments {
+  transactionHash: string,
+}
+
 export const NetworkMap: Record<string, string> = {
   "kovan": "42",
   "goerli": "5",
@@ -30,6 +34,18 @@ export const NetworkMap: Record<string, string> = {
   "xDai": "100",
   "POA": "99",
 }
+
+export const ReverseNetworkMap: Record<string, string> = {
+  "42": "kovan",
+  "5": "goerli",
+  "1": "mainnet",
+  "4": "rinkeby",
+  "3": "ropsten",
+  "80001": "mumbai",
+  "100": "xDai",
+  "99": "POA",
+}
+
 
 const extractContractData = async (
   contracts: string[],
