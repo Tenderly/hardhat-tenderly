@@ -41,7 +41,7 @@ export class TenderlyService {
     const tenderlyApi = TenderlyApiService.configureInstance();
 
     try {
-      const response = await tenderlyApi.post(
+      await tenderlyApi.post(
         `/api/v1/account/${username}/project/${tenderlyProject}/contracts`,
         {...request}
       )
