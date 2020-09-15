@@ -5,15 +5,3 @@ export interface TenderlyContractUploadRequest {
   contracts: TenderlyContract[];
   tag?: string;
 }
-
-export const newContractUploadRequest = (
-  config: TenderlyContractConfig,
-  contracts: TenderlyContract[],
-  tag: string
-): TenderlyContractUploadRequest => {
-  return {
-    config,
-    contracts,
-    tag
-  };
-};

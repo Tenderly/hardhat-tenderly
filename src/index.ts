@@ -131,12 +131,12 @@ const pushContracts: ActionType<VerifyArguments> = async (
     throw new BuidlerPluginError(PluginName, `At least one contract must be provided (ContractName=Address)`)
   }
 
-  if (config["tenderlyProject"] == undefined) {
-    throw new BuidlerPluginError(PluginName, `Please provide the tenderlyProject field in buidler.config.js`)
+  if (config.tenderly.project == undefined) {
+    throw new BuidlerPluginError(PluginName, `Please provide the project field in the tenderly object in buidler.config.js`)
   }
 
-  if (config["tenderlyUsername"] == undefined) {
-    throw new BuidlerPluginError(PluginName, `Please provide the tenderlyUsername field in buidler.config.js`)
+  if (config.tenderly.username == undefined) {
+    throw new BuidlerPluginError(PluginName, `Please provide the username field in the tenderly object in buidler.config.js`)
   }
 
   const requestContracts = await extractContractData(
@@ -154,18 +154,18 @@ const pushContracts: ActionType<VerifyArguments> = async (
   await TenderlyService.pushContracts({
     config: solcConfig,
     contracts: requestContracts,
-  }, config["tenderlyProject"], config["tenderlyUsername"])
+  }, config.tenderly.project, config.tenderly.username)
 }
 
 
-task("tenderly-verify", "Verifies contracts on Tenderly")
+task("tenderly:verify", "Verifies contracts on Tenderly")
   .addOptionalVariadicPositionalParam(
     "contracts",
     "Addresses and names of contracts that will be verified formatted ContractName=Address"
   )
   .setAction(verifyContract)
 
-task("tenderly-push", "Privately pushes contracts to Tenderly")
+task("tenderly:push", "Privately pushes contracts to Tenderly")
   .addOptionalVariadicPositionalParam(
     "contracts",
     "Addresses and names of contracts that will be verified formatted ContractName=Address"

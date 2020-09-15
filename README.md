@@ -21,9 +21,9 @@ usePlugin("@tenderly/buidler-tenderly");
 
 ## Tasks
 
-This plugin adds the _`tenderly-verify`_ task to Buidler:
+This plugin adds the _`tenderly:verify`_ task to Buidler:
 ```
-Usage: buidler [GLOBAL OPTIONS] tenderly-verify ...contracts
+Usage: buidler [GLOBAL OPTIONS] tenderly:verify ...contracts
 
 POSITIONAL ARGUMENTS:
 
@@ -32,9 +32,9 @@ POSITIONAL ARGUMENTS:
 tenderly-verify: Verifies contracts on Tenderly
 ```
 
-And the `tenderly-push` task:
+And the `tenderly:push` task:
 ```
-Usage: buidler [GLOBAL OPTIONS] tenderly-push ...contracts
+Usage: buidler [GLOBAL OPTIONS] tenderly:push ...contracts
 
 POSITIONAL ARGUMENTS:
 
@@ -48,19 +48,47 @@ tenderly-push: Privately pushes contracts to Tenderly
 This plugin extends the Buidler Runtime Environment by adding a `tenderly` field
 whose type is `Tenderly`.
 
-This field has the `veriftContract` and `pushContract` methods.
+This field has the `verify` and `push` methods.
+
+This is an example on how you can call it from your scripts (using ethers to deploy a contract):
+```js
+    const Greeter = await ethers.getContractFactory("Greeter");
+    const greeter = await Greeter.deploy("Hello, Buidler!");
+
+    await bre.tenderly.verify({
+        name: "Greeter",
+        address: greeter.address,
+    })
+```
+
+Both functions accept variadic parameters:
+```js
+    const contracts = [
+    {
+        name: "Greeter",
+        address: "123"
+    },
+    {
+        name: "Greeter2",
+        address: "456"
+    }]
+
+    await bre.tenderly.verify(...contracts)
+```
 
 ## Configuration
 
-This plugin extends the `BuidlerConfig` object with an optional 
-`tenderlyProject` and `tenderlyUsername` fields.
+This plugin extends the `BuidlerConfig` object with optional 
+`project` and `username` fields.
 
 This is an example of how to set it:
 
 ```js
 module.exports = {
-  tenderlyProject: "",
-  tenderlyUsername: "",
+    tenderly: {
+        project: "",
+        username: "",
+    }
 };
 ```
 

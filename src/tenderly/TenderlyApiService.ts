@@ -1,6 +1,6 @@
-import {AxiosInstance, AxiosRequestConfig} from "axios";
+import {AxiosInstance} from "axios";
 import axios from "axios"
-import {TenderlyConfig} from "./types";
+import {TenderlyKeyConfig} from "./types";
 import {homedir} from "os";
 import fs from "fs";
 import * as yaml from "js-yaml";
@@ -17,10 +17,10 @@ export class TenderlyApiService {
     })
   }
 
-  private static getTenderlyConfig(): TenderlyConfig {
+  private static getTenderlyConfig(): TenderlyKeyConfig {
     const filepath = homedir() + "/.tenderly/config.yaml"
     const fileData = fs.readFileSync(filepath)
-    const yamlData: TenderlyConfig = yaml.load(fileData.toString())
+    const yamlData: TenderlyKeyConfig = yaml.load(fileData.toString())
 
     if (yamlData.access_key == null) {
       throw new BuidlerPluginError(PluginName, `Access token not provided at filepath ${filepath}.\n` +

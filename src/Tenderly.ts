@@ -11,7 +11,7 @@ export class Tenderly {
     this.env = bre
   }
 
-  public async verifyContract(...contracts) {
+  public async verify(...contracts) {
     const flatContracts: ContractByName[] = contracts.reduce((accumulator, value) => accumulator.concat(value), []);
 
     const requestData = await this.filterContracts(flatContracts)
@@ -28,18 +28,18 @@ export class Tenderly {
     }
   }
 
-  public async pushContract(...contracts) {
+  public async push(...contracts) {
     const flatContracts: ContractByName[] = contracts.reduce((accumulator, value) => accumulator.concat(value), []);
 
     const requestData = await this.filterContracts(flatContracts)
 
-    if (this.env.config["tenderlyProject"] == undefined) {
-      console.log(`Error in ${PluginName}: Please provide the tenderlyProject field in buidler.config.js`)
+    if (this.env.config.tenderly.project == undefined) {
+      console.log(`Error in ${PluginName}: Please provide the project field in the tenderly object in buidler.config.js`)
       return
     }
 
-    if (this.env.config["tenderlyUsername"] == undefined) {
-      console.log(`Error in ${PluginName}: Please provide the tenderlyUsername field in buidler.config.js`)
+    if (this.env.config.tenderly.username == undefined) {
+      console.log(`Error in ${PluginName}: Please provide the username field in the tenderly object in buidler.config.js`)
       return
     }
 
@@ -49,7 +49,7 @@ export class Tenderly {
     }
 
     try {
-      await TenderlyService.pushContracts(requestData, this.env.config["tenderlyProject"], this.env.config["tenderlyUsername"])
+      await TenderlyService.pushContracts(requestData, this.env.config.tenderly.project, this.env.config.tenderly.username)
     } catch (err) {
       console.log(err.message)
     }
