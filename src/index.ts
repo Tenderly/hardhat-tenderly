@@ -97,6 +97,11 @@ const verifyContract: ActionType<VerifyArguments> = async (
   },
   {config, buidlerArguments, run}
 ) => {
+
+  if (contracts == undefined) {
+    throw new BuidlerPluginError(PluginName, `At least one contract must be provided (ContractName=Address)`)
+  }
+
   const requestContracts = await extractContractData(
     contracts,
     buidlerArguments.network,
@@ -121,6 +126,19 @@ const pushContracts: ActionType<VerifyArguments> = async (
   },
   {config, buidlerArguments, run}
 ) => {
+
+  if (contracts == undefined) {
+    throw new BuidlerPluginError(PluginName, `At least one contract must be provided (ContractName=Address)`)
+  }
+
+  if (config["projectSlug"] == undefined) {
+    throw new BuidlerPluginError(PluginName, `Please provide the projectSlug field in buidler.config.js`)
+  }
+
+  if (config["tenderlyUsername"] == undefined) {
+    throw new BuidlerPluginError(PluginName, `Please provide the tenderlyUsername field in buidler.config.js`)
+  }
+
   const requestContracts = await extractContractData(
     contracts,
     buidlerArguments.network,
@@ -131,14 +149,6 @@ const pushContracts: ActionType<VerifyArguments> = async (
     compiler_version: config.solc.version,
     optimizations_used: config.solc.optimizer.enabled,
     optimizations_count: config.solc.optimizer.runs,
-  }
-
-  if (config["projectSlug"] == undefined) {
-    throw new BuidlerPluginError(PluginName, `Please provide the projectSlug field in buidler.config.js`)
-  }
-
-  if (config["tenderlyUsername"] == undefined) {
-    throw new BuidlerPluginError(PluginName, `Please provide the tenderlyUsername field in buidler.config.js`)
   }
 
   await TenderlyService.pushContracts({
