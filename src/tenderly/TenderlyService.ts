@@ -30,29 +30,27 @@ export class TenderlyService {
       console.groupEnd()
     } catch (error) {
       console.log(`Error in ${PluginName}: There was an error during the request. Contract verification failed`)
-      console.log(error.response)
     }
   }
 
   public static async pushContracts(
     request: TenderlyContractUploadRequest,
-    projectSlug: string,
+    tenderlyProject: string,
     username: string,
   ) {
     const tenderlyApi = TenderlyApiService.configureInstance();
 
     try {
       const response = await tenderlyApi.post(
-        `/api/v1/account/${username}/project/${projectSlug}/contracts`,
+        `/api/v1/account/${username}/project/${tenderlyProject}/contracts`,
         {...request}
       )
 
-      const dashLink = `${TENDERLY_DASHBOARD_BASE_URL}/${username}/${projectSlug}/contracts`
+      const dashLink = `${TENDERLY_DASHBOARD_BASE_URL}/${username}/${tenderlyProject}/contracts`
 
-      console.log(`Successfully pushed Smart Contracts for project ${projectSlug}. You can view your contracts at ${dashLink}`)
+      console.log(`Successfully pushed Smart Contracts for project ${tenderlyProject}. You can view your contracts at ${dashLink}`)
     } catch (error) {
       console.log(`Error in ${PluginName}: There was an error during the request. Contract push failed`)
-      console.log(error.response)
     }
   }
 }

@@ -33,8 +33,8 @@ export class Tenderly {
 
     const requestData = await this.filterContracts(flatContracts)
 
-    if (this.env.config["projectSlug"] == undefined) {
-      console.log(`Error in ${PluginName}: Please provide the projectSlug field in buidler.config.js`)
+    if (this.env.config["tenderlyProject"] == undefined) {
+      console.log(`Error in ${PluginName}: Please provide the tenderlyProject field in buidler.config.js`)
       return
     }
 
@@ -49,7 +49,7 @@ export class Tenderly {
     }
 
     try {
-      await TenderlyService.pushContracts(requestData, this.env.config["projectSlug"], this.env.config["tenderlyUsername"])
+      await TenderlyService.pushContracts(requestData, this.env.config["tenderlyProject"], this.env.config["tenderlyUsername"])
     } catch (err) {
       console.log(err.message)
     }

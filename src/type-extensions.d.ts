@@ -9,12 +9,12 @@ declare module "@nomiclabs/buidler/types" {
   }
 
   export interface BuidlerConfig {
-    projectSlug?: string;
+    tenderlyProject?: string;
     tenderlyUsername?: string;
   }
 
   export interface ResolvedBuidlerConfig {
-    projectSlug: string;
+    tenderlyProject: string;
     tenderlyUsername: string;
   }
 }

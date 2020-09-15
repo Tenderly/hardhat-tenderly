@@ -131,8 +131,8 @@ const pushContracts: ActionType<VerifyArguments> = async (
     throw new BuidlerPluginError(PluginName, `At least one contract must be provided (ContractName=Address)`)
   }
 
-  if (config["projectSlug"] == undefined) {
-    throw new BuidlerPluginError(PluginName, `Please provide the projectSlug field in buidler.config.js`)
+  if (config["tenderlyProject"] == undefined) {
+    throw new BuidlerPluginError(PluginName, `Please provide the tenderlyProject field in buidler.config.js`)
   }
 
   if (config["tenderlyUsername"] == undefined) {
@@ -154,7 +154,7 @@ const pushContracts: ActionType<VerifyArguments> = async (
   await TenderlyService.pushContracts({
     config: solcConfig,
     contracts: requestContracts,
-  }, config["projectSlug"], config["tenderlyUsername"])
+  }, config["tenderlyProject"], config["tenderlyUsername"])
 }
 
 
