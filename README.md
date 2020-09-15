@@ -73,7 +73,9 @@ access_token: 123
 ```
 
 You can find the access token on the [Tenderly dashboard](https://dashboard.tenderly.co/), 
-under _Settings -> Authorization_, or by doing `tenderly login` on the `tenderly-cli`
+under _Settings -> Authorization_.
+
+*Alternatively*, this step can be skipped by doing `tenderly login` on the `tenderly-cli`
 
 After this you can access [Tenderly](https://tenderly.co/) through the Buidler Runtime Environment anywhere 
 you need it (tasks, scripts, tests, etc).
