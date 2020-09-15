@@ -67,7 +67,7 @@ module.exports = {
 ## Usage
 
 For this plugin to function you need to create a `config.yaml` file at 
-`$HOME/.tenderly/config.yaml` or `$HOME\\.tenderly\\config.yaml` and add an `access_token` field to it:
+`$HOME/.tenderly/config.yaml` or `%HOMEPATH%\.tenderly\config.yaml` and add an `access_token` field to it:
 ```yaml
 access_token: 123
 ```
