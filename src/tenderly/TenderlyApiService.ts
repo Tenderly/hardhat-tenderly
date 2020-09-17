@@ -2,6 +2,7 @@ import {AxiosInstance} from "axios";
 import axios from "axios"
 import {TenderlyKeyConfig} from "./types";
 import {homedir} from "os";
+import {sep} from "path";
 import fs from "fs";
 import * as yaml from "js-yaml";
 import {BuidlerPluginError} from "@nomiclabs/buidler/plugins";
@@ -18,7 +19,7 @@ export class TenderlyApiService {
   }
 
   private static getTenderlyConfig(): TenderlyKeyConfig {
-    const filepath = homedir() + "/.tenderly/config.yaml"
+    const filepath = homedir() + sep + ".tenderly" + sep + "config.yaml"
     const fileData = fs.readFileSync(filepath)
     const yamlData: TenderlyKeyConfig = yaml.load(fileData.toString())
 
