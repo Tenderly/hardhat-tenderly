@@ -1,6 +1,6 @@
-# buidler-tenderly
+# hardhat-tenderly
 
-[Buidler](http://getbuidler.com) plugin for integration with [Tenderly](https://tenderly.co/). 
+[Hardhat](http://getbuidler.com) plugin for integration with [Tenderly](https://tenderly.co/). 
 
 ## What
 
@@ -10,18 +10,18 @@ privately push contracts to [Tenderly](https://tenderly.co/).
 ## Installation
 
 ```bash
-npm install --save-dev @tenderly/buidler-tenderly
+npm install --save-dev @tenderly/hardhat-tenderly
 ```
 
 And add the following statement to your `buidler.config.js`:
 
 ```js
-usePlugin("@tenderly/buidler-tenderly");
+usePlugin("@tenderly/hardhat-tenderly");
 ```
 
 ## Tasks
 
-This plugin adds the _`tenderly:verify`_ task to Buidler:
+This plugin adds the _`tenderly:verify`_ task to Hardhat:
 ```
 Usage: buidler [GLOBAL OPTIONS] tenderly:verify ...contracts
 
@@ -45,7 +45,7 @@ tenderly-push: Privately pushes contracts to Tenderly
 
 ## Environment extensions
 
-This plugin extends the Buidler Runtime Environment by adding a `tenderly` field
+This plugin extends the Hardhat Runtime Environment by adding a `tenderly` field
 whose type is `Tenderly`.
 
 This field has the `verify` and `push` methods.
@@ -53,7 +53,7 @@ This field has the `verify` and `push` methods.
 This is an example on how you can call it from your scripts (using ethers to deploy a contract):
 ```js
     const Greeter = await ethers.getContractFactory("Greeter");
-    const greeter = await Greeter.deploy("Hello, Buidler!");
+    const greeter = await Greeter.deploy("Hello, Hardhat!");
 
     await bre.tenderly.verify({
         name: "Greeter",
@@ -78,7 +78,7 @@ Both functions accept variadic parameters:
 
 ## Configuration
 
-This plugin extends the `BuidlerConfig` object with optional 
+This plugin extends the `HardhatConfig` object with optional 
 `project` and `username` fields.
 
 This is an example of how to set it:
@@ -105,10 +105,10 @@ under _Settings -> Authorization_.
 
 *Alternatively*, this step can be skipped by doing `tenderly login` on the `tenderly-cli`
 
-After this you can access [Tenderly](https://tenderly.co/) through the Buidler Runtime Environment anywhere 
+After this you can access [Tenderly](https://tenderly.co/) through the Hardhat Runtime Environment anywhere 
 you need it (tasks, scripts, tests, etc).
 
 ## TypeScript support
 
 You need to add this to your `tsconfig.json`'s `files` array: 
-`"node_modules/@tenderly/buidler-tenderly/src/type-extensions.d.ts"`
+`"node_modules/@tenderly/hardhat-tenderly/src/type-extensions.d.ts"`

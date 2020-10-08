@@ -1,13 +1,13 @@
 {
-  "name": "@tenderly/buidler-tenderly",
+  "name": "@tenderly/hardhat-tenderly",
   "version": "0.0.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "keywords": [
     "ethereum",
     "smart-contracts",
-    "buidler",
-    "buidler-plugin",
+    "hardhat",
+    "hardhat-plugin",
     "tenderly"
   ],
   "scripts": {

@@ -8,7 +8,7 @@ import {Tenderly} from "./Tenderly";
 import {TenderlyService} from "./tenderly/TenderlyService"
 import {TenderlyContract} from "./tenderly/types";
 
-export const PluginName = "buidler-tenderly"
+export const PluginName = "hardhat-tenderly"
 
 export default function () {
   extendEnvironment(env => {
