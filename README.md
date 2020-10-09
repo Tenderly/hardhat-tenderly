@@ -1,3 +1,5 @@
+![npm (tag)](https://img.shields.io/npm/v/@tenderly/hardhat-tenderly/latest?color=7E50EC&style=for-the-badge)
+
 # hardhat-tenderly
 
 [Hardhat](http://getbuidler.com) plugin for integration with [Tenderly](https://tenderly.co/). 
