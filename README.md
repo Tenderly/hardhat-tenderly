@@ -1,4 +1,5 @@
-![npm (tag)](https://img.shields.io/npm/v/@tenderly/hardhat-tenderly/latest?color=7E50EC&style=for-the-badge)
+![npm (tag)](https://img.shields.io/npm/v/@tenderly/hardhat-tenderly/latest?color=23C197&labelColor=060e18&style=for-the-badge)
+
 
 # hardhat-tenderly
 
