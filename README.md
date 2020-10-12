@@ -100,11 +100,13 @@ module.exports = {
 For this plugin to function you need to create a `config.yaml` file at 
 `$HOME/.tenderly/config.yaml` or `%HOMEPATH%\.tenderly\config.yaml` and add an `access_token` field to it:
 ```yaml
-access_token: 123
+access_token: topsecretaccesstoken
 ```
 
 You can find the access token on the [Tenderly dashboard](https://dashboard.tenderly.co/), 
-under _Settings -> Authorization_.
+under _Settings -> Authorization_. 
+
+Or if the project belongs to an organization, by going to the Organization page inside the dashboard and navigating to the _Access Keys_ tab in the sidebar.
 
 *Alternatively*, this step can be skipped by doing `tenderly login` on the `tenderly-cli`
 
