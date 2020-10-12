@@ -1,8 +1,11 @@
 import {BuidlerRuntimeEnvironment} from "@nomiclabs/buidler/types";
 import {NetworkMap, PluginName} from "./index";
 import {TenderlyService} from "./tenderly/TenderlyService"
+import {sep} from "path";
 
-import {ContractByName, TenderlyContract, TenderlyContractUploadRequest} from "./tenderly/types";
+
+import {ContractByName, TenderlyArtifact, TenderlyContract, TenderlyContractUploadRequest} from "./tenderly/types";
+import * as fs from "fs-extra";
 
 export class Tenderly {
   env: BuidlerRuntimeEnvironment;
@@ -53,6 +56,33 @@ export class Tenderly {
     } catch (err) {
       console.log(err.message)
     }
+  }
+
+  public async persistArtifacts(...contracts) {
+    const data = await this.env.run("compile:get-compiler-input")
+    const outputPath = `${this.env.config.paths.cache}${sep}solc-output.json`
+    const outputData = JSON.parse(fs.readFileSync(outputPath).toString())
+    let contract: ContractByName
+    const destPath = `deployments${sep}localhost_5777${sep}`
+
+    Object.keys(data.sources).forEach((key, _) => {
+      const name = key.split("/").slice(-1)[0].split(".")[0];
+
+      for (contract of contracts) {
+        if (contract.name === name) {
+          const contractData = outputData.contracts[key][name]
+          const artifact: TenderlyArtifact = {
+            metadata: contractData.metadata,
+            address: contract.address,
+            bytecode: contractData.evm.bytecode.object,
+            deployedBytecode: contractData.evm.deployedBytecode.object,
+            abi: contractData.abi
+          };
+
+          fs.outputFileSync(`${destPath}${name}.json`, JSON.stringify(artifact))
+        }
+      }
+    })
   }
 
   private async filterContracts(flatContracts: ContractByName[]): Promise<TenderlyContractUploadRequest | null> {

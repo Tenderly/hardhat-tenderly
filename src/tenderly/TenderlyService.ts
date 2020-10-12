@@ -2,7 +2,7 @@ import {TenderlyContractUploadRequest, ContractResponse, ApiContract} from "./ty
 import {PluginName, ReverseNetworkMap} from "../index"
 import {TenderlyApiService} from "./TenderlyApiService";
 
-export const TENDERLY_API_BASE_URL = "http://localhost:8000"
+export const TENDERLY_API_BASE_URL = "https://api.tenderly.co"
 export const TENDERLY_DASHBOARD_BASE_URL = "https://dashboard.tenderly.co"
 
 export class TenderlyService {

@@ -13,6 +13,14 @@ export interface TenderlyContract {
   networks?: Record<string, ContractNetwork>;
 }
 
+export interface TenderlyArtifact {
+  address: string;
+  metadata: string;
+  bytecode: string;
+  deployedBytecode: string;
+  abi: any;
+}
+
 export interface ContractCompiler {
   name: string;
   version: string;
