@@ -1,42 +1,51 @@
-import {TenderlyContractUploadRequest, ContractResponse, ApiContract} from "./types"
-import {PluginName, ReverseNetworkMap} from "../index"
-import {TenderlyApiService} from "./TenderlyApiService";
+import {PluginName, ReverseNetworkMap} from "../index";
 
-export const TENDERLY_API_BASE_URL = "https://api.tenderly.co"
-export const TENDERLY_DASHBOARD_BASE_URL = "https://dashboard.tenderly.co"
+import {TenderlyApiService} from "./TenderlyApiService";
+import {
+  ApiContract,
+  ContractResponse,
+  TenderlyContractUploadRequest
+} from "./types";
+
+export const TENDERLY_API_BASE_URL = "https://api.tenderly.co";
+export const TENDERLY_DASHBOARD_BASE_URL = "https://dashboard.tenderly.co";
 
 export class TenderlyService {
-  public static async verifyContracts(
-    request: TenderlyContractUploadRequest
-  ) {
+  public static async verifyContracts(request: TenderlyContractUploadRequest) {
     const tenderlyApi = TenderlyApiService.configureInstance();
 
     try {
       const response = await tenderlyApi.post(
         "/api/v1/account/me/verify-contracts",
         {...request}
-      )
+      );
 
-      const responseData: ContractResponse = response.data
+      const responseData: ContractResponse = response.data;
 
-      let contract: ApiContract
+      let contract: ApiContract;
 
-      console.log("Smart Contracts successfully verified")
-      console.group()
+      console.log("Smart Contracts successfully verified");
+      console.group();
       for (contract of responseData.contracts) {
-        const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/contract/${ReverseNetworkMap[contract.network_id]}/${contract.address}`
-        console.log(`Contract ${contract.address} verified. You can view the contract at ${contractLink}`)
+        const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/contract/${
+          ReverseNetworkMap[contract.network_id]
+        }/${contract.address}`;
+        console.log(
+          `Contract ${contract.address} verified. You can view the contract at ${contractLink}`
+        );
       }
-      console.groupEnd()
+      console.groupEnd();
     } catch (error) {
-      console.log(`Error in ${PluginName}: There was an error during the request. Contract verification failed`)
+      console.log(
+        `Error in ${PluginName}: There was an error during the request. Contract verification failed`
+      );
     }
   }
 
   public static async pushContracts(
     request: TenderlyContractUploadRequest,
     tenderlyProject: string,
-    username: string,
+    username: string
   ) {
     const tenderlyApi = TenderlyApiService.configureInstance();
 
@@ -44,13 +53,17 @@ export class TenderlyService {
       await tenderlyApi.post(
         `/api/v1/account/${username}/project/${tenderlyProject}/contracts`,
         {...request}
-      )
+      );
 
-      const dashLink = `${TENDERLY_DASHBOARD_BASE_URL}/${username}/${tenderlyProject}/contracts`
+      const dashLink = `${TENDERLY_DASHBOARD_BASE_URL}/${username}/${tenderlyProject}/contracts`;
 
-      console.log(`Successfully pushed Smart Contracts for project ${tenderlyProject}. You can view your contracts at ${dashLink}`)
+      console.log(
+        `Successfully pushed Smart Contracts for project ${tenderlyProject}. You can view your contracts at ${dashLink}`
+      );
     } catch (error) {
-      console.log(`Error in ${PluginName}: There was an error during the request. Contract push failed`)
+      console.log(
+        `Error in ${PluginName}: There was an error during the request. Contract push failed`
+      );
     }
   }
 }
