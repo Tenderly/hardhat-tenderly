@@ -1,11 +1,12 @@
 import "@nomiclabs/buidler/types";
+
 import {TenderlyConfig} from "./tenderly/types";
 
 declare module "@nomiclabs/buidler/types" {
   export interface BuidlerRuntimeEnvironment {
     tenderly: {
-      verify: (...contracts) => Promise<void>
-      push: (...contracts) => Promise<void>
+      verify: (...contracts) => Promise<void>;
+      push: (...contracts) => Promise<void>;
     };
   }
 

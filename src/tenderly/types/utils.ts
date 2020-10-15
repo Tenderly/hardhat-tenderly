@@ -1,5 +1,5 @@
 export interface TenderlyKeyConfig {
-  access_key: string
+  access_key: string;
 }
 
 export interface BytecodeMismatchError {

@@ -1,6 +1,6 @@
 {
   "name": "@tenderly/hardhat-tenderly",
-  "version": "0.0.1",
+  "version": "0.0.2-beta.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
@@ -31,7 +31,9 @@
   "devDependencies": {
     "@nomiclabs/buidler": "^1.0.1",
     "@types/chai": "^4.1.7",
+    "@types/find-up": "^4.0.0",
     "@types/fs-extra": "^5.0.4",
+    "@types/js-yaml": "^3.12.5",
     "@types/mocha": "^5.2.5",
     "@types/node": "^8.10.38",
     "chai": "^4.2.0",
@@ -43,15 +45,14 @@
     "tslint": "^5.16.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.0.1",
-    "typescript": "^3.4.5",
-    "@types/find-up": "^4.0.0",
-    "@types/js-yaml": "^3.12.5"
+    "typescript": "^3.4.5"
   },
   "peerDependencies": {
     "@nomiclabs/buidler": "^1.0.1"
   },
   "dependencies": {
     "axios": "^0.20.0",
+    "fs-extra": "^9.0.1",
     "js-yaml": "^3.14.0"
   }
 }
