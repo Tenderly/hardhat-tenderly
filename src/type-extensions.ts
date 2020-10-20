@@ -1,5 +1,5 @@
+import "hardhat/types/config";
 import "hardhat/types/runtime";
-import "hardhat/types/config"
 
 import {TenderlyConfig} from "./tenderly/types";
 

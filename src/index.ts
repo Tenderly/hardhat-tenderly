@@ -1,12 +1,12 @@
 import {extendEnvironment, task} from "hardhat/config";
 import {HardhatPluginError, lazyObject} from "hardhat/plugins";
 import {RunTaskFunction} from "hardhat/src/types";
-import {ActionType, HardhatConfig,} from "hardhat/types";
-import "./type-extensions";
+import {ActionType, HardhatConfig} from "hardhat/types";
 
 import {Tenderly} from "./Tenderly";
 import {TenderlyService} from "./tenderly/TenderlyService";
 import {TenderlyContract} from "./tenderly/types";
+import "./type-extensions";
 
 export const PluginName = "hardhat-tenderly";
 
@@ -50,8 +50,12 @@ const extractContractData = async (
   const requestContracts: TenderlyContract[] = [];
 
   const sourcePaths = await run("compile:solidity:get-source-paths");
-  const sourceNames = await run("compile:solidity:get-source-names", {sourcePaths: sourcePaths});
-  const data = await run("compile:solidity:get-dependency-graph", {sourceNames: sourceNames});
+  const sourceNames = await run("compile:solidity:get-source-names", {
+    sourcePaths
+  });
+  const data = await run("compile:solidity:get-dependency-graph", {
+    sourceNames
+  });
 
   for (contract of contracts) {
     const contractData = contract.split("=");

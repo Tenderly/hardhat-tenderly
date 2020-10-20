@@ -1,6 +1,6 @@
-import {HardhatPluginError} from "hardhat/plugins";
 import * as axios from "axios";
 import fs from "fs";
+import {HardhatPluginError} from "hardhat/plugins";
 import * as yaml from "js-yaml";
 import {homedir} from "os";
 import {sep} from "path";

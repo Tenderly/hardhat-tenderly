@@ -17,9 +17,9 @@ export interface TenderlyConfig {
 
 export interface Metadata {
   compiler: ContractCompiler;
-  sources: Record<string, MetadataSources>
+  sources: Record<string, MetadataSources>;
 }
 
 export interface MetadataSources {
-  content: string
+  content: string;
 }

@@ -1,11 +1,12 @@
-import {HardhatRuntimeEnvironment} from "hardhat/types";
 import * as fs from "fs-extra";
+import {HardhatRuntimeEnvironment} from "hardhat/types";
 import {sep} from "path";
 
 import {NetworkMap, PluginName} from "./index";
 import {TenderlyService} from "./tenderly/TenderlyService";
 import {
-  ContractByName, Metadata,
+  ContractByName,
+  Metadata,
   TenderlyArtifact,
   TenderlyContract,
   TenderlyContractUploadRequest
@@ -78,14 +79,19 @@ export class Tenderly {
 
   public async persistArtifacts(...contracts) {
     const sourcePaths = await this.env.run("compile:solidity:get-source-paths");
-    const sourceNames = await this.env.run("compile:solidity:get-source-names", {sourcePaths: sourcePaths});
-    const data = await this.env.run("compile:solidity:get-dependency-graph", {sourceNames: sourceNames});
+    const sourceNames = await this.env.run(
+      "compile:solidity:get-source-names",
+      {sourcePaths}
+    );
+    const data = await this.env.run("compile:solidity:get-dependency-graph", {
+      sourceNames
+    });
 
     let contract: ContractByName;
     const destPath = `deployments${sep}localhost_5777${sep}`;
 
     data._resolvedFiles.forEach((resolvedFile, _) => {
-      const sourcePath: string = resolvedFile.sourceName
+      const sourcePath: string = resolvedFile.sourceName;
       const name = sourcePath
         .split("/")
         .slice(-1)[0]
@@ -94,24 +100,28 @@ export class Tenderly {
       for (contract of contracts) {
         if (contract.name === name) {
           const contractDataPath = `${this.env.config.paths.artifacts}${sep}${sourcePath}${sep}${name}.json`;
-          const contractData = JSON.parse(fs.readFileSync(contractDataPath).toString());
+          const contractData = JSON.parse(
+            fs.readFileSync(contractDataPath).toString()
+          );
 
-          let metadata: Metadata = {
+          const metadata: Metadata = {
             compiler: {
-              version: this.env.config.solidity.compilers[0].version,
+              version: this.env.config.solidity.compilers[0].version
             },
             sources: {
               [sourcePath]: {
                 content: resolvedFile.content.rawContent
               }
             }
-          }
+          };
 
-          data._dependenciesPerFile.get(sourcePath).forEach((resolvedDependency, _) => {
-            metadata.sources[resolvedDependency.sourceName] = {
-              content: resolvedDependency.content.rawContent
-            }
-          })
+          data._dependenciesPerFile
+            .get(sourcePath)
+            .forEach((resolvedDependency, __) => {
+              metadata.sources[resolvedDependency.sourceName] = {
+                content: resolvedDependency.content.rawContent
+              };
+            });
 
           const artifact: TenderlyArtifact = {
             metadata: JSON.stringify(metadata),
@@ -166,8 +176,13 @@ export class Tenderly {
 
   private async getContracts(): Promise<TenderlyContract[]> {
     const sourcePaths = await this.env.run("compile:solidity:get-source-paths");
-    const sourceNames = await this.env.run("compile:solidity:get-source-names", {sourcePaths: sourcePaths});
-    const data = await this.env.run("compile:solidity:get-dependency-graph", {sourceNames: sourceNames});
+    const sourceNames = await this.env.run(
+      "compile:solidity:get-source-names",
+      {sourcePaths}
+    );
+    const data = await this.env.run("compile:solidity:get-dependency-graph", {
+      sourceNames
+    });
 
     const requestContracts: TenderlyContract[] = [];
 
