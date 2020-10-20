@@ -1,20 +1,20 @@
-import {BuidlerRuntimeEnvironment} from "@nomiclabs/buidler/types";
+import {HardhatRuntimeEnvironment} from "hardhat/types";
 import * as fs from "fs-extra";
 import {sep} from "path";
 
 import {NetworkMap, PluginName} from "./index";
 import {TenderlyService} from "./tenderly/TenderlyService";
 import {
-  ContractByName,
+  ContractByName, Metadata,
   TenderlyArtifact,
   TenderlyContract,
   TenderlyContractUploadRequest
 } from "./tenderly/types";
 
 export class Tenderly {
-  public env: BuidlerRuntimeEnvironment;
+  public env: HardhatRuntimeEnvironment;
 
-  constructor(bre: BuidlerRuntimeEnvironment) {
+  constructor(bre: HardhatRuntimeEnvironment) {
     this.env = bre;
   }
 
@@ -48,14 +48,14 @@ export class Tenderly {
 
     if (this.env.config.tenderly.project === undefined) {
       console.log(
-        `Error in ${PluginName}: Please provide the project field in the tenderly object in buidler.config.js`
+        `Error in ${PluginName}: Please provide the project field in the tenderly object in hardhat.config.js`
       );
       return;
     }
 
     if (this.env.config.tenderly.username === undefined) {
       console.log(
-        `Error in ${PluginName}: Please provide the username field in the tenderly object in buidler.config.js`
+        `Error in ${PluginName}: Please provide the username field in the tenderly object in hardhat.config.js`
       );
       return;
     }
@@ -77,26 +77,47 @@ export class Tenderly {
   }
 
   public async persistArtifacts(...contracts) {
-    const data = await this.env.run("compile:get-compiler-input");
-    const outputPath = `${this.env.config.paths.cache}${sep}solc-output.json`;
-    const outputData = JSON.parse(fs.readFileSync(outputPath).toString());
+    const sourcePaths = await this.env.run("compile:solidity:get-source-paths");
+    const sourceNames = await this.env.run("compile:solidity:get-source-names", {sourcePaths: sourcePaths});
+    const data = await this.env.run("compile:solidity:get-dependency-graph", {sourceNames: sourceNames});
+
     let contract: ContractByName;
     const destPath = `deployments${sep}localhost_5777${sep}`;
 
-    Object.keys(data.sources).forEach((key, _) => {
-      const name = key
+    data._resolvedFiles.forEach((resolvedFile, _) => {
+      const sourcePath: string = resolvedFile.sourceName
+      const name = sourcePath
         .split("/")
         .slice(-1)[0]
         .split(".")[0];
 
       for (contract of contracts) {
         if (contract.name === name) {
-          const contractData = outputData.contracts[key][name];
+          const contractDataPath = `${this.env.config.paths.artifacts}${sep}${sourcePath}${sep}${name}.json`;
+          const contractData = JSON.parse(fs.readFileSync(contractDataPath).toString());
+
+          let metadata: Metadata = {
+            compiler: {
+              version: this.env.config.solidity.compilers[0].version,
+            },
+            sources: {
+              [sourcePath]: {
+                content: resolvedFile.content.rawContent
+              }
+            }
+          }
+
+          data._dependenciesPerFile.get(sourcePath).forEach((resolvedDependency, _) => {
+            metadata.sources[resolvedDependency.sourceName] = {
+              content: resolvedDependency.content.rawContent
+            }
+          })
+
           const artifact: TenderlyArtifact = {
-            metadata: contractData.metadata,
+            metadata: JSON.stringify(metadata),
             address: contract.address,
-            bytecode: contractData.evm.bytecode.object,
-            deployedBytecode: contractData.evm.deployedBytecode.object,
+            bytecode: contractData.bytecode,
+            deployedBytecode: contractData.deployedBytecode,
             abi: contractData.abi
           };
 
@@ -117,12 +138,12 @@ export class Tenderly {
 
     for (contract of flatContracts) {
       const network =
-        this.env.buidlerArguments.network !== "buidlerevm"
-          ? this.env.buidlerArguments.network
+        this.env.hardhatArguments.network !== "hardhat"
+          ? this.env.hardhatArguments.network
           : contract.network;
       if (network === undefined) {
         console.log(
-          `Error in ${PluginName}: Please provide a network via the buidler --network argument or directly in the contract`
+          `Error in ${PluginName}: Please provide a network via the hardhat --network argument or directly in the contract`
         );
         return null;
       }
@@ -144,23 +165,25 @@ export class Tenderly {
   }
 
   private async getContracts(): Promise<TenderlyContract[]> {
-    const data = await this.env.run("compile:get-compiler-input");
+    const sourcePaths = await this.env.run("compile:solidity:get-source-paths");
+    const sourceNames = await this.env.run("compile:solidity:get-source-names", {sourcePaths: sourcePaths});
+    const data = await this.env.run("compile:solidity:get-dependency-graph", {sourceNames: sourceNames});
 
     const requestContracts: TenderlyContract[] = [];
 
-    Object.keys(data.sources).forEach((key, _) => {
-      const name = key
+    data._resolvedFiles.forEach((resolvedFile, _) => {
+      const name = resolvedFile.sourceName
         .split("/")
         .slice(-1)[0]
         .split(".")[0];
       const contractToPush: TenderlyContract = {
         contractName: name,
-        source: data.sources[key].content,
-        sourcePath: key,
+        source: resolvedFile.content.rawContent,
+        sourcePath: resolvedFile.sourceName,
         networks: {},
         compiler: {
           name: "solc",
-          version: this.env.config.solc?.version!
+          version: this.env.config.solidity?.compilers[0].version!
         }
       };
       requestContracts.push(contractToPush);
@@ -174,9 +197,9 @@ export class Tenderly {
     const contracts = await this.getContracts();
 
     const solcConfig = {
-      compiler_version: config.solc?.version,
-      optimizations_used: config.solc?.optimizer!.enabled,
-      optimizations_count: config.solc?.optimizer!.runs
+      compiler_version: config.solidity.compilers[0].version,
+      optimizations_used: config.solidity.compilers[0].settings.enabled,
+      optimizations_count: config.solidity.compilers[0].settings.runs
     };
 
     return {

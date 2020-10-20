@@ -1,7 +1,8 @@
-import {extendEnvironment, task} from "@nomiclabs/buidler/config";
-import {BuidlerPluginError, lazyObject} from "@nomiclabs/buidler/plugins";
-import {RunTaskFunction} from "@nomiclabs/buidler/src/types";
-import {ActionType, ResolvedBuidlerConfig} from "@nomiclabs/buidler/types";
+import {extendEnvironment, task} from "hardhat/config";
+import {HardhatPluginError, lazyObject} from "hardhat/plugins";
+import {RunTaskFunction} from "hardhat/src/types";
+import {ActionType, HardhatConfig,} from "hardhat/types";
+import "./type-extensions";
 
 import {Tenderly} from "./Tenderly";
 import {TenderlyService} from "./tenderly/TenderlyService";
@@ -9,18 +10,12 @@ import {TenderlyContract} from "./tenderly/types";
 
 export const PluginName = "hardhat-tenderly";
 
-export default function () {
-  extendEnvironment(env => {
-    env.tenderly = lazyObject(() => new Tenderly(env));
-  });
-}
+extendEnvironment(env => {
+  env.tenderly = lazyObject(() => new Tenderly(env));
+});
 
 interface VerifyArguments {
   contracts: string[];
-}
-
-interface ExportArguments {
-  transactionHash: string;
 }
 
 export const NetworkMap: Record<string, string> = {
@@ -48,32 +43,36 @@ export const ReverseNetworkMap: Record<string, string> = {
 const extractContractData = async (
   contracts: string[],
   network: string | undefined,
-  config: ResolvedBuidlerConfig,
+  config: HardhatConfig,
   run: RunTaskFunction
 ): Promise<TenderlyContract[]> => {
   let contract: string;
   const requestContracts: TenderlyContract[] = [];
-  const data = await run("compile:get-compiler-input");
+
+  const sourcePaths = await run("compile:solidity:get-source-paths");
+  const sourceNames = await run("compile:solidity:get-source-names", {sourcePaths: sourcePaths});
+  const data = await run("compile:solidity:get-dependency-graph", {sourceNames: sourceNames});
+
   for (contract of contracts) {
     const contractData = contract.split("=");
     if (contractData.length < 2) {
-      throw new BuidlerPluginError(PluginName, `Invalid contract provided`);
+      throw new HardhatPluginError(PluginName, `Invalid contract provided`);
     }
 
     if (network === undefined) {
-      throw new BuidlerPluginError(PluginName, `No network provided`);
+      throw new HardhatPluginError(PluginName, `No network provided`);
     }
 
-    Object.keys(data.sources).forEach((key, _) => {
-      const name = key.split("/").slice(-1)[0];
+    data._resolvedFiles.forEach((resolvedFile, _) => {
+      const name = resolvedFile.sourceName.split("/").slice(-1)[0];
       const contractToPush: TenderlyContract = {
         contractName: name.split(".")[0],
-        source: data.sources[key].content,
-        sourcePath: key,
+        source: resolvedFile.content.rawContent,
+        sourcePath: resolvedFile.sourceName,
         networks: {},
         compiler: {
           name: "solc",
-          version: config.solc.version
+          version: config.solidity.compilers[0].version
         }
       };
       if (contractToPush.contractName === contractData[0]) {
@@ -91,10 +90,10 @@ const extractContractData = async (
 
 const verifyContract: ActionType<VerifyArguments> = async (
   {contracts},
-  {config, buidlerArguments, run}
+  {config, hardhatArguments, run}
 ) => {
   if (contracts === undefined) {
-    throw new BuidlerPluginError(
+    throw new HardhatPluginError(
       PluginName,
       `At least one contract must be provided (ContractName=Address)`
     );
@@ -102,14 +101,14 @@ const verifyContract: ActionType<VerifyArguments> = async (
 
   const requestContracts = await extractContractData(
     contracts,
-    buidlerArguments.network,
+    hardhatArguments.network,
     config,
     run
   );
   const solcConfig = {
-    compiler_version: config.solc.version,
-    optimizations_used: config.solc.optimizer.enabled,
-    optimizations_count: config.solc.optimizer.runs
+    compiler_version: config.solidity.compilers[0].version,
+    optimizations_used: config.solidity.compilers[0].settings.enabled,
+    optimizations_count: config.solidity.compilers[0].settings.runs
   };
 
   await TenderlyService.verifyContracts({
@@ -120,39 +119,39 @@ const verifyContract: ActionType<VerifyArguments> = async (
 
 const pushContracts: ActionType<VerifyArguments> = async (
   {contracts},
-  {config, buidlerArguments, run}
+  {config, hardhatArguments, run}
 ) => {
   if (contracts === undefined) {
-    throw new BuidlerPluginError(
+    throw new HardhatPluginError(
       PluginName,
       `At least one contract must be provided (ContractName=Address)`
     );
   }
 
   if (config.tenderly.project === undefined) {
-    throw new BuidlerPluginError(
+    throw new HardhatPluginError(
       PluginName,
-      `Please provide the project field in the tenderly object in buidler.config.js`
+      `Please provide the project field in the tenderly object in hardhat.config.js`
     );
   }
 
   if (config.tenderly.username === undefined) {
-    throw new BuidlerPluginError(
+    throw new HardhatPluginError(
       PluginName,
-      `Please provide the username field in the tenderly object in buidler.config.js`
+      `Please provide the username field in the tenderly object in hardhat.config.js`
     );
   }
 
   const requestContracts = await extractContractData(
     contracts,
-    buidlerArguments.network,
+    hardhatArguments.network,
     config,
     run
   );
   const solcConfig = {
-    compiler_version: config.solc.version,
-    optimizations_used: config.solc.optimizer.enabled,
-    optimizations_count: config.solc.optimizer.runs
+    compiler_version: config.solidity.compilers[0].version,
+    optimizations_used: config.solidity.compilers[0].settings.enabled,
+    optimizations_count: config.solidity.compilers[0].settings.runs
   };
 
   await TenderlyService.pushContracts(
