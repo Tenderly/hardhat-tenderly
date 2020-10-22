@@ -24,8 +24,7 @@
     "watch": "tsc -w"
   },
   "files": [
-    "dist/src/",
-    "src/",
+    "dist/",
     "LICENSE",
     "README.md"
   ],
