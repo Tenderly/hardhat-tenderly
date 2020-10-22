@@ -213,8 +213,8 @@ export class Tenderly {
 
     const solcConfig = {
       compiler_version: config.solidity.compilers[0].version,
-      optimizations_used: config.solidity.compilers[0].settings.enabled,
-      optimizations_count: config.solidity.compilers[0].settings.runs
+      optimizations_used: config.solidity.compilers[0].settings.optimizer.enabled,
+      optimizations_count: config.solidity.compilers[0].settings.optimizer.runs
     };
 
     return {
