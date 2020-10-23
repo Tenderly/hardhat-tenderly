@@ -8,7 +8,12 @@ declare module "hardhat/types/runtime" {
     tenderly: {
       verify: (...contracts) => Promise<void>;
       push: (...contracts) => Promise<void>;
+      persistArtifacts: (...contracts) => Promise<void>
     };
+    tenderlyRPC: {
+      verify: (...contracts) => Promise<void>;
+      resetFork: () => string | undefined;
+    }
   }
 }
 
