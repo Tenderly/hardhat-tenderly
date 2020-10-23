@@ -1,12 +1,14 @@
-import {TenderlyContract} from "./tenderly/types";
 import {HardhatRuntimeEnvironment} from "hardhat/types";
 
-export const getContracts = async (hre: HardhatRuntimeEnvironment): Promise<TenderlyContract[]> => {
+import {TenderlyContract} from "./tenderly/types";
+
+export const getContracts = async (
+  hre: HardhatRuntimeEnvironment
+): Promise<TenderlyContract[]> => {
   const sourcePaths = await hre.run("compile:solidity:get-source-paths");
-  const sourceNames = await hre.run(
-    "compile:solidity:get-source-names",
-    {sourcePaths}
-  );
+  const sourceNames = await hre.run("compile:solidity:get-source-names", {
+    sourcePaths
+  });
   const data = await hre.run("compile:solidity:get-dependency-graph", {
     sourceNames
   });
@@ -31,4 +33,4 @@ export const getContracts = async (hre: HardhatRuntimeEnvironment): Promise<Tend
     requestContracts.push(contractToPush);
   });
   return requestContracts;
-}
+};

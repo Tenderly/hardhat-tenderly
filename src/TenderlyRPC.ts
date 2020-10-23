@@ -1,15 +1,18 @@
 import fs from "fs";
+import {HardhatRuntimeEnvironment} from "hardhat/types";
 import * as yaml from "js-yaml";
 import os from "os";
 import path from "path";
 
-import {TenderlyApiService} from "./tenderly/TenderlyApiService";
-import {HardhatRuntimeEnvironment} from "hardhat/types";
-import {ContractByName, TenderlyContractUploadRequest, TenderlyForkContractUploadRequest} from "./tenderly/types";
 import {NetworkMap, PluginName} from "./index";
-import {getContracts} from "./util";
+import {TenderlyApiService} from "./tenderly/TenderlyApiService";
 import {TenderlyService} from "./tenderly/TenderlyService";
-
+import {
+  ContractByName,
+  TenderlyContractUploadRequest,
+  TenderlyForkContractUploadRequest
+} from "./tenderly/types";
+import {getContracts} from "./util";
 
 export class TenderlyRPC {
   public host: string;
@@ -21,22 +24,20 @@ export class TenderlyRPC {
   public accounts: Record<string, string> | undefined;
   public env: HardhatRuntimeEnvironment;
 
-
-  private filepath = os.homedir() + path.sep + ".tenderly" + path.sep + "config.yaml";
+  private filepath =
+    os.homedir() + path.sep + ".tenderly" + path.sep + "config.yaml";
 
   constructor(hre: HardhatRuntimeEnvironment) {
-    this.env = hre
+    this.env = hre;
     this.connected = true;
 
     const fileData = fs.readFileSync(this.filepath);
     const yamlData = yaml.load(fileData.toString());
 
     this.accessKey = yamlData.access_key;
-    this.head = yamlData.head;
-    this.fork = yamlData.fork
 
-    this.tenderlyAPI = TenderlyApiService.configureTenderlyRPCInstance()
-    this.host = this.tenderlyAPI.defaults.baseURL!
+    this.tenderlyAPI = TenderlyApiService.configureTenderlyRPCInstance();
+    this.host = this.tenderlyAPI.defaults.baseURL!;
   }
 
   public supportsSubscriptions() {
@@ -54,9 +55,9 @@ export class TenderlyRPC {
     try {
       const resp = await this.tenderlyAPI.post("", payload);
 
-      this.head = resp.headers["head"]
+      this.head = resp.headers.head;
 
-      this.writeHead()
+      this.writeHead();
       cb(null, resp.data);
     } catch (err) {
       console.log(err.response.data);
@@ -64,43 +65,18 @@ export class TenderlyRPC {
     }
   }
 
-  private writeHead() {
-    const fileData = fs.readFileSync(this.filepath);
-    const yamlData = yaml.load(fileData.toString());
-
-    yamlData.head = this.head
-
-    fs.writeFileSync(this.filepath, yaml.safeDump(yamlData), "utf8")
-  }
-
-  private async initializeFork() {
-    const username: string = this.env.config.tenderly.username
-    const projectID: string = this.env.config.tenderly.project
-    try {
-      const resp = await this.tenderlyAPI.post(
-        `/account/${username}/project/${projectID}/fork`,
-        {network_id: "1"}
-      );
-      this.head = resp.data.root_transaction.id;
-      this.accounts = resp.data.simulation_fork.accounts;
-      this.fork = resp.data.simulation_fork.id
-    } catch (err) {
-      throw err;
-    }
-  }
-
   public resetFork(): string | undefined {
     const fileData = fs.readFileSync(this.filepath);
     const yamlData = yaml.load(fileData.toString());
 
-    const oldHead = yamlData.head
+    const oldHead = yamlData.head;
 
-    delete yamlData.head
-    delete yamlData.fork
+    delete yamlData.head;
+    delete yamlData.fork;
 
-    fs.writeFileSync(this.filepath, yaml.safeDump(yamlData), "utf8")
+    fs.writeFileSync(this.filepath, yaml.safeDump(yamlData), "utf8");
 
-    return oldHead
+    return oldHead;
   }
 
   public async verify(...contracts) {
@@ -125,10 +101,35 @@ export class TenderlyRPC {
         requestData,
         this.env.config.tenderly.project,
         this.env.config.tenderly.username,
-        this.fork!,
+        this.fork!
       );
     } catch (err) {
       console.log(err.message);
+    }
+  }
+
+  private writeHead() {
+    const fileData = fs.readFileSync(this.filepath);
+    const yamlData = yaml.load(fileData.toString());
+
+    yamlData.head = this.head;
+
+    fs.writeFileSync(this.filepath, yaml.safeDump(yamlData), "utf8");
+  }
+
+  private async initializeFork() {
+    const username: string = this.env.config.tenderly.username;
+    const projectID: string = this.env.config.tenderly.project;
+    try {
+      const resp = await this.tenderlyAPI.post(
+        `/account/${username}/project/${projectID}/fork`,
+        {network_id: "1"}
+      );
+      this.head = resp.data.root_transaction.id;
+      this.accounts = resp.data.simulation_fork.accounts;
+      this.fork = resp.data.simulation_fork.id;
+    } catch (err) {
+      throw err;
     }
   }
 
@@ -157,11 +158,12 @@ export class TenderlyRPC {
 
   private async getForkContractData(): Promise<TenderlyForkContractUploadRequest> {
     const config = this.env.config;
-    const contracts = await getContracts(this.env)
+    const contracts = await getContracts(this.env);
 
     const solcConfig = {
       compiler_version: config.solidity.compilers[0].version,
-      optimizations_used: config.solidity.compilers[0].settings.optimizer.enabled,
+      optimizations_used:
+      config.solidity.compilers[0].settings.optimizer.enabled,
       optimizations_count: config.solidity.compilers[0].settings.optimizer.runs
     };
 

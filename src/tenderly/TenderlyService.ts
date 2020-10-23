@@ -4,12 +4,13 @@ import {TenderlyApiService} from "./TenderlyApiService";
 import {
   ApiContract,
   ContractResponse,
-  TenderlyContractUploadRequest, TenderlyForkContractUploadRequest
+  TenderlyContractUploadRequest,
+  TenderlyForkContractUploadRequest
 } from "./types";
 
 export const TENDERLY_API_BASE_URL = "https://api.tenderly.co";
 export const TENDERLY_DASHBOARD_BASE_URL = "https://dashboard.tenderly.co";
-export const TENDERLY_RPC_BASE = "http://127.0.0.1/8545"
+export const TENDERLY_RPC_BASE = "http://127.0.0.1/8545";
 
 export class TenderlyService {
   public static async verifyContracts(request: TenderlyContractUploadRequest) {
@@ -72,7 +73,7 @@ export class TenderlyService {
     request: TenderlyForkContractUploadRequest,
     tenderlyProject: string,
     username: string,
-    fork: string,
+    fork: string
   ) {
     const tenderlyApi = TenderlyApiService.configureTenderlyRPCInstance();
 
@@ -84,7 +85,12 @@ export class TenderlyService {
 
       const responseData: ContractResponse = response.data;
 
-      let contract: ApiContract;
+      if (responseData.bytecode_mismatch_errors.length > 0) {
+        console.log(
+          `Error in ${PluginName}: Bytecode mismatch detected. Contract verification failed`
+        );
+        return;
+      }
 
       console.log("Smart Contracts successfully verified");
     } catch (error) {

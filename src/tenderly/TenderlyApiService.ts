@@ -23,6 +23,17 @@ export class TenderlyApiService {
     });
   }
 
+  public static configureTenderlyRPCInstance(): axios.AxiosInstance {
+    const yamlData = this.getTenderlyConfig();
+    return axios.default.create({
+      baseURL: TENDERLY_RPC_BASE,
+      headers: {
+        "x-access-key": yamlData.access_key,
+        head: yamlData.head
+      }
+    });
+  }
+
   private static getTenderlyConfig(): TenderlyKeyConfig {
     const filepath = homedir() + sep + ".tenderly" + sep + "config.yaml";
     const fileData = fs.readFileSync(filepath);
@@ -36,16 +47,5 @@ export class TenderlyApiService {
       );
     }
     return yamlData;
-  }
-
-  public static configureTenderlyRPCInstance(): axios.AxiosInstance {
-    const yamlData = this.getTenderlyConfig();
-    return axios.default.create({
-      baseURL: TENDERLY_RPC_BASE,
-      headers: {
-        "x-access-key": yamlData.access_key,
-        "head": yamlData.head
-      }
-    });
   }
 }

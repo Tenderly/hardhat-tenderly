@@ -6,14 +6,14 @@ import {ActionType, HardhatConfig} from "hardhat/types";
 import {Tenderly} from "./Tenderly";
 import {TenderlyService} from "./tenderly/TenderlyService";
 import {TenderlyContract} from "./tenderly/types";
-import "./type-extensions";
 import {TenderlyRPC} from "./TenderlyRPC";
+import "./type-extensions";
 
 export const PluginName = "hardhat-tenderly";
 
 extendEnvironment(env => {
   env.tenderly = lazyObject(() => new Tenderly(env));
-  env.tenderlyRPC = lazyObject(() => new TenderlyRPC(env))
+  env.tenderlyRPC = lazyObject(() => new TenderlyRPC(env));
 });
 
 interface VerifyArguments {
