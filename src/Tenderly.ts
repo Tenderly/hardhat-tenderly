@@ -11,6 +11,7 @@ import {
   TenderlyContract,
   TenderlyContractUploadRequest
 } from "./tenderly/types";
+import {getContracts} from "./util";
 
 export class Tenderly {
   public env: HardhatRuntimeEnvironment;
@@ -174,42 +175,10 @@ export class Tenderly {
     return requestData;
   }
 
-  private async getContracts(): Promise<TenderlyContract[]> {
-    const sourcePaths = await this.env.run("compile:solidity:get-source-paths");
-    const sourceNames = await this.env.run(
-      "compile:solidity:get-source-names",
-      {sourcePaths}
-    );
-    const data = await this.env.run("compile:solidity:get-dependency-graph", {
-      sourceNames
-    });
-
-    const requestContracts: TenderlyContract[] = [];
-
-    data._resolvedFiles.forEach((resolvedFile, _) => {
-      const name = resolvedFile.sourceName
-        .split("/")
-        .slice(-1)[0]
-        .split(".")[0];
-      const contractToPush: TenderlyContract = {
-        contractName: name,
-        source: resolvedFile.content.rawContent,
-        sourcePath: resolvedFile.sourceName,
-        networks: {},
-        compiler: {
-          name: "solc",
-          version: this.env.config.solidity?.compilers[0].version!
-        }
-      };
-      requestContracts.push(contractToPush);
-    });
-    return requestContracts;
-  }
-
   private async getContractData(): Promise<TenderlyContractUploadRequest> {
     const config = this.env.config;
 
-    const contracts = await this.getContracts();
+    const contracts = await getContracts(this.env)
 
     const solcConfig = {
       compiler_version: config.solidity.compilers[0].version,

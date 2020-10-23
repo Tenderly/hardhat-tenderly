@@ -5,6 +5,10 @@ import path from "path";
 
 import {TenderlyApiService} from "./tenderly/TenderlyApiService";
 import {HardhatRuntimeEnvironment} from "hardhat/types";
+import {ContractByName, TenderlyContractUploadRequest, TenderlyForkContractUploadRequest} from "./tenderly/types";
+import {NetworkMap, PluginName} from "./index";
+import {getContracts} from "./util";
+import {TenderlyService} from "./tenderly/TenderlyService";
 
 
 export class TenderlyRPC {
@@ -12,6 +16,7 @@ export class TenderlyRPC {
   public connected: boolean;
   public accessKey: string;
   public head: string | undefined;
+  public fork: string | undefined;
   public tenderlyAPI: axios.AxiosInstance;
   public accounts: Record<string, string> | undefined;
   public env: HardhatRuntimeEnvironment;
@@ -28,6 +33,7 @@ export class TenderlyRPC {
 
     this.accessKey = yamlData.access_key;
     this.head = yamlData.head;
+    this.fork = yamlData.fork
 
     this.tenderlyAPI = TenderlyApiService.configureTenderlyRPCInstance()
     this.host = this.tenderlyAPI.defaults.baseURL!
@@ -77,22 +83,92 @@ export class TenderlyRPC {
       );
       this.head = resp.data.root_transaction.id;
       this.accounts = resp.data.simulation_fork.accounts;
-    }
-   catch (err) {
-        throw err;
-      }
-    }
-  
-    public resetFork(): string | undefined {
-      const fileData = fs.readFileSync(this.filepath);
-      const yamlData = yaml.load(fileData.toString());
-  
-      const oldHead = yamlData.head
-  
-      delete yamlData.head
-  
-      fs.writeFileSync(this.filepath, yaml.safeDump(yamlData), "utf8")
-  
-      return oldHead
+      this.fork = resp.data.simulation_fork.id
+    } catch (err) {
+      throw err;
     }
   }
+
+  public resetFork(): string | undefined {
+    const fileData = fs.readFileSync(this.filepath);
+    const yamlData = yaml.load(fileData.toString());
+
+    const oldHead = yamlData.head
+
+    delete yamlData.head
+    delete yamlData.fork
+
+    fs.writeFileSync(this.filepath, yaml.safeDump(yamlData), "utf8")
+
+    return oldHead
+  }
+
+  public async verify(...contracts) {
+    if (this.head === undefined) {
+      await this.initializeFork();
+    }
+
+    const flatContracts: ContractByName[] = contracts.reduce(
+      (accumulator, value) => accumulator.concat(value),
+      []
+    );
+
+    const requestData = await this.filterContracts(flatContracts);
+
+    if (requestData == null) {
+      console.log("Fork verification failed");
+      return;
+    }
+
+    try {
+      await TenderlyService.verifyForkContracts(
+        requestData,
+        this.env.config.tenderly.project,
+        this.env.config.tenderly.username,
+        this.fork!,
+      );
+    } catch (err) {
+      console.log(err.message);
+    }
+  }
+
+  private async filterContracts(
+    flatContracts: ContractByName[]
+  ): Promise<TenderlyForkContractUploadRequest | null> {
+    let contract: ContractByName;
+    const requestData = await this.getForkContractData();
+
+    for (contract of flatContracts) {
+      const index = requestData.contracts.findIndex(
+        requestContract => requestContract.contractName === contract.name
+      );
+      if (index === -1) {
+        continue;
+      }
+      requestData.contracts[index].networks = {
+        [NetworkMap[this.fork!]]: {
+          address: contract.address
+        }
+      };
+    }
+
+    return requestData;
+  }
+
+  private async getForkContractData(): Promise<TenderlyForkContractUploadRequest> {
+    const config = this.env.config;
+    const contracts = await getContracts(this.env)
+
+    const solcConfig = {
+      compiler_version: config.solidity.compilers[0].version,
+      optimizations_used: config.solidity.compilers[0].settings.optimizer.enabled,
+      optimizations_count: config.solidity.compilers[0].settings.optimizer.runs
+    };
+
+    return {
+      contracts,
+      config: solcConfig,
+      root: this.head!
+    };
+  }
+}

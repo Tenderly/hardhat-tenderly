@@ -4,7 +4,7 @@ import {TenderlyApiService} from "./TenderlyApiService";
 import {
   ApiContract,
   ContractResponse,
-  TenderlyContractUploadRequest
+  TenderlyContractUploadRequest, TenderlyForkContractUploadRequest
 } from "./types";
 
 export const TENDERLY_API_BASE_URL = "https://api.tenderly.co";
@@ -64,6 +64,32 @@ export class TenderlyService {
     } catch (error) {
       console.log(
         `Error in ${PluginName}: There was an error during the request. Contract push failed`
+      );
+    }
+  }
+
+  public static async verifyForkContracts(
+    request: TenderlyForkContractUploadRequest,
+    tenderlyProject: string,
+    username: string,
+    fork: string,
+  ) {
+    const tenderlyApi = TenderlyApiService.configureTenderlyRPCInstance();
+
+    try {
+      const response = await tenderlyApi.post(
+        `/account/${username}/project/${tenderlyProject}/fork/${fork}/verify`,
+        {...request}
+      );
+
+      const responseData: ContractResponse = response.data;
+
+      let contract: ApiContract;
+
+      console.log("Smart Contracts successfully verified");
+    } catch (error) {
+      console.log(
+        `Error in ${PluginName}: There was an error during the request. Contract verification failed`
       );
     }
   }
