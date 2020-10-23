@@ -9,7 +9,8 @@ import {PluginName} from "../index";
 
 import {
   TENDERLY_API_BASE_URL,
-  TENDERLY_DASHBOARD_BASE_URL
+  TENDERLY_DASHBOARD_BASE_URL,
+  TENDERLY_RPC_BASE
 } from "./TenderlyService";
 import {TenderlyKeyConfig} from "./types";
 
@@ -34,7 +35,17 @@ export class TenderlyApiService {
         `You can find the token at ${TENDERLY_DASHBOARD_BASE_URL}/account/authorization`
       );
     }
-
     return yamlData;
+  }
+
+  public static configureTenderlyRPCInstance(): axios.AxiosInstance {
+    const yamlData = this.getTenderlyConfig();
+    return axios.default.create({
+      baseURL: TENDERLY_RPC_BASE,
+      headers: {
+        "x-access-key": yamlData.access_key,
+        "head": yamlData.head
+      }
+    });
   }
 }

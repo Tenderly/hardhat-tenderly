@@ -2,6 +2,7 @@ import {ContractCompiler} from "./Contract";
 
 export interface TenderlyKeyConfig {
   access_key: string;
+  head: string | undefined
 }
 
 export interface BytecodeMismatchError {
