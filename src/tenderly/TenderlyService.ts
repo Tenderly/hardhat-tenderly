@@ -10,6 +10,7 @@ import {
 
 export const TENDERLY_API_BASE_URL = "https://api.tenderly.co";
 export const TENDERLY_DASHBOARD_BASE_URL = "https://dashboard.tenderly.co";
+// TODO(viktor): change this when we release rpc
 export const TENDERLY_RPC_BASE = "http://127.0.0.1:8545/rpc";
 
 export class TenderlyService {
