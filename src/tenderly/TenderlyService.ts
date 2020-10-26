@@ -10,7 +10,7 @@ import {
 
 export const TENDERLY_API_BASE_URL = "https://api.tenderly.co";
 export const TENDERLY_DASHBOARD_BASE_URL = "https://dashboard.tenderly.co";
-export const TENDERLY_RPC_BASE = "http://127.0.0.1:8545";
+export const TENDERLY_RPC_BASE = "http://127.0.0.1:8545/rpc";
 
 export class TenderlyService {
   public static async verifyContracts(request: TenderlyContractUploadRequest) {
@@ -79,7 +79,7 @@ export class TenderlyService {
 
     try {
       const response = await tenderlyApi.post(
-        `/rpc/account/${username}/project/${tenderlyProject}/fork/${fork}/verify`,
+        `/account/${username}/project/${tenderlyProject}/fork/${fork}/verify`,
         { ...request }
       );
 
