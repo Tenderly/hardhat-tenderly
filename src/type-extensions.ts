@@ -1,7 +1,7 @@
 import "hardhat/types/config";
 import "hardhat/types/runtime";
 
-import {TenderlyConfig} from "./tenderly/types";
+import { TenderlyConfig } from "./tenderly/types";
 
 declare module "hardhat/types/runtime" {
   export interface HardhatRuntimeEnvironment {

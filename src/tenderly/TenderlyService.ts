@@ -1,6 +1,6 @@
-import {PluginName, ReverseNetworkMap} from "../index";
+import { PluginName, ReverseNetworkMap } from "../index";
 
-import {TenderlyApiService} from "./TenderlyApiService";
+import { TenderlyApiService } from "./TenderlyApiService";
 import {
   ApiContract,
   ContractResponse,
@@ -10,7 +10,7 @@ import {
 
 export const TENDERLY_API_BASE_URL = "https://api.tenderly.co";
 export const TENDERLY_DASHBOARD_BASE_URL = "https://dashboard.tenderly.co";
-export const TENDERLY_RPC_BASE = "http://127.0.0.1/8545";
+export const TENDERLY_RPC_BASE = "http://127.0.0.1:8545";
 
 export class TenderlyService {
   public static async verifyContracts(request: TenderlyContractUploadRequest) {
@@ -19,7 +19,7 @@ export class TenderlyService {
     try {
       const response = await tenderlyApi.post(
         "/api/v1/account/me/verify-contracts",
-        {...request}
+        { ...request }
       );
 
       const responseData: ContractResponse = response.data;
@@ -54,7 +54,7 @@ export class TenderlyService {
     try {
       await tenderlyApi.post(
         `/api/v1/account/${username}/project/${tenderlyProject}/contracts`,
-        {...request}
+        { ...request }
       );
 
       const dashLink = `${TENDERLY_DASHBOARD_BASE_URL}/${username}/${tenderlyProject}/contracts`;
@@ -79,8 +79,8 @@ export class TenderlyService {
 
     try {
       const response = await tenderlyApi.post(
-        `/account/${username}/project/${tenderlyProject}/fork/${fork}/verify`,
-        {...request}
+        `/rpc/account/${username}/project/${tenderlyProject}/fork/${fork}/verify`,
+        { ...request }
       );
 
       const responseData: ContractResponse = response.data;

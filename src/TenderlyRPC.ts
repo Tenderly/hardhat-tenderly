@@ -1,18 +1,17 @@
+import * as axios from "axios";
 import fs from "fs";
-import {HardhatRuntimeEnvironment} from "hardhat/types";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
 import * as yaml from "js-yaml";
 import os from "os";
 import path from "path";
 
-import {NetworkMap, PluginName} from "./index";
-import {TenderlyApiService} from "./tenderly/TenderlyApiService";
-import {TenderlyService} from "./tenderly/TenderlyService";
+import { TenderlyApiService } from "./tenderly/TenderlyApiService";
+import { TenderlyService } from "./tenderly/TenderlyService";
 import {
   ContractByName,
-  TenderlyContractUploadRequest,
   TenderlyForkContractUploadRequest
 } from "./tenderly/types";
-import {getContracts} from "./util";
+import { getContracts } from "./util";
 
 export class TenderlyRPC {
   public host: string;
@@ -123,7 +122,7 @@ export class TenderlyRPC {
     try {
       const resp = await this.tenderlyAPI.post(
         `/account/${username}/project/${projectID}/fork`,
-        {network_id: "1"}
+        { network_id: "1" }
       );
       this.head = resp.data.root_transaction.id;
       this.accounts = resp.data.simulation_fork.accounts;
@@ -147,7 +146,7 @@ export class TenderlyRPC {
         continue;
       }
       requestData.contracts[index].networks = {
-        [NetworkMap[this.fork!]]: {
+        [this.fork!]: {
           address: contract.address
         }
       };
@@ -156,14 +155,16 @@ export class TenderlyRPC {
     return requestData;
   }
 
-  private async getForkContractData(): Promise<TenderlyForkContractUploadRequest> {
+  private async getForkContractData(): Promise<
+    TenderlyForkContractUploadRequest
+  > {
     const config = this.env.config;
     const contracts = await getContracts(this.env);
 
     const solcConfig = {
       compiler_version: config.solidity.compilers[0].version,
       optimizations_used:
-      config.solidity.compilers[0].settings.optimizer.enabled,
+        config.solidity.compilers[0].settings.optimizer.enabled,
       optimizations_count: config.solidity.compilers[0].settings.optimizer.runs
     };
 

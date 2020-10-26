@@ -1,6 +1,6 @@
-import {HardhatRuntimeEnvironment} from "hardhat/types";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import {TenderlyContract} from "./tenderly/types";
+import { TenderlyContract } from "./tenderly/types";
 
 export const getContracts = async (
   hre: HardhatRuntimeEnvironment

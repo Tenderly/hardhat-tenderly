@@ -1,17 +1,16 @@
 import * as fs from "fs-extra";
-import {HardhatRuntimeEnvironment} from "hardhat/types";
-import {sep} from "path";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { sep } from "path";
 
-import {NetworkMap, PluginName} from "./index";
-import {TenderlyService} from "./tenderly/TenderlyService";
+import { NetworkMap, PluginName } from "./index";
+import { TenderlyService } from "./tenderly/TenderlyService";
 import {
   ContractByName,
   Metadata,
   TenderlyArtifact,
-  TenderlyContract,
   TenderlyContractUploadRequest
 } from "./tenderly/types";
-import {getContracts} from "./util";
+import { getContracts } from "./util";
 
 export class Tenderly {
   public env: HardhatRuntimeEnvironment;
@@ -82,7 +81,7 @@ export class Tenderly {
     const sourcePaths = await this.env.run("compile:solidity:get-source-paths");
     const sourceNames = await this.env.run(
       "compile:solidity:get-source-names",
-      {sourcePaths}
+      { sourcePaths }
     );
     const data = await this.env.run("compile:solidity:get-dependency-graph", {
       sourceNames
@@ -183,7 +182,7 @@ export class Tenderly {
     const solcConfig = {
       compiler_version: config.solidity.compilers[0].version,
       optimizations_used:
-      config.solidity.compilers[0].settings.optimizer.enabled,
+        config.solidity.compilers[0].settings.optimizer.enabled,
       optimizations_count: config.solidity.compilers[0].settings.optimizer.runs
     };
 
