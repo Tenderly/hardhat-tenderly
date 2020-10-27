@@ -1,3 +1,5 @@
+import {ContractCompiler} from "./Contract";
+
 export interface TenderlyKeyConfig {
   access_key: string;
 }
@@ -11,4 +13,13 @@ export interface BytecodeMismatchError {
 export interface TenderlyConfig {
   project: string;
   username: string;
+}
+
+export interface Metadata {
+  compiler: ContractCompiler;
+  sources: Record<string, MetadataSources>;
+}
+
+export interface MetadataSources {
+  content: string;
 }

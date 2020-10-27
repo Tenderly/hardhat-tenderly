@@ -1,6 +1,7 @@
 {
   "name": "@tenderly/hardhat-tenderly",
-  "version": "0.0.2-beta.0",
+  "description": "Hardhat plugin for integration with Tenderly",
+  "version": "1.0.3",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
@@ -23,13 +24,11 @@
     "watch": "tsc -w"
   },
   "files": [
-    "dist/src/",
-    "src/",
+    "dist/",
     "LICENSE",
     "README.md"
   ],
   "devDependencies": {
-    "@nomiclabs/buidler": "^1.0.1",
     "@types/chai": "^4.1.7",
     "@types/find-up": "^4.0.0",
     "@types/fs-extra": "^5.0.4",
@@ -48,7 +47,7 @@
     "typescript": "^3.4.5"
   },
   "peerDependencies": {
-    "@nomiclabs/buidler": "^1.0.1"
+    "hardhat": "2.0.0-rc.0"
   },
   "dependencies": {
     "axios": "^0.20.0",

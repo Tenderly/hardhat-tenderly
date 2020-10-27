@@ -1,6 +1,6 @@
-import {BuidlerPluginError} from "@nomiclabs/buidler/plugins";
 import * as axios from "axios";
 import fs from "fs";
+import {HardhatPluginError} from "hardhat/plugins";
 import * as yaml from "js-yaml";
 import {homedir} from "os";
 import {sep} from "path";
@@ -28,7 +28,7 @@ export class TenderlyApiService {
     const yamlData: TenderlyKeyConfig = yaml.load(fileData.toString());
 
     if (yamlData.access_key == null) {
-      throw new BuidlerPluginError(
+      throw new HardhatPluginError(
         PluginName,
         `Access token not provided at filepath ${filepath}.\n` +
         `You can find the token at ${TENDERLY_DASHBOARD_BASE_URL}/account/authorization`

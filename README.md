@@ -3,7 +3,7 @@
 
 # hardhat-tenderly
 
-[Hardhat](http://getbuidler.com) plugin for integration with [Tenderly](https://tenderly.co/). 
+[Hardhat](http://hardhat.org) plugin for integration with [Tenderly](https://tenderly.co/). 
 
 ## What
 
@@ -16,7 +16,7 @@ privately push contracts to [Tenderly](https://tenderly.co/).
 npm install --save-dev @tenderly/hardhat-tenderly
 ```
 
-And add the following statement to your `buidler.config.js`:
+And add the following statement to your `hardhat.config.js`:
 
 ```js
 usePlugin("@tenderly/hardhat-tenderly");
@@ -26,7 +26,7 @@ usePlugin("@tenderly/hardhat-tenderly");
 
 This plugin adds the _`tenderly:verify`_ task to Hardhat:
 ```
-Usage: buidler [GLOBAL OPTIONS] tenderly:verify ...contracts
+Usage: hardhat [GLOBAL OPTIONS] tenderly:verify ...contracts
 
 POSITIONAL ARGUMENTS:
 
@@ -37,7 +37,7 @@ tenderly-verify: Verifies contracts on Tenderly
 
 And the `tenderly:push` task:
 ```
-Usage: buidler [GLOBAL OPTIONS] tenderly:push ...contracts
+Usage: hardhat [GLOBAL OPTIONS] tenderly:push ...contracts
 
 POSITIONAL ARGUMENTS:
 
@@ -112,8 +112,3 @@ Or if the project belongs to an organization, by going to the Organization page 
 
 After this you can access [Tenderly](https://tenderly.co/) through the Hardhat Runtime Environment anywhere 
 you need it (tasks, scripts, tests, etc).
-
-## TypeScript support
-
-You need to add this to your `tsconfig.json`'s `files` array: 
-`"node_modules/@tenderly/hardhat-tenderly/src/type-extensions.d.ts"`

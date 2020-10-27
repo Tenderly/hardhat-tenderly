@@ -22,7 +22,7 @@ export interface TenderlyArtifact {
 }
 
 export interface ContractCompiler {
-  name: string;
+  name?: string;
   version: string;
 }
 
