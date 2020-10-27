@@ -13,6 +13,8 @@ declare module "hardhat/types/runtime" {
     tenderlyRPC: {
       verify: (...contracts) => Promise<void>;
       resetFork: () => string | undefined;
+      getHead: () => string | undefined;
+      setHead: (head: string | undefined) => void;
     };
   }
 }
