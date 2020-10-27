@@ -29,7 +29,7 @@ export class TenderlyApiService {
       baseURL: TENDERLY_RPC_BASE,
       headers: {
         "x-access-key": yamlData.access_key,
-        head: yamlData.head
+        Head: yamlData.head
       }
     });
   }

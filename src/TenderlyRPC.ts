@@ -52,6 +52,7 @@ export class TenderlyRPC {
       await this.initializeFork();
     }
     try {
+      this.tenderlyAPI.defaults.headers.Head = this.head;
       const resp = await this.tenderlyAPI.post("", payload);
 
       this.head = resp.headers.head;
@@ -105,6 +106,14 @@ export class TenderlyRPC {
     } catch (err) {
       console.log(err.message);
     }
+  }
+
+  public getHead(): string | undefined {
+    return this.head;
+  }
+
+  public setHead(head: string | undefined): void {
+    this.head = head;
   }
 
   private writeHead() {
