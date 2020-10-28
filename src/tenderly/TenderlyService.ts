@@ -86,7 +86,7 @@ export class TenderlyService {
 
       const responseData: ContractResponse = response.data;
 
-      if (responseData.bytecode_mismatch_errors.length > 0) {
+      if (responseData.bytecode_mismatch_errors != null) {
         console.log(
           `Error in ${PluginName}: Bytecode mismatch detected. Contract verification failed`
         );

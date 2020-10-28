@@ -116,6 +116,14 @@ export class TenderlyRPC {
     this.head = head;
   }
 
+  public getFork(): string | undefined {
+    return this.fork;
+  }
+
+  public setFork(fork: string | undefined): void {
+    this.fork = fork;
+  }
+
   private writeHead() {
     const fileData = fs.readFileSync(this.filepath);
     const yamlData = yaml.load(fileData.toString());

@@ -15,6 +15,8 @@ declare module "hardhat/types/runtime" {
       resetFork: () => string | undefined;
       getHead: () => string | undefined;
       setHead: (head: string | undefined) => void;
+      getFork: () => string | undefined;
+      setFork: (fork: string | undefined) => void;
     };
   }
 }
