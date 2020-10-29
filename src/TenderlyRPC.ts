@@ -139,7 +139,7 @@ export class TenderlyRPC {
     try {
       const resp = await this.tenderlyAPI.post(
         `/account/${username}/project/${projectID}/fork`,
-        { network_id: "1" }
+        { network_id: this.env.config.tenderly.forkNetwork }
       );
       this.head = resp.data.root_transaction.id;
       this.accounts = resp.data.simulation_fork.accounts;

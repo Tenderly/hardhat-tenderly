@@ -14,6 +14,7 @@ export interface BytecodeMismatchError {
 export interface TenderlyConfig {
   project: string;
   username: string;
+  forkNetwork: string;
 }
 
 export interface Metadata {
