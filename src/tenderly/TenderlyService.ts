@@ -1,14 +1,17 @@
-import {PluginName, ReverseNetworkMap} from "../index";
+import { PluginName, ReverseNetworkMap } from "../index";
 
-import {TenderlyApiService} from "./TenderlyApiService";
+import { TenderlyApiService } from "./TenderlyApiService";
 import {
   ApiContract,
   ContractResponse,
-  TenderlyContractUploadRequest
+  TenderlyContractUploadRequest,
+  TenderlyForkContractUploadRequest
 } from "./types";
 
 export const TENDERLY_API_BASE_URL = "https://api.tenderly.co";
 export const TENDERLY_DASHBOARD_BASE_URL = "https://dashboard.tenderly.co";
+// TODO(viktor): change this when we release rpc
+export const TENDERLY_RPC_BASE = "https://rpc.tenderly.co";
 
 export class TenderlyService {
   public static async verifyContracts(request: TenderlyContractUploadRequest) {
@@ -17,7 +20,7 @@ export class TenderlyService {
     try {
       const response = await tenderlyApi.post(
         "/api/v1/account/me/verify-contracts",
-        {...request}
+        { ...request }
       );
 
       const responseData: ContractResponse = response.data;
@@ -52,7 +55,7 @@ export class TenderlyService {
     try {
       await tenderlyApi.post(
         `/api/v1/account/${username}/project/${tenderlyProject}/contracts`,
-        {...request}
+        { ...request }
       );
 
       const dashLink = `${TENDERLY_DASHBOARD_BASE_URL}/${username}/${tenderlyProject}/contracts`;
@@ -63,6 +66,37 @@ export class TenderlyService {
     } catch (error) {
       console.log(
         `Error in ${PluginName}: There was an error during the request. Contract push failed`
+      );
+    }
+  }
+
+  public static async verifyForkContracts(
+    request: TenderlyForkContractUploadRequest,
+    tenderlyProject: string,
+    username: string,
+    fork: string
+  ) {
+    const tenderlyApi = TenderlyApiService.configureTenderlyRPCInstance();
+
+    try {
+      const response = await tenderlyApi.post(
+        `/account/${username}/project/${tenderlyProject}/fork/${fork}/verify`,
+        { ...request }
+      );
+
+      const responseData: ContractResponse = response.data;
+
+      if (responseData.bytecode_mismatch_errors != null) {
+        console.log(
+          `Error in ${PluginName}: Bytecode mismatch detected. Contract verification failed`
+        );
+        return;
+      }
+
+      console.log("Smart Contracts successfully verified");
+    } catch (error) {
+      console.log(
+        `Error in ${PluginName}: There was an error during the request. Contract verification failed`
       );
     }
   }

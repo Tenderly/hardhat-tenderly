@@ -47,7 +47,7 @@
     "typescript": "^3.4.5"
   },
   "peerDependencies": {
-    "hardhat": "2.0.0-rc.0"
+    "hardhat": "^2.0.0"
   },
   "dependencies": {
     "axios": "^0.20.0",

@@ -1,13 +1,22 @@
 import "hardhat/types/config";
 import "hardhat/types/runtime";
 
-import {TenderlyConfig} from "./tenderly/types";
+import { TenderlyConfig } from "./tenderly/types";
 
 declare module "hardhat/types/runtime" {
   export interface HardhatRuntimeEnvironment {
     tenderly: {
       verify: (...contracts) => Promise<void>;
       push: (...contracts) => Promise<void>;
+      persistArtifacts: (...contracts) => Promise<void>;
+    };
+    tenderlyRPC: {
+      verify: (...contracts) => Promise<void>;
+      resetFork: () => string | undefined;
+      getHead: () => string | undefined;
+      setHead: (head: string | undefined) => void;
+      getFork: () => string | undefined;
+      setFork: (fork: string | undefined) => void;
     };
   }
 }

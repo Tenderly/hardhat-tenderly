@@ -1,17 +1,19 @@
-import {extendEnvironment, task} from "hardhat/config";
-import {HardhatPluginError, lazyObject} from "hardhat/plugins";
-import {RunTaskFunction} from "hardhat/src/types";
-import {ActionType, HardhatConfig} from "hardhat/types";
+import { extendEnvironment, task } from "hardhat/config";
+import { HardhatPluginError, lazyObject } from "hardhat/plugins";
+import { RunTaskFunction } from "hardhat/src/types";
+import { ActionType, HardhatConfig } from "hardhat/types";
 
-import {Tenderly} from "./Tenderly";
-import {TenderlyService} from "./tenderly/TenderlyService";
-import {TenderlyContract} from "./tenderly/types";
+import { Tenderly } from "./Tenderly";
+import { TenderlyService } from "./tenderly/TenderlyService";
+import { TenderlyContract } from "./tenderly/types";
+import { TenderlyRPC } from "./TenderlyRPC";
 import "./type-extensions";
 
 export const PluginName = "hardhat-tenderly";
 
 extendEnvironment(env => {
   env.tenderly = lazyObject(() => new Tenderly(env));
+  env.tenderlyRPC = lazyObject(() => new TenderlyRPC(env));
 });
 
 interface VerifyArguments {
@@ -93,8 +95,8 @@ const extractContractData = async (
 };
 
 const verifyContract: ActionType<VerifyArguments> = async (
-  {contracts},
-  {config, hardhatArguments, run}
+  { contracts },
+  { config, hardhatArguments, run }
 ) => {
   if (contracts === undefined) {
     throw new HardhatPluginError(
@@ -122,8 +124,8 @@ const verifyContract: ActionType<VerifyArguments> = async (
 };
 
 const pushContracts: ActionType<VerifyArguments> = async (
-  {contracts},
-  {config, hardhatArguments, run}
+  { contracts },
+  { config, hardhatArguments, run }
 ) => {
   if (contracts === undefined) {
     throw new HardhatPluginError(
