@@ -1,8 +1,6 @@
 name: Publish package
 on:
   push:
-    branches:
-      - master
     tags:
       - v*
 jobs:
