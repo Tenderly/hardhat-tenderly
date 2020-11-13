@@ -182,7 +182,8 @@ export class TenderlyRPC {
       compiler_version: config.solidity.compilers[0].version,
       optimizations_used:
         config.solidity.compilers[0].settings.optimizer.enabled,
-      optimizations_count: config.solidity.compilers[0].settings.optimizer.runs
+      optimizations_count: config.solidity.compilers[0].settings.optimizer.runs,
+      evm_version: config.solidity.compilers[0].settings.evmVersion
     };
 
     return {
