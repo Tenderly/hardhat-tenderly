@@ -11,12 +11,20 @@ declare module "hardhat/types/runtime" {
       persistArtifacts: (...contracts) => Promise<void>;
     };
     tenderlyRPC: {
+      send: (
+        request: {
+          method: string;
+          params?: any[];
+        },
+        callback: (error: any, response: any) => void
+      ) => void;
       verify: (...contracts) => Promise<void>;
       resetFork: () => string | undefined;
       getHead: () => string | undefined;
       setHead: (head: string | undefined) => void;
       getFork: () => string | undefined;
       setFork: (fork: string | undefined) => void;
+      initializeFork: () => Promise<void>;
     };
   }
 }

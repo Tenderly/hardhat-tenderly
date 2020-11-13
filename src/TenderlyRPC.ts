@@ -124,16 +124,7 @@ export class TenderlyRPC {
     this.fork = fork;
   }
 
-  private writeHead() {
-    const fileData = fs.readFileSync(this.filepath);
-    const yamlData = yaml.load(fileData.toString());
-
-    yamlData.head = this.head;
-
-    fs.writeFileSync(this.filepath, yaml.safeDump(yamlData), "utf8");
-  }
-
-  private async initializeFork() {
+  public async initializeFork() {
     const username: string = this.env.config.tenderly.username;
     const projectID: string = this.env.config.tenderly.project;
     try {
@@ -147,6 +138,15 @@ export class TenderlyRPC {
     } catch (err) {
       throw err;
     }
+  }
+
+  private writeHead() {
+    const fileData = fs.readFileSync(this.filepath);
+    const yamlData = yaml.load(fileData.toString());
+
+    yamlData.head = this.head;
+
+    fs.writeFileSync(this.filepath, yaml.safeDump(yamlData), "utf8");
   }
 
   private async filterContracts(
