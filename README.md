@@ -19,7 +19,13 @@ npm install --save-dev @tenderly/hardhat-tenderly
 And add the following statement to your `hardhat.config.js`:
 
 ```js
-usePlugin("@tenderly/hardhat-tenderly");
+require("@tenderly/hardhat-tenderly");
+```
+
+Or, if you are using typescript:
+
+```ts
+import "@tenderly/hardhat-tenderly"
 ```
 
 ## Tasks
