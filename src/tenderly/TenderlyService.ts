@@ -1,6 +1,6 @@
-import {PluginName, ReverseNetworkMap} from "../index";
+import { PluginName, ReverseNetworkMap } from "../index";
 
-import {TenderlyApiService} from "./TenderlyApiService";
+import { TenderlyApiService } from "./TenderlyApiService";
 import {
   ApiContract,
   ContractResponse,
@@ -17,7 +17,7 @@ export class TenderlyService {
     try {
       const response = await tenderlyApi.post(
         "/api/v1/account/me/verify-contracts",
-        {...request}
+        { ...request }
       );
 
       const responseData: ContractResponse = response.data;
@@ -52,7 +52,7 @@ export class TenderlyService {
     try {
       await tenderlyApi.post(
         `/api/v1/account/${username}/project/${tenderlyProject}/contracts`,
-        {...request}
+        { ...request }
       );
 
       const dashLink = `${TENDERLY_DASHBOARD_BASE_URL}/${username}/${tenderlyProject}/contracts`;
