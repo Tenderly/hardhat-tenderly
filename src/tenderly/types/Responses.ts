@@ -1,5 +1,5 @@
-import {ApiContract} from "./Contract";
-import {BytecodeMismatchError} from "./utils";
+import { ApiContract } from "./Contract";
+import { BytecodeMismatchError } from "./utils";
 
 export interface ContractResponse {
   contracts: ApiContract[];

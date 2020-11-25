@@ -1,4 +1,4 @@
-import {ContractCompiler} from "./Contract";
+import { ContractCompiler } from "./Contract";
 
 export interface TenderlyKeyConfig {
   access_key: string;
