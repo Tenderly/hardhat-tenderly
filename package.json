@@ -1,7 +1,7 @@
 {
   "name": "@tenderly/hardhat-tenderly",
   "description": "Hardhat plugin for integration with Tenderly",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
@@ -47,7 +47,7 @@
     "typescript": "^3.4.5"
   },
   "peerDependencies": {
-    "hardhat": "2.0.0-rc.0"
+    "hardhat": "^2.0.0"
   },
   "dependencies": {
     "axios": "^0.20.0",
