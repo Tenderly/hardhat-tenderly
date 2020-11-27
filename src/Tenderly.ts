@@ -8,6 +8,7 @@ import {
   ContractByName,
   Metadata,
   TenderlyArtifact,
+  TenderlyContract,
   TenderlyContractUploadRequest
 } from "./tenderly/types";
 import { getContracts } from "./util";
