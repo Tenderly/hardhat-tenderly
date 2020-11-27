@@ -19,7 +19,13 @@ npm install --save-dev @tenderly/hardhat-tenderly
 And add the following statement to your `hardhat.config.js`:
 
 ```js
-usePlugin("@tenderly/hardhat-tenderly");
+require("@tenderly/hardhat-tenderly");
+```
+
+Or, if you are using typescript:
+
+```ts
+import "@tenderly/hardhat-tenderly"
 ```
 
 ## Tasks
@@ -100,7 +106,7 @@ module.exports = {
 For this plugin to function you need to create a `config.yaml` file at 
 `$HOME/.tenderly/config.yaml` or `%HOMEPATH%\.tenderly\config.yaml` and add an `access_key` field to it:
 ```yaml
-access_key: topsecretaccesstoken
+access_key: super_secret_access_key
 ```
 
 You can find the access token on the [Tenderly dashboard](https://dashboard.tenderly.co/), 
