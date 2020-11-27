@@ -27,8 +27,8 @@ export const NetworkMap: Record<string, string> = {
   ropsten: "3",
   matic: "137",
   mumbai: "80001",
-  xDai: "100",
-  POA: "99"
+  xdai: "100",
+  poa: "99"
 };
 
 export const ReverseNetworkMap: Record<string, string> = {
@@ -39,8 +39,8 @@ export const ReverseNetworkMap: Record<string, string> = {
   "3": "ropsten",
   "80001": "matic-mumbai",
   "137": "matic-mainnet",
-  "100": "xDai",
-  "99": "POA"
+  "100": "xdai",
+  "99": "poa"
 };
 
 const extractContractData = async (
@@ -115,7 +115,7 @@ const extractContractData = async (
       const contractData = contract.split("=");
       if (contractToPush.contractName === contractData[0]) {
         contractToPush.networks = {
-          [NetworkMap[network!]]: {
+          [NetworkMap[network!.toLowerCase()]]: {
             address: contractData[1]
           }
         };

@@ -162,7 +162,7 @@ export class Tenderly {
         continue;
       }
       requestData.contracts[index].networks = {
-        [NetworkMap[network]]: {
+        [NetworkMap[network.toLowerCase()]]: {
           address: contract.address
         }
       };
