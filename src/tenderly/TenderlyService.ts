@@ -23,6 +23,10 @@ export class TenderlyService {
       const responseData: ContractResponse = response.data;
 
       let contract: ApiContract;
+      
+      if(!responseData.contracts?.length){
+        throw Error('Empty Contracts Response')
+      }
 
       console.log("Smart Contracts successfully verified");
       console.group();
