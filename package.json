@@ -1,7 +1,7 @@
 {
   "name": "@tenderly/hardhat-tenderly",
   "description": "Hardhat plugin for integration with Tenderly",
-  "version": "1.1.0-beta.4",
+  "version": "1.1.0-beta.5",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
@@ -51,7 +51,9 @@
     "hardhat": "^2.0.3"
   },
   "dependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.1",
     "axios": "^0.20.0",
+    "ethers": "^5.0.24",
     "fs-extra": "^9.0.1",
     "js-yaml": "^3.14.0"
   }

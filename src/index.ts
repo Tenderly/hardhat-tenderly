@@ -1,7 +1,12 @@
-import { extendEnvironment, task } from "hardhat/config";
+import "@nomiclabs/hardhat-ethers";
+import { extendConfig, extendEnvironment, task } from "hardhat/config";
 import { HardhatPluginError, lazyObject } from "hardhat/plugins";
 import { RunTaskFunction } from "hardhat/src/types";
-import { ActionType, HardhatConfig } from "hardhat/types";
+import {
+  ActionType,
+  HardhatConfig,
+  HardhatRuntimeEnvironment
+} from "hardhat/types";
 
 import { Tenderly } from "./Tenderly";
 import { TenderlyService } from "./tenderly/TenderlyService";
@@ -14,7 +19,32 @@ export const PluginName = "hardhat-tenderly";
 extendEnvironment(env => {
   env.tenderly = lazyObject(() => new Tenderly(env));
   env.tenderlyRPC = lazyObject(() => new TenderlyRPC(env));
+  extendProvider(env);
 });
+
+extendConfig((resolvedConfig, userConfig) => {
+  resolvedConfig.networks.tenderly = {
+    ...resolvedConfig.networks.tenderly
+  };
+});
+
+const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
+  if (hre.network.name !== "tenderly") {
+    return;
+  }
+  hre.tenderlyRPC
+    .initializeFork()
+    .then(_ => {
+      hre.ethers.provider = new hre.ethers.providers.Web3Provider(
+        hre.tenderlyRPC
+      );
+    })
+    .catch(_ => {
+      console.log(
+        `Error in ${PluginName}: Initializing fork, check your tenderly configuration`
+      );
+    });
+};
 
 interface VerifyArguments {
   contracts: string[];
