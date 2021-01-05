@@ -11,13 +11,16 @@ import {
   TenderlyContract,
   TenderlyContractUploadRequest
 } from "./tenderly/types";
+import { TenderlyNetwork } from "./TenderlyNetwork";
 import { getContracts } from "./util";
 
 export class Tenderly {
   public env: HardhatRuntimeEnvironment;
+  public tenderlyNetwork: TenderlyNetwork;
 
-  constructor(bre: HardhatRuntimeEnvironment) {
-    this.env = bre;
+  constructor(hre: HardhatRuntimeEnvironment) {
+    this.env = hre;
+    this.tenderlyNetwork = new TenderlyNetwork(hre);
   }
 
   public async verify(...contracts) {
@@ -38,6 +41,10 @@ export class Tenderly {
     } catch (err) {
       console.log(err.message);
     }
+  }
+
+  public network(): TenderlyNetwork {
+    return this.tenderlyNetwork;
   }
 
   public async push(...contracts) {

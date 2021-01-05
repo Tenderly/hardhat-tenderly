@@ -2,6 +2,7 @@ import "hardhat/types/config";
 import "hardhat/types/runtime";
 
 import { TenderlyConfig } from "./tenderly/types";
+import { TenderlyNetwork } from "./TenderlyNetwork";
 
 declare module "hardhat/types/runtime" {
   export interface HardhatRuntimeEnvironment {
@@ -9,8 +10,9 @@ declare module "hardhat/types/runtime" {
       verify: (...contracts) => Promise<void>;
       push: (...contracts) => Promise<void>;
       persistArtifacts: (...contracts) => Promise<void>;
+      network: () => TenderlyNetwork;
     };
-    tenderlyRPC: {
+    tenderlyNetwork: {
       send: (
         request: {
           method: string;

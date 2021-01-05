@@ -11,14 +11,12 @@ import {
 import { Tenderly } from "./Tenderly";
 import { TenderlyService } from "./tenderly/TenderlyService";
 import { TenderlyContract } from "./tenderly/types";
-import { TenderlyRPC } from "./TenderlyRPC";
 import "./type-extensions";
 
 export const PluginName = "hardhat-tenderly";
 
 extendEnvironment(env => {
   env.tenderly = lazyObject(() => new Tenderly(env));
-  env.tenderlyRPC = lazyObject(() => new TenderlyRPC(env));
   extendProvider(env);
 });
 
@@ -32,11 +30,12 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
   if (hre.network.name !== "tenderly") {
     return;
   }
-  hre.tenderlyRPC
+  hre.tenderly
+    .network()
     .initializeFork()
     .then(_ => {
       hre.ethers.provider = new hre.ethers.providers.Web3Provider(
-        hre.tenderlyRPC
+        hre.tenderly.network()
       );
     })
     .catch(_ => {

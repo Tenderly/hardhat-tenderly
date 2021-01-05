@@ -5,6 +5,7 @@ import * as yaml from "js-yaml";
 import os from "os";
 import path from "path";
 
+import { PluginName } from "./index";
 import { TenderlyApiService } from "./tenderly/TenderlyApiService";
 import { TenderlyService } from "./tenderly/TenderlyService";
 import {
@@ -13,7 +14,7 @@ import {
 } from "./tenderly/types";
 import { getContracts } from "./util";
 
-export class TenderlyRPC {
+export class TenderlyNetwork {
   public host: string;
   public connected: boolean;
   public accessKey: string;
@@ -40,14 +41,23 @@ export class TenderlyRPC {
   }
 
   public supportsSubscriptions() {
+    if (!this.checkNetwork()) {
+      return;
+    }
     return false;
   }
 
   public disconnect() {
+    if (!this.checkNetwork()) {
+      return;
+    }
     return true;
   }
 
   public async send(payload, cb) {
+    if (!this.checkNetwork()) {
+      return;
+    }
     if (this.head === undefined) {
       await this.initializeFork();
     }
@@ -80,6 +90,9 @@ export class TenderlyRPC {
   }
 
   public async verify(...contracts) {
+    if (!this.checkNetwork()) {
+      return;
+    }
     if (this.head === undefined) {
       await this.initializeFork();
     }
@@ -109,22 +122,37 @@ export class TenderlyRPC {
   }
 
   public getHead(): string | undefined {
+    if (!this.checkNetwork()) {
+      return;
+    }
     return this.head;
   }
 
   public setHead(head: string | undefined): void {
+    if (!this.checkNetwork()) {
+      return;
+    }
     this.head = head;
   }
 
   public getFork(): string | undefined {
+    if (!this.checkNetwork()) {
+      return;
+    }
     return this.fork;
   }
 
   public setFork(fork: string | undefined): void {
+    if (!this.checkNetwork()) {
+      return;
+    }
     this.fork = fork;
   }
 
   public async initializeFork() {
+    if (!this.checkNetwork()) {
+      return;
+    }
     const username: string = this.env.config.tenderly.username;
     const projectID: string = this.env.config.tenderly.project;
     try {
@@ -191,5 +219,14 @@ export class TenderlyRPC {
       config: solcConfig,
       root: this.head!
     };
+  }
+  private checkNetwork(): boolean {
+    if (this.env.network.name !== "tenderly") {
+      console.log(
+        `Warning in ${PluginName}: Network is not set to tenderly. Please call the task again with --network tenderly`
+      );
+      return false;
+    }
+    return true;
   }
 }
