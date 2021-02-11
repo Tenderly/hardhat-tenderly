@@ -115,13 +115,9 @@ export class Tenderly {
             }
           };
 
-          data._dependenciesPerFile
-            .get(sourcePath)
-            .forEach((resolvedDependency, __) => {
-              metadata.sources[resolvedDependency.sourceName] = {
-                content: resolvedDependency.content.rawContent
-              };
-            });
+          const visited: Record<string, boolean> = {};
+
+          this.resolveDependencies(data, sourcePath, metadata, visited);
 
           const artifact: TenderlyArtifact = {
             metadata: JSON.stringify(metadata),
@@ -222,5 +218,32 @@ export class Tenderly {
       contracts,
       config: solcConfig
     };
+  }
+
+  private resolveDependencies(
+    data: any,
+    sourcePath: string,
+    metadata: Metadata,
+    visited: Record<string, boolean>
+  ): void {
+    if (visited[sourcePath]) {
+      return;
+    }
+
+    visited[sourcePath] = true;
+
+    data._dependenciesPerFile
+      .get(sourcePath)
+      .forEach((resolvedDependency, __) => {
+        this.resolveDependencies(
+          data,
+          resolvedDependency.sourceName,
+          metadata,
+          visited
+        );
+        metadata.sources[resolvedDependency.sourceName] = {
+          content: resolvedDependency.content.rawContent
+        };
+      });
   }
 }
