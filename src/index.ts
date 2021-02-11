@@ -24,6 +24,7 @@ export const NetworkMap: Record<string, string> = {
   mainnet: "1",
   rinkeby: "4",
   ropsten: "3",
+  matic: "137",
   mumbai: "80001",
   xDai: "100",
   POA: "99"
@@ -35,7 +36,8 @@ export const ReverseNetworkMap: Record<string, string> = {
   "1": "mainnet",
   "4": "rinkeby",
   "3": "ropsten",
-  "80001": "mumbai",
+  "80001": "matic-mumbai",
+  "137": "matic-mainnet",
   "100": "xDai",
   "99": "POA"
 };

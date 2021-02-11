@@ -24,6 +24,18 @@ export class TenderlyService {
 
       let contract: ApiContract;
 
+      if (responseData.bytecode_mismatch_errors != null) {
+        console.log(
+          `Error in ${PluginName}: Bytecode mismatch detected. Contract verification failed`
+        );
+        return;
+      }
+
+      if (!responseData.contracts?.length) {
+        console.log(`${PluginName}: No new contracts have been verified`);
+        return;
+      }
+
       console.log("Smart Contracts successfully verified");
       console.group();
       for (contract of responseData.contracts) {
@@ -50,10 +62,24 @@ export class TenderlyService {
     const tenderlyApi = TenderlyApiService.configureInstance();
 
     try {
-      await tenderlyApi.post(
+      const response = await tenderlyApi.post(
         `/api/v1/account/${username}/project/${tenderlyProject}/contracts`,
         { ...request }
       );
+
+      const responseData: ContractResponse = response.data;
+
+      if (responseData.bytecode_mismatch_errors != null) {
+        console.log(
+          `Error in ${PluginName}: Bytecode mismatch detected. Contract push failed`
+        );
+        return;
+      }
+
+      if (!responseData.contracts?.length) {
+        console.log(`${PluginName}: No new contracts have been pushed`);
+        return;
+      }
 
       const dashLink = `${TENDERLY_DASHBOARD_BASE_URL}/${username}/${tenderlyProject}/contracts`;
 
