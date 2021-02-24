@@ -145,7 +145,7 @@ export class Tenderly {
     for (contract of flatContracts) {
       const network =
         this.env.hardhatArguments.network !== "hardhat"
-          ? (this.env.hardhatArguments.network || contract.network)
+          ? this.env.hardhatArguments.network || contract.network
           : contract.network;
       if (network === undefined) {
         console.log(
