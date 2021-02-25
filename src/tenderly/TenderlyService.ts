@@ -12,13 +12,16 @@ export const TENDERLY_DASHBOARD_BASE_URL = "https://dashboard.tenderly.co";
 
 export class TenderlyService {
   public static async verifyContracts(request: TenderlyContractUploadRequest) {
-    const tenderlyApi = TenderlyApiService.configureInstance();
+    let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
+    let apiPath = "/api/v1/account/me/verify-contracts";
+
+    if (TenderlyApiService.isAuthenticated()) {
+      tenderlyApi = TenderlyApiService.configureInstance();
+      apiPath = "/api/v1/account/me/verify-contracts";
+    }
 
     try {
-      const response = await tenderlyApi.post(
-        "/api/v1/account/me/verify-contracts",
-        { ...request }
-      );
+      const response = await tenderlyApi.post(apiPath, { ...request });
 
       const responseData: ContractResponse = response.data;
 
@@ -53,7 +56,6 @@ export class TenderlyService {
       );
     }
   }
-
   public static async pushContracts(
     request: TenderlyContractUploadRequest,
     tenderlyProject: string,
