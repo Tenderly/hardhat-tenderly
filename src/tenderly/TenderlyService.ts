@@ -13,7 +13,7 @@ export const TENDERLY_DASHBOARD_BASE_URL = "https://dashboard.tenderly.co";
 export class TenderlyService {
   public static async verifyContracts(request: TenderlyContractUploadRequest) {
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
-    let apiPath = "/api/v1/account/me/verify-contracts";
+    let apiPath = "/api/v1/public/verify-contracts";
 
     if (TenderlyApiService.isAuthenticated()) {
       tenderlyApi = TenderlyApiService.configureInstance();
