@@ -34,6 +34,21 @@ export class TenderlyApiService {
     });
   }
 
+  public static configureAnonymousInstance(): axios.AxiosInstance {
+    return axios.default.create({
+      baseURL: TENDERLY_API_BASE_URL
+    });
+  }
+
+  public static isAuthenticated(): boolean {
+    try {
+      this.getTenderlyConfig();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   private static getTenderlyConfig(): TenderlyKeyConfig {
     const filepath = homedir() + sep + ".tenderly" + sep + "config.yaml";
     const fileData = fs.readFileSync(filepath);

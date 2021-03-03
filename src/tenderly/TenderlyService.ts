@@ -15,17 +15,32 @@ export const TENDERLY_RPC_BASE = "https://rpc.tenderly.co";
 
 export class TenderlyService {
   public static async verifyContracts(request: TenderlyContractUploadRequest) {
-    const tenderlyApi = TenderlyApiService.configureInstance();
+    let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
+    let apiPath = "/api/v1/public/verify-contracts";
+
+    if (TenderlyApiService.isAuthenticated()) {
+      tenderlyApi = TenderlyApiService.configureInstance();
+      apiPath = "/api/v1/account/me/verify-contracts";
+    }
 
     try {
-      const response = await tenderlyApi.post(
-        "/api/v1/account/me/verify-contracts",
-        { ...request }
-      );
+      const response = await tenderlyApi.post(apiPath, { ...request });
 
       const responseData: ContractResponse = response.data;
 
       let contract: ApiContract;
+
+      if (responseData.bytecode_mismatch_errors != null) {
+        console.log(
+          `Error in ${PluginName}: Bytecode mismatch detected. Contract verification failed`
+        );
+        return;
+      }
+
+      if (!responseData.contracts?.length) {
+        console.log(`${PluginName}: No new contracts have been verified`);
+        return;
+      }
 
       console.log("Smart Contracts successfully verified");
       console.group();
@@ -44,7 +59,6 @@ export class TenderlyService {
       );
     }
   }
-
   public static async pushContracts(
     request: TenderlyContractUploadRequest,
     tenderlyProject: string,
@@ -53,10 +67,24 @@ export class TenderlyService {
     const tenderlyApi = TenderlyApiService.configureInstance();
 
     try {
-      await tenderlyApi.post(
+      const response = await tenderlyApi.post(
         `/api/v1/account/${username}/project/${tenderlyProject}/contracts`,
         { ...request }
       );
+
+      const responseData: ContractResponse = response.data;
+
+      if (responseData.bytecode_mismatch_errors != null) {
+        console.log(
+          `Error in ${PluginName}: Bytecode mismatch detected. Contract push failed`
+        );
+        return;
+      }
+
+      if (!responseData.contracts?.length) {
+        console.log(`${PluginName}: No new contracts have been pushed`);
+        return;
+      }
 
       const dashLink = `${TENDERLY_DASHBOARD_BASE_URL}/${username}/${tenderlyProject}/contracts`;
 
