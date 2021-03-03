@@ -16,11 +16,10 @@ export const TENDERLY_RPC_BASE = "https://rpc.tenderly.co";
 export class TenderlyService {
   public static async verifyContracts(request: TenderlyContractUploadRequest) {
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
-    let apiPath = "/api/v1/public/verify-contracts";
+    const apiPath = "/api/v1/public/verify-contracts";
 
     if (TenderlyApiService.isAuthenticated()) {
       tenderlyApi = TenderlyApiService.configureInstance();
-      apiPath = "/api/v1/account/me/verify-contracts";
     }
 
     try {
