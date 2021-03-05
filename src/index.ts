@@ -5,8 +5,9 @@ import { ActionType, HardhatConfig } from "hardhat/types";
 
 import { Tenderly } from "./Tenderly";
 import { TenderlyService } from "./tenderly/TenderlyService";
-import { TenderlyContract } from "./tenderly/types";
+import { Metadata, TenderlyContract } from "./tenderly/types";
 import "./type-extensions";
+import { resolveDependencies } from "./util";
 
 export const PluginName = "hardhat-tenderly";
 
@@ -59,28 +60,59 @@ const extractContractData = async (
     sourceNames
   });
 
-  for (contract of contracts) {
-    const contractData = contract.split("=");
-    if (contractData.length < 2) {
-      throw new HardhatPluginError(PluginName, `Invalid contract provided`);
-    }
+  const metadata: Metadata = {
+    compiler: {
+      version: config.solidity.compilers[0].version
+    },
+    sources: {}
+  };
 
-    if (network === undefined) {
-      throw new HardhatPluginError(PluginName, `No network provided`);
-    }
+  data._resolvedFiles.forEach((resolvedFile, _) => {
+    for (contract of contracts) {
+      const contractData = contract.split("=");
+      if (contractData.length < 2) {
+        throw new HardhatPluginError(PluginName, `Invalid contract provided`);
+      }
 
-    data._resolvedFiles.forEach((resolvedFile, _) => {
-      const name = resolvedFile.sourceName.split("/").slice(-1)[0];
-      const contractToPush: TenderlyContract = {
-        contractName: name.split(".")[0],
-        source: resolvedFile.content.rawContent,
-        sourcePath: resolvedFile.sourceName,
-        networks: {},
-        compiler: {
-          name: "solc",
-          version: config.solidity.compilers[0].version
-        }
+      if (network === undefined) {
+        throw new HardhatPluginError(PluginName, `No network provided`);
+      }
+      const sourcePath: string = resolvedFile.sourceName;
+      const name = sourcePath
+        .split("/")
+        .slice(-1)[0]
+        .split(".")[0];
+
+      if (name !== contractData[0]) {
+        continue;
+      }
+      metadata.sources[sourcePath] = {
+        content: resolvedFile.content.rawContent
       };
+      const visited: Record<string, boolean> = {};
+      resolveDependencies(data, sourcePath, metadata, visited);
+    }
+  });
+
+  for (const [key, value] of Object.entries(metadata.sources)) {
+    const name = key
+      .split("/")
+      .slice(-1)[0]
+      .split(".")[0];
+
+    const contractToPush: TenderlyContract = {
+      contractName: name,
+      source: value.content,
+      sourcePath: key,
+      networks: {},
+      compiler: {
+        name: "solc",
+        version: config.solidity.compilers[0].version
+      }
+    };
+
+    for (contract of contracts) {
+      const contractData = contract.split("=");
       if (contractToPush.contractName === contractData[0]) {
         contractToPush.networks = {
           [NetworkMap[network!]]: {
@@ -88,8 +120,8 @@ const extractContractData = async (
           }
         };
       }
-      requestContracts.push(contractToPush);
-    });
+    }
+    requestContracts.push(contractToPush);
   }
   return requestContracts;
 };
