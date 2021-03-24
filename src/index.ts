@@ -12,7 +12,11 @@ import { Tenderly } from "./Tenderly";
 import { TenderlyService } from "./tenderly/TenderlyService";
 import { Metadata, TenderlyContract } from "./tenderly/types";
 import "./type-extensions";
-import { newCompilerConfig, resolveDependencies } from "./util";
+import {
+  extractCompilerVersion,
+  newCompilerConfig,
+  resolveDependencies
+} from "./util";
 
 export const PluginName = "hardhat-tenderly";
 
@@ -35,9 +39,11 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
     .network()
     .initializeFork()
     .then(_ => {
-      hre.ethers.provider = new hre.ethers.providers.Web3Provider(
+      const provider = new hre.ethers.providers.Web3Provider(
         hre.tenderly.network()
       );
+
+      hre.ethers.provider = provider;
     })
     .catch(_ => {
       console.log(
@@ -93,7 +99,7 @@ const extractContractData = async (
 
   const metadata: Metadata = {
     compiler: {
-      version: config.solidity.compilers[0].version
+      version: extractCompilerVersion(config)
     },
     sources: {}
   };
@@ -138,7 +144,7 @@ const extractContractData = async (
       networks: {},
       compiler: {
         name: "solc",
-        version: config.solidity.compilers[0].version
+        version: extractCompilerVersion(config, key)
       }
     };
 
@@ -212,11 +218,7 @@ const pushContracts: ActionType<VerifyArguments> = async (
     config,
     run
   );
-  const solcConfig = {
-    compiler_version: config.solidity.compilers[0].version,
-    optimizations_used: config.solidity.compilers[0].settings.optimizer.enabled,
-    optimizations_count: config.solidity.compilers[0].settings.optimizer.runs
-  };
+  const solcConfig = newCompilerConfig(config);
 
   await TenderlyService.pushContracts(
     {

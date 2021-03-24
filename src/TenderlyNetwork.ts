@@ -12,7 +12,7 @@ import {
   ContractByName,
   TenderlyForkContractUploadRequest
 } from "./tenderly/types";
-import { getContracts } from "./util";
+import { getCompilerDataFromContracts, getContracts } from "./util";
 
 export class TenderlyNetwork {
   public host: string;
@@ -181,7 +181,12 @@ export class TenderlyNetwork {
     flatContracts: ContractByName[]
   ): Promise<TenderlyForkContractUploadRequest | null> {
     let contract: ContractByName;
-    const requestData = await this.getForkContractData();
+    let requestData: TenderlyForkContractUploadRequest;
+    try {
+      requestData = await this.getForkContractData(flatContracts);
+    } catch (e) {
+      return null;
+    }
 
     for (contract of flatContracts) {
       const index = requestData.contracts.findIndex(
@@ -200,23 +205,24 @@ export class TenderlyNetwork {
     return requestData;
   }
 
-  private async getForkContractData(): Promise<
-    TenderlyForkContractUploadRequest
-  > {
-    const config = this.env.config;
-    const contracts = await getContracts(this.env);
+  private async getForkContractData(
+    flatContracts: ContractByName[]
+  ): Promise<TenderlyForkContractUploadRequest> {
+    const contracts = await getContracts(this.env, flatContracts);
 
-    const solcConfig = {
-      compiler_version: config.solidity.compilers[0].version,
-      optimizations_used:
-        config.solidity.compilers[0].settings.optimizer.enabled,
-      optimizations_count: config.solidity.compilers[0].settings.optimizer.runs,
-      evm_version: config.solidity.compilers[0].settings.evmVersion
-    };
+    const solcConfig = getCompilerDataFromContracts(
+      contracts,
+      flatContracts,
+      this.env.config
+    );
+
+    if (solcConfig === undefined) {
+      console.log(`Error in ${PluginName}: No compiler configuration found`);
+    }
 
     return {
       contracts,
-      config: solcConfig,
+      config: solcConfig!,
       root: this.head!
     };
   }

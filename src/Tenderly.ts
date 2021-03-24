@@ -9,10 +9,18 @@ import {
   Metadata,
   TenderlyArtifact,
   TenderlyContract,
+  TenderlyContractConfig,
   TenderlyContractUploadRequest
 } from "./tenderly/types";
 import { TenderlyNetwork } from "./TenderlyNetwork";
-import { newCompilerConfig, resolveDependencies } from "./util";
+import {
+  compareConfigs,
+  extractCompilerVersion,
+  getCompilerDataFromContracts,
+  getContracts,
+  newCompilerConfig,
+  resolveDependencies
+} from "./util";
 
 export class Tenderly {
   public env: HardhatRuntimeEnvironment;
@@ -114,7 +122,7 @@ export class Tenderly {
 
           const metadata: Metadata = {
             compiler: {
-              version: this.env.config.solidity.compilers[0].version
+              version: extractCompilerVersion(this.env.config, sourcePath)
             },
             sources: {
               [sourcePath]: {
@@ -148,7 +156,12 @@ export class Tenderly {
     flatContracts: ContractByName[]
   ): Promise<TenderlyContractUploadRequest | null> {
     let contract: ContractByName;
-    const requestData = await this.getContractData(flatContracts);
+    let requestData: TenderlyContractUploadRequest;
+    try {
+      requestData = await this.getContractData(flatContracts);
+    } catch (e) {
+      return null;
+    }
 
     for (contract of flatContracts) {
       const network =
@@ -178,75 +191,24 @@ export class Tenderly {
     return requestData;
   }
 
-  private async getContracts(
-    flatContracts: ContractByName[]
-  ): Promise<TenderlyContract[]> {
-    const sourcePaths = await this.env.run("compile:solidity:get-source-paths");
-    const sourceNames = await this.env.run(
-      "compile:solidity:get-source-names",
-      { sourcePaths }
-    );
-    const data = await this.env.run("compile:solidity:get-dependency-graph", {
-      sourceNames
-    });
-
-    let contract: ContractByName;
-    const requestContracts: TenderlyContract[] = [];
-    const metadata: Metadata = {
-      compiler: {
-        version: this.env.config.solidity.compilers[0].version
-      },
-      sources: {}
-    };
-
-    data._resolvedFiles.forEach((resolvedFile, _) => {
-      const sourcePath: string = resolvedFile.sourceName;
-      const name = sourcePath
-        .split("/")
-        .slice(-1)[0]
-        .split(".")[0];
-
-      for (contract of flatContracts) {
-        if (contract.name !== name) {
-          continue;
-        }
-
-        metadata.sources[sourcePath] = {
-          content: resolvedFile.content.rawContent
-        };
-        const visited: Record<string, boolean> = {};
-        resolveDependencies(data, sourcePath, metadata, visited);
-      }
-    });
-
-    for (const [key, value] of Object.entries(metadata.sources)) {
-      const name = key
-        .split("/")
-        .slice(-1)[0]
-        .split(".")[0];
-      const contractToPush: TenderlyContract = {
-        contractName: name,
-        source: value.content,
-        sourcePath: key,
-        networks: {},
-        compiler: {
-          name: "solc",
-          version: this.env.config.solidity?.compilers[0].version!
-        }
-      };
-      requestContracts.push(contractToPush);
-    }
-    return requestContracts;
-  }
-
   private async getContractData(
     flatContracts: ContractByName[]
   ): Promise<TenderlyContractUploadRequest> {
-    const contracts = await this.getContracts(flatContracts);
+    const contracts = await getContracts(this.env, flatContracts);
+
+    const config = getCompilerDataFromContracts(
+      contracts,
+      flatContracts,
+      this.env.config
+    );
+
+    if (config === undefined) {
+      console.log(`Error in ${PluginName}: No compiler configuration found`);
+    }
 
     return {
       contracts,
-      config: newCompilerConfig(this.env.config)
+      config: config!
     };
   }
 }
