@@ -11,6 +11,7 @@ import {
   TenderlyContract,
   TenderlyContractUploadRequest
 } from "./tenderly/types";
+import { resolveDependencies } from "./util";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 import { getContracts } from "./util";
 
@@ -125,7 +126,7 @@ export class Tenderly {
 
           const visited: Record<string, boolean> = {};
 
-          this.resolveDependencies(data, sourcePath, metadata, visited);
+          resolveDependencies(data, sourcePath, metadata, visited);
 
           const artifact: TenderlyArtifact = {
             metadata: JSON.stringify(metadata),
@@ -148,7 +149,7 @@ export class Tenderly {
     flatContracts: ContractByName[]
   ): Promise<TenderlyContractUploadRequest | null> {
     let contract: ContractByName;
-    const requestData = await this.getContractData();
+    const requestData = await this.getContractData(flatContracts);
 
     for (contract of flatContracts) {
       const network =
@@ -178,7 +179,9 @@ export class Tenderly {
     return requestData;
   }
 
-  private async getContracts(): Promise<TenderlyContract[]> {
+  private async getContracts(
+    flatContracts: ContractByName[]
+  ): Promise<TenderlyContract[]> {
     const sourcePaths = await this.env.run("compile:solidity:get-source-paths");
     const sourceNames = await this.env.run(
       "compile:solidity:get-source-names",
@@ -188,17 +191,44 @@ export class Tenderly {
       sourceNames
     });
 
+    let contract: ContractByName;
     const requestContracts: TenderlyContract[] = [];
+    const metadata: Metadata = {
+      compiler: {
+        version: this.env.config.solidity.compilers[0].version
+      },
+      sources: {}
+    };
 
     data._resolvedFiles.forEach((resolvedFile, _) => {
-      const name = resolvedFile.sourceName
+      const sourcePath: string = resolvedFile.sourceName;
+      const name = sourcePath
+        .split("/")
+        .slice(-1)[0]
+        .split(".")[0];
+
+      for (contract of flatContracts) {
+        if (contract.name !== name) {
+          continue;
+        }
+
+        metadata.sources[sourcePath] = {
+          content: resolvedFile.content.rawContent
+        };
+        const visited: Record<string, boolean> = {};
+        resolveDependencies(data, sourcePath, metadata, visited);
+      }
+    });
+
+    for (const [key, value] of Object.entries(metadata.sources)) {
+      const name = key
         .split("/")
         .slice(-1)[0]
         .split(".")[0];
       const contractToPush: TenderlyContract = {
         contractName: name,
-        source: resolvedFile.content.rawContent,
-        sourcePath: resolvedFile.sourceName,
+        source: value.content,
+        sourcePath: key,
         networks: {},
         compiler: {
           name: "solc",
@@ -206,14 +236,16 @@ export class Tenderly {
         }
       };
       requestContracts.push(contractToPush);
-    });
+    }
     return requestContracts;
   }
 
-  private async getContractData(): Promise<TenderlyContractUploadRequest> {
+  private async getContractData(
+    flatContracts: ContractByName[]
+  ): Promise<TenderlyContractUploadRequest> {
     const config = this.env.config;
 
-    const contracts = await getContracts(this.env);
+    const contracts = await this.getContracts(flatContracts);
 
     const solcConfig = {
       compiler_version: config.solidity.compilers[0].version,
@@ -226,32 +258,5 @@ export class Tenderly {
       contracts,
       config: solcConfig
     };
-  }
-
-  private resolveDependencies(
-    data: any,
-    sourcePath: string,
-    metadata: Metadata,
-    visited: Record<string, boolean>
-  ): void {
-    if (visited[sourcePath]) {
-      return;
-    }
-
-    visited[sourcePath] = true;
-
-    data._dependenciesPerFile
-      .get(sourcePath)
-      .forEach((resolvedDependency, __) => {
-        this.resolveDependencies(
-          data,
-          resolvedDependency.sourceName,
-          metadata,
-          visited
-        );
-        metadata.sources[resolvedDependency.sourceName] = {
-          content: resolvedDependency.content.rawContent
-        };
-      });
   }
 }
