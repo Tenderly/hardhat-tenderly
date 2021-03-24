@@ -1,6 +1,11 @@
+import { HardhatConfig } from "hardhat/src/types/config";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import { Metadata, TenderlyContract } from "./tenderly/types";
+import {
+  Metadata,
+  TenderlyContract,
+  TenderlyContractConfig
+} from "./tenderly/types";
 
 export const getContracts = async (
   hre: HardhatRuntimeEnvironment
@@ -60,4 +65,16 @@ export const resolveDependencies = (
         content: resolvedDependency.content.rawContent
       };
     });
+};
+
+export const newCompilerConfig = (
+  config: HardhatConfig
+): TenderlyContractConfig => {
+  return {
+    compiler_version: config.solidity.compilers[0].version,
+    optimizations_used: config.solidity.compilers[0].settings.optimizer.enabled,
+    optimizations_count: config.solidity.compilers[0].settings.optimizer.runs,
+    evm_version: config.solidity.compilers[0].settings.evmVersion,
+    debug: config.solidity.compilers[0].settings.debug
+  };
 };

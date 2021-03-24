@@ -11,9 +11,8 @@ import {
   TenderlyContract,
   TenderlyContractUploadRequest
 } from "./tenderly/types";
-import { resolveDependencies } from "./util";
 import { TenderlyNetwork } from "./TenderlyNetwork";
-import { getContracts } from "./util";
+import { newCompilerConfig, resolveDependencies } from "./util";
 
 export class Tenderly {
   public env: HardhatRuntimeEnvironment;
@@ -243,20 +242,11 @@ export class Tenderly {
   private async getContractData(
     flatContracts: ContractByName[]
   ): Promise<TenderlyContractUploadRequest> {
-    const config = this.env.config;
-
     const contracts = await this.getContracts(flatContracts);
-
-    const solcConfig = {
-      compiler_version: config.solidity.compilers[0].version,
-      optimizations_used:
-        config.solidity.compilers[0].settings.optimizer.enabled,
-      optimizations_count: config.solidity.compilers[0].settings.optimizer.runs
-    };
 
     return {
       contracts,
-      config: solcConfig
+      config: newCompilerConfig(this.env.config)
     };
   }
 }
