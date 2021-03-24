@@ -120,6 +120,11 @@ export class TenderlyService {
         return;
       }
 
+      if (responseData.contracts.length === 0) {
+        console.log(`No new contracts have been verified`);
+        return;
+      }
+
       console.log("Smart Contracts successfully verified");
     } catch (error) {
       console.log(

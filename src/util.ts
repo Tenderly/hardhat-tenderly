@@ -1,6 +1,6 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import { TenderlyContract } from "./tenderly/types";
+import { Metadata, TenderlyContract } from "./tenderly/types";
 
 export const getContracts = async (
   hre: HardhatRuntimeEnvironment
@@ -33,10 +33,10 @@ export const getContracts = async (
     requestContracts.push(contractToPush);
   });
   return requestContracts;
-import { Metadata } from "./tenderly/types";
+};
 
 export const resolveDependencies = (
-  data: any,
+  dependencyData: any,
   sourcePath: string,
   metadata: Metadata,
   visited: Record<string, boolean>
@@ -47,11 +47,11 @@ export const resolveDependencies = (
 
   visited[sourcePath] = true;
 
-  data._dependenciesPerFile
+  dependencyData._dependenciesPerFile
     .get(sourcePath)
     .forEach((resolvedDependency, __) => {
       resolveDependencies(
-        data,
+        dependencyData,
         resolvedDependency.sourceName,
         metadata,
         visited
