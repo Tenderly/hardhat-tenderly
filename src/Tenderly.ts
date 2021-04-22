@@ -161,8 +161,12 @@ export class Tenderly {
       if (index === -1) {
         continue;
       }
+      let chainID: string = network!.toLowerCase();
+      if (this.env.config.networks[network!].chainId !== undefined) {
+        chainID = this.env.config.networks[network!].chainId!.toString();
+      }
       requestData.contracts[index].networks = {
-        [NetworkMap[network.toLowerCase()]]: {
+        [chainID]: {
           address: contract.address
         }
       };

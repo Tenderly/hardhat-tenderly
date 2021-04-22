@@ -10,15 +10,6 @@ import "./type-extensions";
 import { resolveDependencies } from "./util";
 
 export const PluginName = "hardhat-tenderly";
-
-extendEnvironment(env => {
-  env.tenderly = lazyObject(() => new Tenderly(env));
-});
-
-interface VerifyArguments {
-  contracts: string[];
-}
-
 export const NetworkMap: Record<string, string> = {
   kovan: "42",
   goerli: "5",
@@ -28,7 +19,13 @@ export const NetworkMap: Record<string, string> = {
   matic: "137",
   mumbai: "80001",
   xdai: "100",
-  poa: "99"
+  poa: "99",
+  bsc: "56",
+  "bsc-testnet": "97",
+  rsk: "30",
+  "rsk-testnet": "31",
+  avalanche: "43114",
+  "avalanche-testnet": "43113"
 };
 
 export const ReverseNetworkMap: Record<string, string> = {
@@ -40,8 +37,22 @@ export const ReverseNetworkMap: Record<string, string> = {
   "80001": "matic-mumbai",
   "137": "matic-mainnet",
   "100": "xdai",
-  "99": "poa"
+  "99": "poa",
+  "56": "binance",
+  "97": "rialto",
+  "30": "rsk",
+  "31": "rsk-testnet",
+  "43114": "c-chain",
+  "43113": "c-chain-testnet"
 };
+
+extendEnvironment(env => {
+  env.tenderly = lazyObject(() => new Tenderly(env));
+});
+
+interface VerifyArguments {
+  contracts: string[];
+}
 
 const extractContractData = async (
   contracts: string[],
@@ -114,8 +125,13 @@ const extractContractData = async (
     for (contract of contracts) {
       const contractData = contract.split("=");
       if (contractToPush.contractName === contractData[0]) {
+        let chainID: string = network!.toLowerCase();
+        if (config.networks[network!].chainId !== undefined) {
+          chainID = config.networks[network!].chainId!.toString();
+        }
+
         contractToPush.networks = {
-          [NetworkMap[network!.toLowerCase()]]: {
+          [NetworkMap[chainID]]: {
             address: contractData[1]
           }
         };
