@@ -93,7 +93,7 @@ export class TenderlyNetwork {
     if (!this.checkNetwork()) {
       return;
     }
-    if (this.head === undefined) {
+    if (this.head === undefined && this.fork === undefined) {
       await this.initializeFork();
     }
 

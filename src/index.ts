@@ -1,22 +1,15 @@
 import "@nomiclabs/hardhat-ethers";
-import { extendConfig, extendEnvironment, task } from "hardhat/config";
-import { HardhatPluginError, lazyObject } from "hardhat/plugins";
-import { RunTaskFunction } from "hardhat/src/types";
-import {
-  ActionType,
-  HardhatConfig,
-  HardhatRuntimeEnvironment
-} from "hardhat/types";
+import {extendConfig, extendEnvironment, task} from "hardhat/config";
+import {HardhatPluginError, lazyObject} from "hardhat/plugins";
+import {RunTaskFunction} from "hardhat/src/types";
+import {ActionType, HardhatConfig, HardhatRuntimeEnvironment} from "hardhat/types";
+import {split} from "ts-node";
 
-import { Tenderly } from "./Tenderly";
-import { TenderlyService } from "./tenderly/TenderlyService";
-import { Metadata, TenderlyContract } from "./tenderly/types";
+import {Tenderly} from "./Tenderly";
+import {TenderlyService} from "./tenderly/TenderlyService";
+import {Metadata, TenderlyContract} from "./tenderly/types";
 import "./type-extensions";
-import {
-  extractCompilerVersion,
-  newCompilerConfig,
-  resolveDependencies
-} from "./util";
+import {extractCompilerVersion, newCompilerConfig, resolveDependencies} from "./util";
 
 export const PluginName = "hardhat-tenderly";
 
@@ -33,6 +26,11 @@ extendConfig((resolvedConfig, userConfig) => {
 
 const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
   if (hre.network.name !== "tenderly") {
+    return;
+  }
+  if ("url" in hre.network.config && hre.network.config.url !== undefined) {
+    const forkID = hre.network.config.url.split("/").pop();
+    hre.tenderly.network().setFork(forkID);
     return;
   }
   hre.tenderly
