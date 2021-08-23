@@ -181,8 +181,19 @@ export class Tenderly {
       if (index === -1) {
         continue;
       }
+      let chainID: string = NetworkMap[network!.toLowerCase()];
+      if (this.env.config.networks[network!].chainId !== undefined) {
+        chainID = this.env.config.networks[network!].chainId!.toString();
+      }
+
+      if (chainID === undefined) {
+        console.log(
+          `Error in ${PluginName}: Couldn't identify network. Please provide a chainID in the network config object`
+        );
+        return null;
+      }
       requestData.contracts[index].networks = {
-        [NetworkMap[network.toLowerCase()]]: {
+        [chainID]: {
           address: contract.address
         }
       };

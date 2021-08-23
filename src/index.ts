@@ -1,12 +1,18 @@
 import "@nomiclabs/hardhat-ethers";
-import {extendConfig, extendEnvironment, task} from "hardhat/config";
-import {HardhatPluginError, lazyObject} from "hardhat/plugins";
-import {RunTaskFunction} from "hardhat/src/types";
-import {ActionType, HardhatConfig, HardhatRuntimeEnvironment, HttpNetworkConfig} from "hardhat/types";
+import { extendConfig, extendEnvironment, task } from "hardhat/config";
+import { HardhatPluginError, lazyObject } from "hardhat/plugins";
+import { RunTaskFunction } from "hardhat/src/types";
+import {
+  ActionType,
+  HardhatConfig,
+  HttpNetworkConfig,
+  HardhatRuntimeEnvironment
+} from "hardhat/types";
 
-import {Tenderly} from "./Tenderly";
-import {TENDERLY_RPC_BASE, TenderlyService} from "./tenderly/TenderlyService";
-import {Metadata, TenderlyContract} from "./tenderly/types";
+import { Tenderly } from "./Tenderly";
+import { TENDERLY_RPC_BASE, TenderlyService } from "./tenderly/TenderlyService";
+import { Metadata, TenderlyContract } from "./tenderly/types";
+import { TenderlyPublicNetwork } from "./tenderly/types/Network";
 import "./type-extensions";
 import {extractCompilerVersion, newCompilerConfig, resolveDependencies} from "./util";
 
@@ -61,7 +67,13 @@ export const NetworkMap: Record<string, string> = {
   matic: "137",
   mumbai: "80001",
   xdai: "100",
-  poa: "99"
+  poa: "99",
+  bsc: "56",
+  "bsc-testnet": "97",
+  rsk: "30",
+  "rsk-testnet": "31",
+  avalanche: "43114",
+  "avalanche-testnet": "43113"
 };
 
 export const ReverseNetworkMap: Record<string, string> = {
@@ -73,8 +85,44 @@ export const ReverseNetworkMap: Record<string, string> = {
   "80001": "matic-mumbai",
   "137": "matic-mainnet",
   "100": "xdai",
-  "99": "poa"
+  "99": "poa",
+  "56": "binance",
+  "97": "rialto",
+  "30": "rsk",
+  "31": "rsk-testnet",
+  "43114": "c-chain",
+  "43113": "c-chain-testnet"
 };
+
+extendEnvironment(env => {
+  env.tenderly = lazyObject(() => new Tenderly(env));
+  populateNetworks(env);
+});
+
+const populateNetworks = (env: HardhatRuntimeEnvironment): void => {
+  TenderlyService.getPublicNetworks()
+    .then(networks => {
+      let network: TenderlyPublicNetwork;
+      let slug: string;
+      for (network of networks) {
+        NetworkMap[network.slug] = network.ethereum_network_id;
+        NetworkMap[network.metadata.slug] = network.ethereum_network_id;
+
+        ReverseNetworkMap[network.ethereum_network_id] = network.slug;
+
+        for (slug of network.metadata.secondary_slugs) {
+          NetworkMap[slug] = network.ethereum_network_id;
+        }
+      }
+    })
+    .catch(e => {
+      console.log("Error encountered while fetching public networks");
+    });
+};
+
+interface VerifyArguments {
+  contracts: string[];
+}
 
 const extractContractData = async (
   contracts: string[],
@@ -147,8 +195,18 @@ const extractContractData = async (
     for (contract of contracts) {
       const contractData = contract.split("=");
       if (contractToPush.contractName === contractData[0]) {
+        let chainID: string = NetworkMap[network!.toLowerCase()];
+        if (config.networks[network!].chainId !== undefined) {
+          chainID = config.networks[network!].chainId!.toString();
+        }
+        if (chainID === undefined) {
+          console.log(
+            `Error in ${PluginName}: Couldn't identify network. Please provide a chainID in the network config object`
+          );
+          return [];
+        }
         contractToPush.networks = {
-          [NetworkMap[network!.toLowerCase()]]: {
+          [chainID]: {
             address: contractData[1]
           }
         };

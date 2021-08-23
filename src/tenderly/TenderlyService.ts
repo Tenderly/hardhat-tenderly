@@ -7,6 +7,7 @@ import {
   TenderlyContractUploadRequest,
   TenderlyForkContractUploadRequest
 } from "./types";
+import { TenderlyPublicNetwork } from "./types/Network";
 
 export const TENDERLY_API_BASE_URL = "https://api.tenderly.co";
 export const TENDERLY_DASHBOARD_BASE_URL = "https://dashboard.tenderly.co";
@@ -14,6 +15,24 @@ export const TENDERLY_DASHBOARD_BASE_URL = "https://dashboard.tenderly.co";
 export const TENDERLY_RPC_BASE = "https://rpc.tenderly.co";
 
 export class TenderlyService {
+  public static async getPublicNetworks(): Promise<TenderlyPublicNetwork[]> {
+    let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
+    const apiPath = "/api/v1/public-networks";
+
+    if (TenderlyApiService.isAuthenticated()) {
+      tenderlyApi = TenderlyApiService.configureInstance();
+    }
+
+    let response: TenderlyPublicNetwork[] = [];
+    try {
+      response = (await tenderlyApi.get(apiPath)).data;
+    } catch (e) {
+      console.log(
+        `Error in ${PluginName}: There was an error during the request. Network fetch failed`
+      );
+    }
+    return response;
+  }
   public static async verifyContracts(request: TenderlyContractUploadRequest) {
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
     const apiPath = "/api/v1/public/verify-contracts";
