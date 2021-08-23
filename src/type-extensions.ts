@@ -11,6 +11,7 @@ declare module "hardhat/types/runtime" {
       push: (...contracts) => Promise<void>;
       persistArtifacts: (...contracts) => Promise<void>;
       network: () => TenderlyNetwork;
+      setNetwork: (network: TenderlyNetwork) => TenderlyNetwork;
     };
     tenderlyNetwork: {
       send: (

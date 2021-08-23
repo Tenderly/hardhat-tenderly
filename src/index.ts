@@ -15,6 +15,7 @@ import { Metadata, TenderlyContract } from "./tenderly/types";
 import { TenderlyPublicNetwork } from "./tenderly/types/Network";
 import "./type-extensions";
 import {extractCompilerVersion, newCompilerConfig, resolveDependencies} from "./util";
+import {TenderlyNetwork} from "./TenderlyNetwork";
 
 export const PluginName = "hardhat-tenderly";
 
@@ -38,10 +39,11 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
     hre.tenderly.network().setFork(forkID);
     return;
   }
-  hre.tenderly
-    .network()
-    .initializeFork()
+
+  let fork = new TenderlyNetwork(hre)
+  fork.initializeFork()
     .then(_ => {
+      hre.tenderly.setNetwork(fork);
       (hre.network.config as HttpNetworkConfig).url = TENDERLY_RPC_BASE + `/fork/${hre.tenderly.network().getFork()}`
       hre.ethers.provider = new hre.ethers.providers.Web3Provider(
           hre.tenderly.network()
