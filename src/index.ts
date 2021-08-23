@@ -1,22 +1,14 @@
 import "@nomiclabs/hardhat-ethers";
-import { extendConfig, extendEnvironment, task } from "hardhat/config";
-import { HardhatPluginError, lazyObject } from "hardhat/plugins";
-import { RunTaskFunction } from "hardhat/src/types";
-import {
-  ActionType,
-  HardhatConfig,
-  HardhatRuntimeEnvironment
-} from "hardhat/types";
+import {extendConfig, extendEnvironment, task} from "hardhat/config";
+import {HardhatPluginError, lazyObject} from "hardhat/plugins";
+import {RunTaskFunction} from "hardhat/src/types";
+import {ActionType, HardhatConfig, HardhatRuntimeEnvironment, HttpNetworkConfig} from "hardhat/types";
 
-import { Tenderly } from "./Tenderly";
-import { TenderlyService } from "./tenderly/TenderlyService";
-import { Metadata, TenderlyContract } from "./tenderly/types";
+import {Tenderly} from "./Tenderly";
+import {TENDERLY_RPC_BASE, TenderlyService} from "./tenderly/TenderlyService";
+import {Metadata, TenderlyContract} from "./tenderly/types";
 import "./type-extensions";
-import {
-  extractCompilerVersion,
-  newCompilerConfig,
-  resolveDependencies
-} from "./util";
+import {extractCompilerVersion, newCompilerConfig, resolveDependencies} from "./util";
 
 export const PluginName = "hardhat-tenderly";
 
@@ -44,11 +36,10 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
     .network()
     .initializeFork()
     .then(_ => {
-      const provider = new hre.ethers.providers.Web3Provider(
-        hre.tenderly.network()
+      (hre.network.config as HttpNetworkConfig).url = TENDERLY_RPC_BASE + `/fork/${hre.tenderly.network().getFork()}`
+      hre.ethers.provider = new hre.ethers.providers.Web3Provider(
+          hre.tenderly.network()
       );
-
-      hre.ethers.provider = provider;
     })
     .catch(_ => {
       console.log(
