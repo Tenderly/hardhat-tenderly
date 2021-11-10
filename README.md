@@ -64,6 +64,8 @@ This is an example on how you can call it from your scripts (using ethers to dep
     const Greeter = await ethers.getContractFactory("Greeter");
     const greeter = await Greeter.deploy("Hello, Hardhat!");
 
+    await greeter.deployed()
+
     await hre.tenderly.verify({
         name: "Greeter",
         address: greeter.address,
