@@ -111,6 +111,7 @@ export class Tenderly {
                         console.log(
                             `Error in ${PluginName}: Please provide a network via the hardhat --network argument or directly in the contract`
                         );
+                        continue
                     }
                     let chainID: string = NetworkMap[network!.toLowerCase()];
                     if (this.env.config.networks[network!].chainId !== undefined) {
