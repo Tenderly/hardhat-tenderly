@@ -36,7 +36,9 @@ export class Tenderly {
     try {
       await TenderlyService.verifyContracts(requestData);
     } catch (err) {
-      console.log(err.message);
+      if (err instanceof Error) {
+        console.log(err.message);
+      }
     }
   }
 
@@ -74,7 +76,9 @@ export class Tenderly {
         this.env.config.tenderly.username
       );
     } catch (err) {
-      console.log(err.message);
+      if (err instanceof Error) {
+        console.log(err.message);
+      }
     }
   }
 
