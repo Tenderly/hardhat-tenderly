@@ -78,6 +78,8 @@ export const NetworkMap: Record<string, string> = {
   "avalanche-testnet": "43113"
 };
 
+export const DefaultChainId = "31337"
+
 export const ReverseNetworkMap: Record<string, string> = {
   "42": "kovan",
   "5": "goerli",
