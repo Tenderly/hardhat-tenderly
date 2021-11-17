@@ -58,8 +58,8 @@ export class Tenderly {
   }
 
   public setNetwork(network: TenderlyNetwork): TenderlyNetwork {
-    this.tenderlyNetwork = network
-    return this.tenderlyNetwork
+    this.tenderlyNetwork = network;
+    return this.tenderlyNetwork;
   }
 
   public async push(...contracts) {
