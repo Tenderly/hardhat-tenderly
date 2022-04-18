@@ -45,32 +45,32 @@ This field has the `verify` and `push` methods, and you can use to trigger manua
 
 This is an example on how you can call it from your scripts (using ethers to deploy a contract):
 ```js
-    const Greeter = await ethers.getContractFactory("Greeter");
-    const greeter = await Greeter.deploy("Hello, Hardhat!");
+const Greeter = await ethers.getContractFactory("Greeter");
+const greeter = await Greeter.deploy("Hello, Hardhat!");
 
-    await greeter.deployed()
+await greeter.deployed()
 
-    // public contract verification
-    await hre.tenderly.verify({
-        name: "Greeter",
-        address: greeter.address,
-    })
+// public contract verification
+await hre.tenderly.verify({
+    name: "Greeter",
+    address: greeter.address,
+})
 ```
 
 Both functions accept variadic parameters:
 ```js
-    const contracts = [
-    {
-        name: "Greeter",
-        address: "123"
-    },
-    {
-        name: "Greeter2",
-        address: "456"
-    }]
-    
-    // private contract verification
-    await hre.tenderly.push(...contracts)
+const contracts = [
+{
+    name: "Greeter",
+    address: "123"
+},
+{
+    name: "Greeter2",
+    address: "456"
+}]
+
+// private contract verification
+await hre.tenderly.push(...contracts)
 ```
 
 ## Manual contract verification - HRE Tasks
