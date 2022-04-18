@@ -52,6 +52,64 @@ POSITIONAL ARGUMENTS:
 tenderly-push: Privately pushes contracts to Tenderly
 ```
 
+## How to set up HardHat with Tenderly CLI
+For Tenderly CLI to work you need to have a `deployments` directory inside your project. You can generate that
+one in next steps:
+
+1. First install hardhat-tenderly.
+
+```bash
+npm install --save-dev @tenderly/hardhat-tenderly
+```
+
+2. Add the following statement to your `hardhat.config.js`:
+
+```js
+require("@tenderly/hardhat-tenderly");
+```
+
+Or, if you are using typescript:
+
+```js
+import "@tenderly/hardhat-tenderly"
+```
+
+3. Then you need to call it from your scripts (using ethers to deploy a contract):
+
+```js
+const Greeter = await ethers.getContractFactory("Greeter");
+const greeter = await Greeter.deploy("Hello, Hardhat!");
+
+await greeter.deployed()
+
+await hre.tenderly.persistArtifacts({
+    name: "Greeter",
+    address: greeter.address,
+})
+```
+
+`persistArtifacts` accept variadic parameters:
+
+```js
+const contracts = [
+    {
+        name: "Greeter",
+        address: "123"
+    },
+    {
+        name: "Greeter2",
+        address: "456"
+    }
+]
+
+await hre.tenderly.persistArtifacts(...contracts)
+```
+
+4. Run: `npx hardhat compile` to compile contracts
+5. Run: `npx hardhat node --network hardhat` to start a local node
+6. Run: `npx hardhat run scripts/sample-script.js --network localhost` to run a script
+7. And at the end now when `deployments` directory was built you can run `tenderly init`
+
 ## Environment extensions
 
 This plugin extends the Hardhat Runtime Environment by adding a `tenderly` field
@@ -61,30 +119,35 @@ This field has the `verify` and `push` methods.
 
 This is an example on how you can call it from your scripts (using ethers to deploy a contract):
 ```js
-    const Greeter = await ethers.getContractFactory("Greeter");
-    const greeter = await Greeter.deploy("Hello, Hardhat!");
+const Greeter = await ethers.getContractFactory("Greeter");
+const greeter = await Greeter.deploy("Hello, Hardhat!");
 
-    await greeter.deployed()
+await greeter.deployed()
 
-    await hre.tenderly.verify({
-        name: "Greeter",
-        address: greeter.address,
-    })
+await hre.tenderly.persistArtifacts({
+    name: "Greeter",
+    address: greeter.address,
+})
+
+await hre.tenderly.verify({
+    name: "Greeter",
+    address: greeter.address,
+})
 ```
 
 Both functions accept variadic parameters:
 ```js
-    const contracts = [
-    {
-        name: "Greeter",
-        address: "123"
-    },
-    {
-        name: "Greeter2",
-        address: "456"
-    }]
+const contracts = [
+{
+    name: "Greeter",
+    address: "123"
+},
+{
+    name: "Greeter2",
+    address: "456"
+}]
 
-    await hre.tenderly.verify(...contracts)
+await hre.tenderly.verify(...contracts)
 ```
 
 ## Configuration
