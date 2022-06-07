@@ -144,7 +144,7 @@ const populateNetworks = (env: HardhatRuntimeEnvironment): void => {
       let slug: string;
       for (network of networks) {
         NetworkMap[network.slug] = network.ethereum_network_id;
-        
+
         if (network?.metadata?.slug) {
           NetworkMap[network.metadata.slug] = network.ethereum_network_id;
         }
