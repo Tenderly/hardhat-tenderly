@@ -38,6 +38,14 @@ export class TenderlyNetwork {
 
     this.tenderlyAPI = TenderlyApiService.configureTenderlyRPCInstance();
     this.host = this.tenderlyAPI.defaults.baseURL!;
+
+    if (
+      hre.network.name === "tenderly" &&
+      "url" in hre.network.config &&
+      hre.network.config.url !== undefined
+    ) {
+      this.fork = hre.network.config.url.split("/").pop();
+    }
   }
 
   public supportsSubscriptions() {
@@ -226,6 +234,7 @@ export class TenderlyNetwork {
       root: this.head!
     };
   }
+
   private checkNetwork(): boolean {
     if (this.env.network.name !== "tenderly") {
       console.log(

@@ -31,7 +31,16 @@ export class Tenderly {
     this.tenderlyNetwork = new TenderlyNetwork(hre);
   }
 
+  public async verifyAll() {
+    // we need to get contract name and address somehow
+    // and run verify for everything
+  }
+
   public async verify(...contracts) {
+    if (this.env.network.name === "tenderly") {
+      return this.tenderlyNetwork.verify(contracts);
+    }
+
     const flatContracts: ContractByName[] = contracts.reduce(
       (accumulator, value) => accumulator.concat(value),
       []
@@ -142,7 +151,7 @@ export class Tenderly {
             chainID = this.env.config.networks[network!].chainId!.toString();
           }
 
-          if (chainID == undefined) {
+          if (chainID === undefined) {
             chainID = DefaultChainId;
           }
           const destPath = `deployments${sep}${network!.toLowerCase()}_${chainID}${sep}`;
