@@ -39,6 +39,15 @@ extendConfig((resolvedConfig, userConfig) => {
   };
 });
 
+export const setup = (): void => {
+  extendEnvironment(env => {
+    env.tenderly = lazyObject(() => new Tenderly(env));
+    extendProvider(env);
+    populateNetworks(env);
+    extendEthers(env);
+  });
+};
+
 const extendEthers = (hre: HardhatRuntimeEnvironment): void => {
   if (
     "ethers" in hre &&
