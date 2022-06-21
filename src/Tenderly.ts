@@ -8,17 +8,13 @@ import {
   ContractByName,
   Metadata,
   TenderlyArtifact,
-  TenderlyContract,
-  TenderlyContractConfig,
   TenderlyContractUploadRequest
 } from "./tenderly/types";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 import {
-  compareConfigs,
   extractCompilerVersion,
   getCompilerDataFromContracts,
   getContracts,
-  newCompilerConfig,
   resolveDependencies
 } from "./util";
 
@@ -33,7 +29,9 @@ export class Tenderly {
 
   public async verifyAll() {
     // we need to get contract name and address somehow
-    // and run verify for everything
+    const contracts = [];
+
+    await this.verify(...contracts);
   }
 
   public async verify(...contracts) {

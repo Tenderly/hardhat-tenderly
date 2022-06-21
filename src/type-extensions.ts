@@ -4,15 +4,23 @@ import "hardhat/types/runtime";
 import { TenderlyConfig } from "./tenderly/types";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 
+export interface TdlyContract {
+  name: string;
+  address: string;
+}
+
+export interface TenderlyPlugin {
+  verifyAll: () => Promise<void>;
+  verify: (...contracts: TdlyContract[]) => Promise<void>;
+  push: (...contracts: TdlyContract[]) => Promise<void>;
+  persistArtifacts: (...contracts) => Promise<void>;
+  network: () => TenderlyNetwork;
+  setNetwork: (network: TenderlyNetwork) => TenderlyNetwork;
+}
+
 declare module "hardhat/types/runtime" {
   export interface HardhatRuntimeEnvironment {
-    tenderly: {
-      verify: (...contracts) => Promise<void>;
-      push: (...contracts) => Promise<void>;
-      persistArtifacts: (...contracts) => Promise<void>;
-      network: () => TenderlyNetwork;
-      setNetwork: (network: TenderlyNetwork) => TenderlyNetwork;
-    };
+    tenderly: TenderlyPlugin;
     tenderlyNetwork: {
       send: (
         request: {

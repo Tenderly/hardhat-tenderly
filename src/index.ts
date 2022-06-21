@@ -1,4 +1,6 @@
 import "@nomiclabs/hardhat-ethers";
+import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/src/types";
+import { ethers } from "ethers";
 import { extendConfig, extendEnvironment, task } from "hardhat/config";
 import { HardhatPluginError, lazyObject } from "hardhat/plugins";
 import { RunTaskFunction } from "hardhat/src/types";
@@ -10,6 +12,7 @@ import {
 } from "hardhat/types";
 
 import { Tenderly } from "./Tenderly";
+import { wrapEthers } from "./tenderly/ethers";
 import { TENDERLY_RPC_BASE, TenderlyService } from "./tenderly/TenderlyService";
 import { Metadata, TenderlyContract } from "./tenderly/types";
 import { TenderlyPublicNetwork } from "./tenderly/types/Network";
@@ -60,6 +63,18 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
         `Error in ${PluginName}: Initializing fork, check your tenderly configuration`
       );
     });
+
+  if (
+    "ethers" in hre &&
+    hre.ethers !== undefined &&
+    "tenderly" in hre &&
+    hre.tenderly !== undefined
+  ) {
+    hre.ethers = (wrapEthers(
+      (hre.ethers as unknown) as typeof ethers & HardhatEthersHelpers,
+      hre.tenderly
+    ) as unknown) as typeof hre.ethers;
+  }
 };
 
 interface VerifyArguments {
