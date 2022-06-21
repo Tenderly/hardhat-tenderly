@@ -65,7 +65,7 @@ function wrapGetContractFactory(
         bytecodeOrFactoryOptions as ethers.Signer | FactoryOptions
       );
 
-      return wrapContractFactory(contractFactory, tenderly, name);
+      return wrapContractFactory(contractFactory, tenderly, nameOrAbi);
     }
 
     return (func as typeof getContractFactoryABI)(
@@ -95,7 +95,7 @@ function wrapGetContractAt(
   ): Promise<ethers.Contract> {
     if (typeof nameOrAbi === "string") {
       const contract = await func(nameOrAbi, address, signer);
-      await tryToVerify(tenderly, name, contract);
+      await tryToVerify(tenderly, nameOrAbi, contract);
 
       return contract;
     }

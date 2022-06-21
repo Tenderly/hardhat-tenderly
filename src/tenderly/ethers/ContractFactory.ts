@@ -18,12 +18,12 @@ export class TdlyContractFactory {
     this.nativeContractFactory = nativeContractFactory;
     this.tenderly = tenderly;
 
-    Object.keys(parent).forEach(key => {
+    Object.keys(nativeContractFactory).forEach(key => {
       if (this[key] !== undefined) {
         return;
       }
 
-      this[key] = parent[key];
+      this[key] = nativeContractFactory[key];
     });
   }
 

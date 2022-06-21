@@ -27,13 +27,6 @@ export class Tenderly {
     this.tenderlyNetwork = new TenderlyNetwork(hre);
   }
 
-  public async verifyAll() {
-    // we need to get contract name and address somehow
-    const contracts = [];
-
-    await this.verify(...contracts);
-  }
-
   public async verify(...contracts) {
     if (this.env.network.name === "tenderly") {
       return this.tenderlyNetwork.verify(contracts);

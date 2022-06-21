@@ -3,6 +3,7 @@ import "hardhat/types/runtime";
 
 import { TenderlyConfig } from "./tenderly/types";
 import { TenderlyNetwork } from "./TenderlyNetwork";
+import {HardhatEthersHelpers} from "@nomiclabs/hardhat-ethers/src/types";
 
 export interface TdlyContract {
   name: string;
@@ -10,7 +11,6 @@ export interface TdlyContract {
 }
 
 export interface TenderlyPlugin {
-  verifyAll: () => Promise<void>;
   verify: (...contracts: TdlyContract[]) => Promise<void>;
   push: (...contracts: TdlyContract[]) => Promise<void>;
   persistArtifacts: (...contracts) => Promise<void>;

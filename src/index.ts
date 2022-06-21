@@ -29,6 +29,8 @@ export const PluginName = "hardhat-tenderly";
 extendEnvironment(env => {
   env.tenderly = lazyObject(() => new Tenderly(env));
   extendProvider(env);
+  populateNetworks(env);
+  extendEthers(env);
 });
 
 extendConfig((resolvedConfig, userConfig) => {
@@ -36,6 +38,23 @@ extendConfig((resolvedConfig, userConfig) => {
     ...resolvedConfig.networks.tenderly
   };
 });
+
+const extendEthers = (hre: HardhatRuntimeEnvironment): void => {
+  if (
+    "ethers" in hre &&
+    hre.ethers !== undefined &&
+    "tenderly" in hre &&
+    hre.tenderly !== undefined
+  ) {
+    Object.assign(
+      hre.ethers,
+      (wrapEthers(
+        (hre.ethers as unknown) as typeof ethers & HardhatEthersHelpers,
+        hre.tenderly
+      ) as unknown) as typeof hre.ethers
+    );
+  }
+};
 
 const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
   if (hre.network.name !== "tenderly") {
@@ -63,18 +82,6 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
         `Error in ${PluginName}: Initializing fork, check your tenderly configuration`
       );
     });
-
-  if (
-    "ethers" in hre &&
-    hre.ethers !== undefined &&
-    "tenderly" in hre &&
-    hre.tenderly !== undefined
-  ) {
-    hre.ethers = (wrapEthers(
-      (hre.ethers as unknown) as typeof ethers & HardhatEthersHelpers,
-      hre.tenderly
-    ) as unknown) as typeof hre.ethers;
-  }
 };
 
 interface VerifyArguments {
@@ -118,11 +125,6 @@ export const ReverseNetworkMap: Record<string, string> = {
   "43114": "c-chain",
   "43113": "c-chain-testnet"
 };
-
-extendEnvironment(env => {
-  env.tenderly = lazyObject(() => new Tenderly(env));
-  populateNetworks(env);
-});
 
 const populateNetworks = (env: HardhatRuntimeEnvironment): void => {
   TenderlyService.getPublicNetworks()
@@ -173,7 +175,7 @@ const extractContractData = async (
     sources: {}
   };
 
-  data._resolvedFiles.forEach((resolvedFile, _) => {
+  data._resolvedFiles.forEach((resolvedFile: any, _: any) => {
     for (contract of contracts) {
       const contractData = contract.split("=");
       if (contractData.length < 2) {
