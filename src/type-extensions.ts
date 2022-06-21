@@ -3,7 +3,6 @@ import "hardhat/types/runtime";
 
 import { TenderlyConfig } from "./tenderly/types";
 import { TenderlyNetwork } from "./TenderlyNetwork";
-import {HardhatEthersHelpers} from "@nomiclabs/hardhat-ethers/src/types";
 
 export interface TdlyContract {
   name: string;

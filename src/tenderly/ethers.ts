@@ -8,10 +8,12 @@ import { Artifact } from "hardhat/types";
 import { TenderlyPlugin } from "../type-extensions";
 
 import { TdlyContractFactory } from "./ethers/ContractFactory";
+import { TenderlyConfig } from "./types";
 
 export function wrapEthers(
   nativeEthers: typeof ethers & HardhatEthersHelpers,
-  tenderly: TenderlyPlugin
+  tenderly: TenderlyPlugin,
+  tenderlyConfig: TenderlyConfig
 ): typeof ethers & HardhatEthersHelpers {
   // Factory
   nativeEthers.getContractFactoryFromArtifact = wrapGetContractFactoryFromArtifact(

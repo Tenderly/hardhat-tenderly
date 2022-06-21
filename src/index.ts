@@ -59,7 +59,8 @@ const extendEthers = (hre: HardhatRuntimeEnvironment): void => {
       hre.ethers,
       (wrapEthers(
         (hre.ethers as unknown) as typeof ethers & HardhatEthersHelpers,
-        hre.tenderly
+        hre.tenderly,
+        hre.config.tenderly
       ) as unknown) as typeof hre.ethers
     );
   }

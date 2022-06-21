@@ -16,19 +16,64 @@ privately push contracts to [Tenderly](https://tenderly.co/).
 npm install --save-dev @tenderly/hardhat-tenderly
 ```
 
-And add the following statement to your `hardhat.config.js`:
+And add the following statement to your `hardhat.config.js` or `hardhat.config.ts`:
 
 ```js
-require("@tenderly/hardhat-tenderly");
+const tdly = require("@tenderly/hardhat-tenderly");
+tdly.setup();
 ```
 
 Or, if you are using typescript:
 
 ```ts
-import "@tenderly/hardhat-tenderly"
+import * as tdly from "@tenderly/hardhat-tenderly";
+tdly.setup();
 ```
 
-## Tasks
+# Verification options
+
+## Automatic verification
+
+Contract verification works out-of-the box if contracts is deployed via ethers provided in HRE object.
+
+## Manual contract verification - Environment extensions
+
+This plugin extends the Hardhat Runtime Environment by adding a `tenderly` field
+whose type is `Tenderly`.
+
+This field has the `verify` and `push` methods, and you can use to trigger manual contract verification.
+
+This is an example on how you can call it from your scripts (using ethers to deploy a contract):
+```js
+    const Greeter = await ethers.getContractFactory("Greeter");
+    const greeter = await Greeter.deploy("Hello, Hardhat!");
+
+    await greeter.deployed()
+
+    // public contract verification
+    await hre.tenderly.verify({
+        name: "Greeter",
+        address: greeter.address,
+    })
+```
+
+Both functions accept variadic parameters:
+```js
+    const contracts = [
+    {
+        name: "Greeter",
+        address: "123"
+    },
+    {
+        name: "Greeter2",
+        address: "456"
+    }]
+    
+    // private contract verification
+    await hre.tenderly.push(...contracts)
+```
+
+## Manual contract verification - HRE Tasks
 
 This plugin adds the _`tenderly:verify`_ task to Hardhat:
 ```
@@ -52,45 +97,14 @@ POSITIONAL ARGUMENTS:
 tenderly-push: Privately pushes contracts to Tenderly
 ```
 
-## Environment extensions
+## Manual contract verification - Source & compiler config manually provided
 
-This plugin extends the Hardhat Runtime Environment by adding a `tenderly` field
-whose type is `Tenderly`.
 
-This field has the `verify` and `push` methods.
-
-This is an example on how you can call it from your scripts (using ethers to deploy a contract):
-```js
-    const Greeter = await ethers.getContractFactory("Greeter");
-    const greeter = await Greeter.deploy("Hello, Hardhat!");
-
-    await greeter.deployed()
-
-    await hre.tenderly.verify({
-        name: "Greeter",
-        address: greeter.address,
-    })
-```
-
-Both functions accept variadic parameters:
-```js
-    const contracts = [
-    {
-        name: "Greeter",
-        address: "123"
-    },
-    {
-        name: "Greeter2",
-        address: "456"
-    }]
-
-    await hre.tenderly.verify(...contracts)
-```
 
 ## Configuration
 
-This plugin extends the `HardhatConfig` object with optional 
-`project` and `username` fields.
+This plugin extends the `HardhatConfig` object with 
+`project`, `username`, `forkNetwork` and `privateVerification` fields.
 
 This is an example of how to set it:
 
@@ -99,6 +113,8 @@ module.exports = {
     tenderly: {
         project: "",
         username: "",
+        forkNetwork: "",
+        privateVerification: false,
     }
 };
 ```

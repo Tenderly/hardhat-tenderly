@@ -5,7 +5,7 @@ import { TenderlyPlugin } from "../../type-extensions";
 export class TdlyContractFactory {
   [key: string]: any;
 
-  private contractName: string;
+  private readonly contractName: string;
   private nativeContractFactory: ethers.ContractFactory;
   private tenderly: TenderlyPlugin;
 
@@ -34,7 +34,6 @@ export class TdlyContractFactory {
       name: this.contractName,
       address: contract.address
     });
-
     return contract;
   }
 }

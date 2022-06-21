@@ -28,6 +28,11 @@ export class Tenderly {
   }
 
   public async verify(...contracts) {
+    const priv = this.env.config.tenderly.privateVerification;
+    if (priv !== undefined && priv && this.env.network.name !== "tenderly") {
+      return this.push(...contracts);
+    }
+
     if (this.env.network.name === "tenderly") {
       return this.tenderlyNetwork.verify(contracts);
     }
@@ -63,6 +68,11 @@ export class Tenderly {
   }
 
   public async push(...contracts) {
+    const priv = this.env.config.tenderly.privateVerification;
+    if (priv !== undefined && !priv) {
+      return this.verify(...contracts);
+    }
+
     const flatContracts: ContractByName[] = contracts.reduce(
       (accumulator, value) => accumulator.concat(value),
       []
