@@ -58,6 +58,16 @@ export class Tenderly {
     }
   }
 
+  public async verifyAPI(request: TenderlyContractUploadRequest) {
+    try {
+      await TenderlyService.verifyContracts(request);
+    } catch (err) {
+      if (err instanceof Error) {
+        console.log(err.message);
+      }
+    }
+  }
+
   public network(): TenderlyNetwork {
     return this.tenderlyNetwork;
   }
@@ -105,6 +115,20 @@ export class Tenderly {
         this.env.config.tenderly.project,
         this.env.config.tenderly.username
       );
+    } catch (err) {
+      if (err instanceof Error) {
+        console.log(err.message);
+      }
+    }
+  }
+
+  public async pushAPI(
+    request: TenderlyContractUploadRequest,
+    tenderlyProject: string,
+    username: string
+  ) {
+    try {
+      await TenderlyService.pushContracts(request, tenderlyProject, username);
     } catch (err) {
       if (err instanceof Error) {
         console.log(err.message);

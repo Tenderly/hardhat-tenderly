@@ -129,6 +129,23 @@ export class TenderlyNetwork {
     }
   }
 
+  public async verifyAPI(
+    request: TenderlyForkContractUploadRequest,
+    tenderlyProject: string,
+    username: string,
+    forkID: string
+  ) {
+    try {
+      await TenderlyService.verifyForkContracts(
+        request,
+        tenderlyProject,
+        username,
+        forkID
+      );
+    } catch (err) {
+      console.log(err.message);
+    }
+  }
   public getHead(): string | undefined {
     if (!this.checkNetwork()) {
       return;
