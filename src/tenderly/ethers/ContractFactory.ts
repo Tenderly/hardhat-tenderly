@@ -2,6 +2,8 @@ import { Contract, ethers } from "ethers";
 
 import { TenderlyPlugin } from "../../type-extensions";
 
+import { TdlyContract } from "./Contract";
+
 export class TdlyContractFactory {
   [key: string]: any;
 
@@ -30,10 +32,10 @@ export class TdlyContractFactory {
   public async deploy(...args: any[]): Promise<Contract> {
     const contract = await this.nativeContractFactory.deploy(...args);
 
-    await this.tenderly.verify({
-      name: this.contractName,
-      address: contract.address
-    });
-    return contract;
+    return (new TdlyContract(
+      contract,
+      this.tenderly,
+      this.contractName
+    ) as unknown) as Contract;
   }
 }
