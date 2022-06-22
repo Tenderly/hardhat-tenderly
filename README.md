@@ -99,7 +99,36 @@ tenderly-push: Privately pushes contracts to Tenderly
 
 ## Manual contract verification - Source & compiler config manually provided
 
+In order to offer the most flexibility we have exposed our internal API interface in the plugin interface.
 
+There are `verifyAPI` and `pushAPI` functions with all necessary data for verification.
+
+Here is the types example that are needed in order for verification to be successful.
+```typescript
+export interface TenderlyContractConfig {
+  compiler_version?: string;
+  optimizations_used?: boolean;
+  optimizations_count?: number;
+  evm_version?: string;
+  debug?: CompilerDebugInput;
+}
+
+export interface TenderlyContract {
+    contractName: string;
+    source: string;
+    sourcePath: string;
+    compiler?: ContractCompiler;
+    networks?: Record<string, ContractNetwork>;
+}
+
+export interface TenderlyContractUploadRequest {
+    config: TenderlyContractConfig;
+    contracts: TenderlyContract[];
+    tag?: string;
+}
+
+public async verifyAPI(request: TenderlyContractUploadRequest)
+```
 
 ## Configuration
 
