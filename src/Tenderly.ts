@@ -8,17 +8,13 @@ import {
   ContractByName,
   Metadata,
   TenderlyArtifact,
-  TenderlyContract,
-  TenderlyContractConfig,
   TenderlyContractUploadRequest
 } from "./tenderly/types";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 import {
-  compareConfigs,
   extractCompilerVersion,
   getCompilerDataFromContracts,
   getContracts,
-  newCompilerConfig,
   resolveDependencies
 } from "./util";
 
@@ -32,6 +28,15 @@ export class Tenderly {
   }
 
   public async verify(...contracts) {
+    const priv = this.env.config.tenderly.privateVerification;
+    if (priv !== undefined && priv && this.env.network.name !== "tenderly") {
+      return this.push(...contracts);
+    }
+
+    if (this.env.network.name === "tenderly") {
+      return this.tenderlyNetwork.verify(contracts);
+    }
+
     const flatContracts: ContractByName[] = contracts.reduce(
       (accumulator, value) => accumulator.concat(value),
       []
@@ -53,6 +58,16 @@ export class Tenderly {
     }
   }
 
+  public async verifyAPI(request: TenderlyContractUploadRequest) {
+    try {
+      await TenderlyService.verifyContracts(request);
+    } catch (err) {
+      if (err instanceof Error) {
+        console.log(err.message);
+      }
+    }
+  }
+
   public network(): TenderlyNetwork {
     return this.tenderlyNetwork;
   }
@@ -63,6 +78,11 @@ export class Tenderly {
   }
 
   public async push(...contracts) {
+    const priv = this.env.config.tenderly.privateVerification;
+    if (priv !== undefined && !priv) {
+      return this.verify(...contracts);
+    }
+
     const flatContracts: ContractByName[] = contracts.reduce(
       (accumulator, value) => accumulator.concat(value),
       []
@@ -95,6 +115,20 @@ export class Tenderly {
         this.env.config.tenderly.project,
         this.env.config.tenderly.username
       );
+    } catch (err) {
+      if (err instanceof Error) {
+        console.log(err.message);
+      }
+    }
+  }
+
+  public async pushAPI(
+    request: TenderlyContractUploadRequest,
+    tenderlyProject: string,
+    username: string
+  ) {
+    try {
+      await TenderlyService.pushContracts(request, tenderlyProject, username);
     } catch (err) {
       if (err instanceof Error) {
         console.log(err.message);
@@ -142,7 +176,7 @@ export class Tenderly {
             chainID = this.env.config.networks[network!].chainId!.toString();
           }
 
-          if (chainID == undefined) {
+          if (chainID === undefined) {
             chainID = DefaultChainId;
           }
           const destPath = `deployments${sep}${network!.toLowerCase()}_${chainID}${sep}`;

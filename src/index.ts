@@ -1,4 +1,6 @@
 import "@nomiclabs/hardhat-ethers";
+import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/src/types";
+import { ethers } from "ethers";
 import { extendConfig, extendEnvironment, task } from "hardhat/config";
 import { HardhatPluginError, lazyObject } from "hardhat/plugins";
 import { RunTaskFunction } from "hardhat/src/types";
@@ -10,6 +12,7 @@ import {
 } from "hardhat/types";
 
 import { Tenderly } from "./Tenderly";
+import { wrapEthers } from "./tenderly/ethers";
 import { TENDERLY_RPC_BASE, TenderlyService } from "./tenderly/TenderlyService";
 import { Metadata, TenderlyContract } from "./tenderly/types";
 import { TenderlyPublicNetwork } from "./tenderly/types/Network";
@@ -26,6 +29,8 @@ export const PluginName = "hardhat-tenderly";
 extendEnvironment(env => {
   env.tenderly = lazyObject(() => new Tenderly(env));
   extendProvider(env);
+  populateNetworks(env);
+  extendEthers(env);
 });
 
 extendConfig((resolvedConfig, userConfig) => {
@@ -33,6 +38,33 @@ extendConfig((resolvedConfig, userConfig) => {
     ...resolvedConfig.networks.tenderly
   };
 });
+
+export const setup = (): void => {
+  extendEnvironment(env => {
+    env.tenderly = lazyObject(() => new Tenderly(env));
+    extendProvider(env);
+    populateNetworks(env);
+    extendEthers(env);
+  });
+};
+
+const extendEthers = (hre: HardhatRuntimeEnvironment): void => {
+  if (
+    "ethers" in hre &&
+    hre.ethers !== undefined &&
+    "tenderly" in hre &&
+    hre.tenderly !== undefined
+  ) {
+    Object.assign(
+      hre.ethers,
+      (wrapEthers(
+        (hre.ethers as unknown) as typeof ethers & HardhatEthersHelpers,
+        hre.tenderly,
+        hre.config.tenderly
+      ) as unknown) as typeof hre.ethers
+    );
+  }
+};
 
 const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
   if (hre.network.name !== "tenderly") {
@@ -104,11 +136,6 @@ export const ReverseNetworkMap: Record<string, string> = {
   "43113": "c-chain-testnet"
 };
 
-extendEnvironment(env => {
-  env.tenderly = lazyObject(() => new Tenderly(env));
-  populateNetworks(env);
-});
-
 const populateNetworks = (env: HardhatRuntimeEnvironment): void => {
   TenderlyService.getPublicNetworks()
     .then(networks => {
@@ -158,7 +185,7 @@ const extractContractData = async (
     sources: {}
   };
 
-  data._resolvedFiles.forEach((resolvedFile, _) => {
+  data._resolvedFiles.forEach((resolvedFile: any, _: any) => {
     for (contract of contracts) {
       const contractData = contract.split("=");
       if (contractData.length < 2) {
