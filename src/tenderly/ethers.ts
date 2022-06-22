@@ -52,9 +52,7 @@ function wrapGetContractFactory(
   func: typeof getContractFactoryName | typeof getContractFactoryABI,
   tenderly: TenderlyPlugin
 ): typeof getContractFactoryName | typeof getContractFactoryABI {
-  const ovrFunc:
-    | typeof getContractFactoryName
-    | typeof getContractFactoryABI = async function(
+  return async function(
     nameOrAbi: string | any[],
     bytecodeOrFactoryOptions?:
       | (ethers.Signer | FactoryOptions)
@@ -76,8 +74,6 @@ function wrapGetContractFactory(
       signer
     );
   };
-
-  return ovrFunc;
 }
 
 export declare function getContractAt(
@@ -90,7 +86,7 @@ function wrapGetContractAt(
   func: typeof getContractAt,
   tenderly: TenderlyPlugin
 ): typeof getContractAt {
-  const ovrFunc: typeof getContractAt = async function(
+  return async function(
     nameOrAbi: string | any[],
     address: string,
     signer?: ethers.Signer
@@ -104,8 +100,6 @@ function wrapGetContractAt(
 
     return func(nameOrAbi, address, signer);
   };
-
-  return ovrFunc;
 }
 
 export declare function getContractFactoryFromArtifact(
@@ -117,7 +111,7 @@ function wrapGetContractFactoryFromArtifact(
   func: typeof getContractFactoryFromArtifact,
   tenderly: TenderlyPlugin
 ): typeof getContractFactoryFromArtifact {
-  const ovrFunc: typeof getContractFactoryFromArtifact = async function(
+  return async function(
     artifact: Artifact,
     signerOrOptions?: ethers.Signer | FactoryOptions
   ): Promise<ethers.ContractFactory> {
@@ -129,8 +123,6 @@ function wrapGetContractFactoryFromArtifact(
       artifact.contractName
     );
   };
-
-  return ovrFunc;
 }
 
 export declare function getContractAtFromArtifact(
@@ -143,7 +135,7 @@ function wrapGetContractAtFromArtifact(
   func: typeof getContractAtFromArtifact,
   tenderly: TenderlyPlugin
 ): typeof getContractAtFromArtifact {
-  const ovrFunc: typeof getContractAtFromArtifact = async function(
+  return async function(
     artifact: Artifact,
     address: string,
     signer?: ethers.Signer
@@ -153,8 +145,6 @@ function wrapGetContractAtFromArtifact(
 
     return contract;
   };
-
-  return ovrFunc;
 }
 
 function wrapContractFactory(
