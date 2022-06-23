@@ -8,6 +8,7 @@ import {
   TenderlyContract,
   TenderlyContractConfig
 } from "./tenderly/types";
+import {HardhatPluginError} from "hardhat/plugins";
 
 export const getCompilerDataFromContracts = (
   contracts: TenderlyContract[],
@@ -47,6 +48,12 @@ export const getContracts = async (
   const data = await hre.run("compile:solidity:get-dependency-graph", {
     sourceNames
   });
+  if (data.length === 0) {
+    throw new HardhatPluginError(
+      PluginName,
+      "Could not detect any contracts inside hardhat project. Make sure you have some contracts under ./contracts directory."
+    );
+  }
 
   let contract: ContractByName;
   const requestContracts: TenderlyContract[] = [];

@@ -1,5 +1,11 @@
 import { PluginName, ReverseNetworkMap } from "../index";
 
+import {
+  API_REQUEST_ERROR,
+  BYTECODE_MISMATCH_ERROR,
+  NO_NEW_CONTRACTS_VERIFIED_ERROR,
+  NO_VERIFIABLE_CONTRACTS_ERROR
+} from "./errors";
 import { TenderlyApiService } from "./TenderlyApiService";
 import {
   ApiContract,
@@ -11,7 +17,6 @@ import { TenderlyPublicNetwork } from "./types/Network";
 
 export const TENDERLY_API_BASE_URL = "https://api.tenderly.co";
 export const TENDERLY_DASHBOARD_BASE_URL = "https://dashboard.tenderly.co";
-// TODO(viktor): change this when we release rpc
 export const TENDERLY_RPC_BASE = "https://rpc.tenderly.co";
 
 export class TenderlyService {
@@ -42,6 +47,11 @@ export class TenderlyService {
     }
 
     try {
+      if (!request.contracts.length) {
+        console.log(NO_VERIFIABLE_CONTRACTS_ERROR);
+        return;
+      }
+
       const response = await tenderlyApi.post(apiPath, { ...request });
 
       const responseData: ContractResponse = response.data;
@@ -49,14 +59,12 @@ export class TenderlyService {
       let contract: ApiContract;
 
       if (responseData.bytecode_mismatch_errors != null) {
-        console.log(
-          `Error in ${PluginName}: Bytecode mismatch detected. Contract verification failed`
-        );
+        console.log(BYTECODE_MISMATCH_ERROR);
         return;
       }
 
       if (!responseData.contracts?.length) {
-        console.log(`${PluginName}: No new contracts have been verified`);
+        console.log(NO_NEW_CONTRACTS_VERIFIED_ERROR);
         return;
       }
 
@@ -72,9 +80,8 @@ export class TenderlyService {
       }
       console.groupEnd();
     } catch (error) {
-      console.log(
-        `Error in ${PluginName}: There was an error during the request. Contract verification failed`
-      );
+      console.log(error);
+      console.log(API_REQUEST_ERROR);
     }
   }
   public static async pushContracts(
@@ -93,14 +100,12 @@ export class TenderlyService {
       const responseData: ContractResponse = response.data;
 
       if (responseData.bytecode_mismatch_errors != null) {
-        console.log(
-          `Error in ${PluginName}: Bytecode mismatch detected. Contract push failed`
-        );
+        console.log(BYTECODE_MISMATCH_ERROR);
         return;
       }
 
       if (!responseData.contracts?.length) {
-        console.log(`${PluginName}: No new contracts have been pushed`);
+        console.log(NO_NEW_CONTRACTS_VERIFIED_ERROR);
         return;
       }
 
@@ -110,9 +115,8 @@ export class TenderlyService {
         `Successfully pushed Smart Contracts for project ${tenderlyProject}. You can view your contracts at ${dashLink}`
       );
     } catch (error) {
-      console.log(
-        `Error in ${PluginName}: There was an error during the request. Contract push failed`
-      );
+      console.log(error);
+      console.log(API_REQUEST_ERROR);
     }
   }
 
@@ -133,22 +137,19 @@ export class TenderlyService {
       const responseData: ContractResponse = response.data;
 
       if (responseData.bytecode_mismatch_errors != null) {
-        console.log(
-          `Error in ${PluginName}: Bytecode mismatch detected. Contract verification failed`
-        );
+        console.log(BYTECODE_MISMATCH_ERROR);
         return;
       }
 
-      if (responseData.contracts.length === 0) {
-        console.log(`No new contracts have been verified`);
+      if (responseData.contracts.length) {
+        console.log(NO_NEW_CONTRACTS_VERIFIED_ERROR);
         return;
       }
 
       console.log("Smart Contracts successfully verified");
     } catch (error) {
-      console.log(
-        `Error in ${PluginName}: There was an error during the request. Contract verification failed`
-      );
+      console.log(error);
+      console.log(API_REQUEST_ERROR);
     }
   }
 }
