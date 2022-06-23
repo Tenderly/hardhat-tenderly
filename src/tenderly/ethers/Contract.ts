@@ -29,11 +29,12 @@ export class TdlyContract {
 
   public async deployed(): Promise<Contract> {
     const contract = await this.nativeContract.deployed();
-
-    await this.tenderly.verify({
+    const contPair = {
       name: this.contractName,
       address: contract.address
-    });
+    };
+    await this.tenderly.persistArtifacts(contPair);
+    await this.tenderly.verify(contPair);
     return contract;
   }
 }

@@ -141,7 +141,7 @@ export class TenderlyService {
         return;
       }
 
-      if (responseData.contracts.length) {
+      if (!responseData.contracts?.length) {
         console.log(NO_NEW_CONTRACTS_VERIFIED_ERROR);
         return;
       }

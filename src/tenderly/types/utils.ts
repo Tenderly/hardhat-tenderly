@@ -16,6 +16,7 @@ export interface TenderlyConfig {
   username: string;
   forkNetwork: string;
   privateVerification?: boolean;
+  deploymentsDir?: string;
 }
 
 export interface Metadata {

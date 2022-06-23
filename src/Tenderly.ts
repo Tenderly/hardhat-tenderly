@@ -1,8 +1,10 @@
 import * as fs from "fs-extra";
+import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { sep } from "path";
 
 import { DefaultChainId, NetworkMap, PluginName } from "./index";
+import { CONTRACTS_NOT_DETECTED } from "./tenderly/errors";
 import { TenderlyService } from "./tenderly/TenderlyService";
 import {
   ContractByName,
@@ -17,8 +19,6 @@ import {
   getContracts,
   resolveDependencies
 } from "./util";
-import {CONTRACTS_NOT_DETECTED} from "./tenderly/errors";
-import {HardhatPluginError} from "hardhat/plugins";
 
 export class Tenderly {
   public env: HardhatRuntimeEnvironment;
@@ -184,7 +184,9 @@ export class Tenderly {
           if (chainID === undefined) {
             chainID = DefaultChainId;
           }
-          const destPath = `deployments${sep}${network!.toLowerCase()}_${chainID}${sep}`;
+          const deploymentsFolder =
+            this.env.config?.tenderly?.deploymentsDir || "deployments";
+          const destPath = `${deploymentsFolder}${sep}${network!.toLowerCase()}_${chainID}${sep}`;
           const contractDataPath = `${this.env.config.paths.artifacts}${sep}${sourcePath}${sep}${name}.json`;
           const contractData = JSON.parse(
             fs.readFileSync(contractDataPath).toString()
