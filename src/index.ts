@@ -12,6 +12,7 @@ import {
 } from "hardhat/types";
 
 import { Tenderly } from "./Tenderly";
+import { CONTRACTS_NOT_DETECTED } from "./tenderly/errors";
 import { wrapEthers } from "./tenderly/ethers";
 import { TENDERLY_RPC_BASE, TenderlyService } from "./tenderly/TenderlyService";
 import { Metadata, TenderlyContract } from "./tenderly/types";
@@ -177,6 +178,9 @@ const extractContractData = async (
   const data = await run("compile:solidity:get-dependency-graph", {
     sourceNames
   });
+  if (data.length === 0) {
+    throw new HardhatPluginError(PluginName, CONTRACTS_NOT_DETECTED);
+  }
 
   const metadata: Metadata = {
     compiler: {
@@ -261,7 +265,7 @@ const verifyContract: ActionType<VerifyArguments> = async (
   if (contracts === undefined) {
     throw new HardhatPluginError(
       PluginName,
-      `At least one contract must be provided (ContractName=Address)`
+      `At least one contract must be provided (ContractName=Address). Run --help for information.`
     );
   }
 

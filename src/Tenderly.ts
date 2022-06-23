@@ -17,6 +17,8 @@ import {
   getContracts,
   resolveDependencies
 } from "./util";
+import {CONTRACTS_NOT_DETECTED} from "./tenderly/errors";
+import {HardhatPluginError} from "hardhat/plugins";
 
 export class Tenderly {
   public env: HardhatRuntimeEnvironment;
@@ -28,7 +30,7 @@ export class Tenderly {
   }
 
   public async verify(...contracts) {
-    const priv = this.env.config.tenderly.privateVerification;
+    const priv = this.env.config.tenderly?.privateVerification;
     if (priv !== undefined && priv && this.env.network.name !== "tenderly") {
       return this.push(...contracts);
     }
@@ -78,7 +80,7 @@ export class Tenderly {
   }
 
   public async push(...contracts) {
-    const priv = this.env.config.tenderly.privateVerification;
+    const priv = this.env.config.tenderly?.privateVerification;
     if (priv !== undefined && !priv) {
       return this.verify(...contracts);
     }
@@ -149,6 +151,9 @@ export class Tenderly {
     const data = await this.env.run("compile:solidity:get-dependency-graph", {
       sourceNames
     });
+    if (data.length === 0) {
+      throw new HardhatPluginError(PluginName, CONTRACTS_NOT_DETECTED);
+    }
 
     let contract: ContractByName;
 
