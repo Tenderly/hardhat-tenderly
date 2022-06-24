@@ -1,26 +1,47 @@
 import * as fs from "fs-extra";
+import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { sep } from "path";
 
 import { DefaultChainId, NetworkMap, PluginName } from "./index";
+import {
+  CONTRACTS_NOT_DETECTED,
+  NO_COMPILER_FOUND_FOR_CONTRACT
+} from "./tenderly/errors";
 import { TenderlyService } from "./tenderly/TenderlyService";
 import {
   ContractByName,
   Metadata,
   TenderlyArtifact,
-  TenderlyContract,
   TenderlyContractUploadRequest
 } from "./tenderly/types";
-import { resolveDependencies } from "./util";
+import { TenderlyNetwork } from "./TenderlyNetwork";
+import {
+  extractCompilerVersion,
+  getCompilerDataFromContracts,
+  getContracts,
+  resolveDependencies
+} from "./util";
 
 export class Tenderly {
   public env: HardhatRuntimeEnvironment;
+  public tenderlyNetwork: TenderlyNetwork;
 
-  constructor(bre: HardhatRuntimeEnvironment) {
-    this.env = bre;
+  constructor(hre: HardhatRuntimeEnvironment) {
+    this.env = hre;
+    this.tenderlyNetwork = new TenderlyNetwork(hre);
   }
 
   public async verify(...contracts) {
+    const priv = this.env.config.tenderly?.privateVerification;
+    if (priv !== undefined && priv && this.env.network.name !== "tenderly") {
+      return this.push(...contracts);
+    }
+
+    if (this.env.network.name === "tenderly") {
+      return this.tenderlyNetwork.verify(contracts);
+    }
+
     const flatContracts: ContractByName[] = contracts.reduce(
       (accumulator, value) => accumulator.concat(value),
       []
@@ -42,7 +63,31 @@ export class Tenderly {
     }
   }
 
+  public async verifyAPI(request: TenderlyContractUploadRequest) {
+    try {
+      await TenderlyService.verifyContracts(request);
+    } catch (err) {
+      if (err instanceof Error) {
+        console.log(err.message);
+      }
+    }
+  }
+
+  public network(): TenderlyNetwork {
+    return this.tenderlyNetwork;
+  }
+
+  public setNetwork(network: TenderlyNetwork): TenderlyNetwork {
+    this.tenderlyNetwork = network;
+    return this.tenderlyNetwork;
+  }
+
   public async push(...contracts) {
+    const priv = this.env.config.tenderly?.privateVerification;
+    if (priv !== undefined && !priv) {
+      return this.verify(...contracts);
+    }
+
     const flatContracts: ContractByName[] = contracts.reduce(
       (accumulator, value) => accumulator.concat(value),
       []
@@ -82,6 +127,20 @@ export class Tenderly {
     }
   }
 
+  public async pushAPI(
+    request: TenderlyContractUploadRequest,
+    tenderlyProject: string,
+    username: string
+  ) {
+    try {
+      await TenderlyService.pushContracts(request, tenderlyProject, username);
+    } catch (err) {
+      if (err instanceof Error) {
+        console.log(err.message);
+      }
+    }
+  }
+
   public async persistArtifacts(...contracts) {
     if (contracts.length === 0) {
       return;
@@ -95,6 +154,9 @@ export class Tenderly {
     const data = await this.env.run("compile:solidity:get-dependency-graph", {
       sourceNames
     });
+    if (data.length === 0) {
+      throw new HardhatPluginError(PluginName, CONTRACTS_NOT_DETECTED);
+    }
 
     let contract: ContractByName;
 
@@ -122,10 +184,12 @@ export class Tenderly {
             chainID = this.env.config.networks[network!].chainId!.toString();
           }
 
-          if (chainID == undefined) {
+          if (chainID === undefined) {
             chainID = DefaultChainId;
           }
-          const destPath = `deployments${sep}${network!.toLowerCase()}_${chainID}${sep}`;
+          const deploymentsFolder =
+            this.env.config?.tenderly?.deploymentsDir || "deployments";
+          const destPath = `${deploymentsFolder}${sep}${network!.toLowerCase()}_${chainID}${sep}`;
           const contractDataPath = `${this.env.config.paths.artifacts}${sep}${sourcePath}${sep}${name}.json`;
           const contractData = JSON.parse(
             fs.readFileSync(contractDataPath).toString()
@@ -133,7 +197,7 @@ export class Tenderly {
 
           const metadata: Metadata = {
             compiler: {
-              version: this.env.config.solidity.compilers[0].version
+              version: extractCompilerVersion(this.env.config, sourcePath)
             },
             sources: {
               [sourcePath]: {
@@ -167,7 +231,12 @@ export class Tenderly {
     flatContracts: ContractByName[]
   ): Promise<TenderlyContractUploadRequest | null> {
     let contract: ContractByName;
-    const requestData = await this.getContractData(flatContracts);
+    let requestData: TenderlyContractUploadRequest;
+    try {
+      requestData = await this.getContractData(flatContracts);
+    } catch (e) {
+      return null;
+    }
 
     for (contract of flatContracts) {
       const network =
@@ -208,84 +277,25 @@ export class Tenderly {
     return requestData;
   }
 
-  private async getContracts(
-    flatContracts: ContractByName[]
-  ): Promise<TenderlyContract[]> {
-    const sourcePaths = await this.env.run("compile:solidity:get-source-paths");
-    const sourceNames = await this.env.run(
-      "compile:solidity:get-source-names",
-      { sourcePaths }
-    );
-    const data = await this.env.run("compile:solidity:get-dependency-graph", {
-      sourceNames
-    });
-
-    let contract: ContractByName;
-    const requestContracts: TenderlyContract[] = [];
-    const metadata: Metadata = {
-      compiler: {
-        version: this.env.config.solidity.compilers[0].version
-      },
-      sources: {}
-    };
-
-    data._resolvedFiles.forEach((resolvedFile, _) => {
-      const sourcePath: string = resolvedFile.sourceName;
-      const name = sourcePath
-        .split("/")
-        .slice(-1)[0]
-        .split(".")[0];
-
-      for (contract of flatContracts) {
-        if (contract.name !== name) {
-          continue;
-        }
-
-        metadata.sources[sourcePath] = {
-          content: resolvedFile.content.rawContent
-        };
-        const visited: Record<string, boolean> = {};
-        resolveDependencies(data, sourcePath, metadata, visited);
-      }
-    });
-
-    for (const [key, value] of Object.entries(metadata.sources)) {
-      const name = key
-        .split("/")
-        .slice(-1)[0]
-        .split(".")[0];
-      const contractToPush: TenderlyContract = {
-        contractName: name,
-        source: value.content,
-        sourcePath: key,
-        networks: {},
-        compiler: {
-          name: "solc",
-          version: this.env.config.solidity?.compilers[0].version!
-        }
-      };
-      requestContracts.push(contractToPush);
-    }
-    return requestContracts;
-  }
-
   private async getContractData(
     flatContracts: ContractByName[]
   ): Promise<TenderlyContractUploadRequest> {
-    const config = this.env.config;
+    const contracts = await getContracts(this.env, flatContracts);
 
-    const contracts = await this.getContracts(flatContracts);
+    const config = getCompilerDataFromContracts(
+      contracts,
+      flatContracts,
+      this.env.config
+    );
 
-    const solcConfig = {
-      compiler_version: config.solidity.compilers[0].version,
-      optimizations_used:
-        config.solidity.compilers[0].settings.optimizer.enabled,
-      optimizations_count: config.solidity.compilers[0].settings.optimizer.runs
-    };
+    if (config === undefined) {
+      console.log(NO_COMPILER_FOUND_FOR_CONTRACT);
+      console.log(flatContracts);
+    }
 
     return {
       contracts,
-      config: solcConfig
+      config: config!
     };
   }
 }

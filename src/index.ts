@@ -1,22 +1,122 @@
-import { extendEnvironment, task } from "hardhat/config";
+import "@nomiclabs/hardhat-ethers";
+import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/src/types";
+import { ethers } from "ethers";
+import { extendConfig, extendEnvironment, task } from "hardhat/config";
 import { HardhatPluginError, lazyObject } from "hardhat/plugins";
 import { RunTaskFunction } from "hardhat/src/types";
 import {
   ActionType,
   HardhatConfig,
-  HardhatRuntimeEnvironment
+  HardhatRuntimeEnvironment,
+  HttpNetworkConfig
 } from "hardhat/types";
 
 import { Tenderly } from "./Tenderly";
-import { TenderlyService } from "./tenderly/TenderlyService";
+import { CONTRACTS_NOT_DETECTED } from "./tenderly/errors";
+import { wrapEthers } from "./tenderly/ethers";
+import { wrapHHDeployments } from "./tenderly/hardhat-deploy";
+import { TENDERLY_RPC_BASE, TenderlyService } from "./tenderly/TenderlyService";
 import { Metadata, TenderlyContract } from "./tenderly/types";
 import { TenderlyPublicNetwork } from "./tenderly/types/Network";
+import { TenderlyNetwork } from "./TenderlyNetwork";
 import "./type-extensions";
-import { resolveDependencies } from "./util";
+import {
+  extractCompilerVersion,
+  newCompilerConfig,
+  resolveDependencies
+} from "./util";
 
 export const PluginName = "hardhat-tenderly";
 
-// TODO(Viktor): we can remove the maps once we figure out what to do with dashboard slugs and avalanche
+extendEnvironment(env => {
+  env.tenderly = lazyObject(() => new Tenderly(env));
+  extendProvider(env);
+  populateNetworks(env);
+  extendEthers(env);
+  extendHardhatDeploy(env);
+});
+
+extendConfig((resolvedConfig, userConfig) => {
+  resolvedConfig.networks.tenderly = {
+    ...resolvedConfig.networks.tenderly
+  };
+});
+
+export const setup = (): void => {
+  extendEnvironment(env => {
+    env.tenderly = lazyObject(() => new Tenderly(env));
+    extendProvider(env);
+    populateNetworks(env);
+    extendEthers(env);
+    extendHardhatDeploy(env);
+  });
+};
+
+const extendEthers = (hre: HardhatRuntimeEnvironment): void => {
+  if (
+    "ethers" in hre &&
+    hre.ethers !== undefined &&
+    "tenderly" in hre &&
+    hre.tenderly !== undefined
+  ) {
+    Object.assign(
+      hre.ethers,
+      (wrapEthers(
+        (hre.ethers as unknown) as typeof ethers & HardhatEthersHelpers,
+        hre.tenderly,
+        hre.config.tenderly
+      ) as unknown) as typeof hre.ethers
+    );
+  }
+};
+
+const extendHardhatDeploy = (hre: HardhatRuntimeEnvironment): void => {
+  // ts-ignore is needed here because we want to avoid importing hardhat-deploy in order not to cause duplicated initialization of the .deployments field
+  if (
+    "deployments" in hre &&
+    // @ts-ignore
+    hre.deployments !== undefined &&
+    "tenderly" in hre &&
+    // @ts-ignore
+    hre.tenderly !== undefined
+  ) {
+    // @ts-ignore
+    hre.deployments = wrapHHDeployments(hre.deployments, hre.tenderly);
+  }
+};
+
+const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
+  if (hre.network.name !== "tenderly") {
+    return;
+  }
+  if ("url" in hre.network.config && hre.network.config.url !== undefined) {
+    const forkID = hre.network.config.url.split("/").pop();
+    hre.tenderly.network().setFork(forkID);
+    return;
+  }
+
+  const fork = new TenderlyNetwork(hre);
+  fork
+    .initializeFork()
+    .then(_ => {
+      hre.tenderly.setNetwork(fork);
+      (hre.network.config as HttpNetworkConfig).url =
+        TENDERLY_RPC_BASE + `/fork/${hre.tenderly.network().getFork()}`;
+      hre.ethers.provider = new hre.ethers.providers.Web3Provider(
+        hre.tenderly.network()
+      );
+    })
+    .catch(_ => {
+      console.log(
+        `Error in ${PluginName}: Initializing fork, check your tenderly configuration`
+      );
+    });
+};
+
+interface VerifyArguments {
+  contracts: string[];
+}
+
 export const NetworkMap: Record<string, string> = {
   kovan: "42",
   goerli: "5",
@@ -54,11 +154,6 @@ export const ReverseNetworkMap: Record<string, string> = {
   "43114": "c-chain",
   "43113": "c-chain-testnet"
 };
-
-extendEnvironment(env => {
-  env.tenderly = lazyObject(() => new Tenderly(env));
-  populateNetworks(env);
-});
 
 const populateNetworks = (env: HardhatRuntimeEnvironment): void => {
   TenderlyService.getPublicNetworks()
@@ -104,15 +199,18 @@ const extractContractData = async (
   const data = await run("compile:solidity:get-dependency-graph", {
     sourceNames
   });
+  if (data.length === 0) {
+    throw new HardhatPluginError(PluginName, CONTRACTS_NOT_DETECTED);
+  }
 
   const metadata: Metadata = {
     compiler: {
-      version: config.solidity.compilers[0].version
+      version: extractCompilerVersion(config)
     },
     sources: {}
   };
 
-  data._resolvedFiles.forEach((resolvedFile, _) => {
+  data._resolvedFiles.forEach((resolvedFile: any, _: any) => {
     for (contract of contracts) {
       const contractData = contract.split("=");
       if (contractData.length < 2) {
@@ -152,7 +250,7 @@ const extractContractData = async (
       networks: {},
       compiler: {
         name: "solc",
-        version: config.solidity.compilers[0].version
+        version: extractCompilerVersion(config, key)
       }
     };
 
@@ -188,7 +286,7 @@ const verifyContract: ActionType<VerifyArguments> = async (
   if (contracts === undefined) {
     throw new HardhatPluginError(
       PluginName,
-      `At least one contract must be provided (ContractName=Address)`
+      `At least one contract must be provided (ContractName=Address). Run --help for information.`
     );
   }
 
@@ -198,14 +296,9 @@ const verifyContract: ActionType<VerifyArguments> = async (
     config,
     run
   );
-  const solcConfig = {
-    compiler_version: config.solidity.compilers[0].version,
-    optimizations_used: config.solidity.compilers[0].settings.optimizer.enabled,
-    optimizations_count: config.solidity.compilers[0].settings.optimizer.runs
-  };
 
   await TenderlyService.verifyContracts({
-    config: solcConfig,
+    config: newCompilerConfig(config),
     contracts: requestContracts
   });
 };
@@ -241,11 +334,7 @@ const pushContracts: ActionType<VerifyArguments> = async (
     config,
     run
   );
-  const solcConfig = {
-    compiler_version: config.solidity.compilers[0].version,
-    optimizations_used: config.solidity.compilers[0].settings.optimizer.enabled,
-    optimizations_count: config.solidity.compilers[0].settings.optimizer.runs
-  };
+  const solcConfig = newCompilerConfig(config);
 
   await TenderlyService.pushContracts(
     {

@@ -3,6 +3,11 @@ export interface TenderlyContractConfig {
   optimizations_used?: boolean;
   optimizations_count?: number;
   evm_version?: string;
+  debug?: CompilerDebugInput;
+}
+
+export interface CompilerDebugInput {
+  revertStrings?: string;
 }
 
 export interface TenderlyContract {

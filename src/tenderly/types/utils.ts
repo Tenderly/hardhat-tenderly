@@ -2,6 +2,7 @@ import { ContractCompiler } from "./Contract";
 
 export interface TenderlyKeyConfig {
   access_key: string;
+  head: string | undefined;
 }
 
 export interface BytecodeMismatchError {
@@ -13,6 +14,9 @@ export interface BytecodeMismatchError {
 export interface TenderlyConfig {
   project: string;
   username: string;
+  forkNetwork: string;
+  privateVerification?: boolean;
+  deploymentsDir?: string;
 }
 
 export interface Metadata {

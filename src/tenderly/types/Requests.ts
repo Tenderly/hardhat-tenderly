@@ -5,3 +5,10 @@ export interface TenderlyContractUploadRequest {
   contracts: TenderlyContract[];
   tag?: string;
 }
+
+export interface TenderlyForkContractUploadRequest {
+  config: TenderlyContractConfig;
+  contracts: TenderlyContract[];
+  tag?: string;
+  root: string;
+}
