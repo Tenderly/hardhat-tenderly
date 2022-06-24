@@ -64,7 +64,12 @@ export class TenderlyService {
       }
 
       if (!responseData.contracts?.length) {
-        console.log(NO_NEW_CONTRACTS_VERIFIED_ERROR);
+        let addresses = "";
+        for (const cont of request.contracts) {
+          addresses += cont.contractName + ", ";
+        }
+
+        console.log(NO_NEW_CONTRACTS_VERIFIED_ERROR, addresses);
         return;
       }
 
@@ -80,7 +85,9 @@ export class TenderlyService {
       }
       console.groupEnd();
     } catch (error) {
-      console.log(error);
+      console.log(error?.response.status);
+      console.log(error?.response.statusText);
+      console.log(error?.response?.data?.error?.message);
       console.log(API_REQUEST_ERROR);
     }
   }
@@ -105,7 +112,12 @@ export class TenderlyService {
       }
 
       if (!responseData.contracts?.length) {
-        console.log(NO_NEW_CONTRACTS_VERIFIED_ERROR);
+        let addresses = "";
+        for (const cont of request.contracts) {
+          addresses += cont.contractName + ", ";
+        }
+
+        console.log(NO_NEW_CONTRACTS_VERIFIED_ERROR, addresses);
         return;
       }
 
@@ -115,7 +127,9 @@ export class TenderlyService {
         `Successfully pushed Smart Contracts for project ${tenderlyProject}. You can view your contracts at ${dashLink}`
       );
     } catch (error) {
-      console.log(error);
+      console.log(error?.response.status);
+      console.log(error?.response.statusText);
+      console.log(error?.response?.data?.error?.message);
       console.log(API_REQUEST_ERROR);
     }
   }
@@ -142,13 +156,24 @@ export class TenderlyService {
       }
 
       if (!responseData.contracts?.length) {
-        console.log(NO_NEW_CONTRACTS_VERIFIED_ERROR);
+        let addresses = "";
+        for (const cont of request.contracts) {
+          addresses += cont.contractName + ", ";
+        }
+
+        console.log(NO_NEW_CONTRACTS_VERIFIED_ERROR, addresses);
         return;
       }
 
-      console.log("Smart Contracts successfully verified");
+      console.group();
+      for (const contract of responseData.contracts) {
+        console.log(`Contract at ${contract.address} verified.`);
+      }
+      console.groupEnd();
     } catch (error) {
-      console.log(error);
+      console.log(error?.response.status);
+      console.log(error?.response.statusText);
+      console.log(error?.response?.data?.error?.message);
       console.log(API_REQUEST_ERROR);
     }
   }

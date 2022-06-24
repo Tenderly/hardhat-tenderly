@@ -1,6 +1,7 @@
 import "@nomiclabs/hardhat-ethers";
 import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/src/types";
 import { ethers } from "ethers";
+import "hardhat-deploy";
 import { extendConfig, extendEnvironment, task } from "hardhat/config";
 import { HardhatPluginError, lazyObject } from "hardhat/plugins";
 import { RunTaskFunction } from "hardhat/src/types";
@@ -32,6 +33,7 @@ extendEnvironment(env => {
   extendProvider(env);
   populateNetworks(env);
   extendEthers(env);
+  extendHardhatDeploy(env);
 });
 
 extendConfig((resolvedConfig, userConfig) => {
@@ -46,6 +48,7 @@ export const setup = (): void => {
     extendProvider(env);
     populateNetworks(env);
     extendEthers(env);
+    extendHardhatDeploy(env);
   });
 };
 
@@ -64,6 +67,18 @@ const extendEthers = (hre: HardhatRuntimeEnvironment): void => {
         hre.config.tenderly
       ) as unknown) as typeof hre.ethers
     );
+  }
+};
+
+const extendHardhatDeploy = (hre: HardhatRuntimeEnvironment): void => {
+  if (
+    "deployments" in hre &&
+    hre.deployments !== undefined &&
+    "tenderly" in hre &&
+    hre.tenderly !== undefined
+  ) {
+    // TODO(filip): implement this wrapper also
+    return;
   }
 };
 

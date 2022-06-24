@@ -4,7 +4,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { sep } from "path";
 
 import { DefaultChainId, NetworkMap, PluginName } from "./index";
-import { CONTRACTS_NOT_DETECTED } from "./tenderly/errors";
+import {CONTRACTS_NOT_DETECTED, NO_COMPILER_FOUND_FOR_CONTRACT} from "./tenderly/errors";
 import { TenderlyService } from "./tenderly/TenderlyService";
 import {
   ContractByName,
@@ -286,7 +286,8 @@ export class Tenderly {
     );
 
     if (config === undefined) {
-      console.log(`Error in ${PluginName}: No compiler configuration found`);
+      console.log(NO_COMPILER_FOUND_FOR_CONTRACT);
+      console.log(flatContracts);
     }
 
     return {

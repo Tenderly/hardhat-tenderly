@@ -13,6 +13,7 @@ import {
   TenderlyForkContractUploadRequest
 } from "./tenderly/types";
 import { getCompilerDataFromContracts, getContracts } from "./util";
+import {NO_COMPILER_FOUND_FOR_CONTRACT} from "./tenderly/errors";
 
 export class TenderlyNetwork {
   public host: string;
@@ -242,7 +243,8 @@ export class TenderlyNetwork {
     );
 
     if (solcConfig === undefined) {
-      console.log(`Error in ${PluginName}: No compiler configuration found`);
+      console.log(NO_COMPILER_FOUND_FOR_CONTRACT);
+      console.log(flatContracts);
     }
 
     return {
