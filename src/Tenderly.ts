@@ -4,7 +4,10 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { sep } from "path";
 
 import { DefaultChainId, NetworkMap, PluginName } from "./index";
-import {CONTRACTS_NOT_DETECTED, NO_COMPILER_FOUND_FOR_CONTRACT} from "./tenderly/errors";
+import {
+  CONTRACTS_NOT_DETECTED,
+  NO_COMPILER_FOUND_FOR_CONTRACT
+} from "./tenderly/errors";
 import { TenderlyService } from "./tenderly/TenderlyService";
 import {
   ContractByName,
