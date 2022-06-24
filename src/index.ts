@@ -14,6 +14,7 @@ import {
 import { Tenderly } from "./Tenderly";
 import { CONTRACTS_NOT_DETECTED } from "./tenderly/errors";
 import { wrapEthers } from "./tenderly/ethers";
+import { wrapHHDeployments } from "./tenderly/hardhat-deploy";
 import { TENDERLY_RPC_BASE, TenderlyService } from "./tenderly/TenderlyService";
 import { Metadata, TenderlyContract } from "./tenderly/types";
 import { TenderlyPublicNetwork } from "./tenderly/types/Network";
@@ -32,6 +33,7 @@ extendEnvironment(env => {
   extendProvider(env);
   populateNetworks(env);
   extendEthers(env);
+  extendHardhatDeploy(env);
 });
 
 extendConfig((resolvedConfig, userConfig) => {
@@ -46,6 +48,7 @@ export const setup = (): void => {
     extendProvider(env);
     populateNetworks(env);
     extendEthers(env);
+    extendHardhatDeploy(env);
   });
 };
 
@@ -64,6 +67,21 @@ const extendEthers = (hre: HardhatRuntimeEnvironment): void => {
         hre.config.tenderly
       ) as unknown) as typeof hre.ethers
     );
+  }
+};
+
+const extendHardhatDeploy = (hre: HardhatRuntimeEnvironment): void => {
+  // ts-ignore is needed here because we want to avoid importing hardhat-deploy in order not to cause duplicated initialization of the .deployments field
+  if (
+    "deployments" in hre &&
+    // @ts-ignore
+    hre.deployments !== undefined &&
+    "tenderly" in hre &&
+    // @ts-ignore
+    hre.tenderly !== undefined
+  ) {
+    // @ts-ignore
+    hre.deployments = wrapHHDeployments(hre.deployments, hre.tenderly);
   }
 };
 

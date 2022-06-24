@@ -6,6 +6,7 @@ import os from "os";
 import path from "path";
 
 import { PluginName } from "./index";
+import { NO_COMPILER_FOUND_FOR_CONTRACT } from "./tenderly/errors";
 import { TenderlyApiService } from "./tenderly/TenderlyApiService";
 import { TenderlyService } from "./tenderly/TenderlyService";
 import {
@@ -242,7 +243,8 @@ export class TenderlyNetwork {
     );
 
     if (solcConfig === undefined) {
-      console.log(`Error in ${PluginName}: No compiler configuration found`);
+      console.log(NO_COMPILER_FOUND_FOR_CONTRACT);
+      console.log(flatContracts);
     }
 
     return {
