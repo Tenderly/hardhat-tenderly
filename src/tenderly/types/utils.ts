@@ -14,7 +14,7 @@ export interface BytecodeMismatchError {
 export interface TenderlyConfig {
   project: string;
   username: string;
-  forkNetwork: string;
+  forkNetwork?: string;
   privateVerification?: boolean;
   deploymentsDir?: string;
 }

@@ -179,6 +179,10 @@ export class TenderlyNetwork {
     if (!this.checkNetwork()) {
       return;
     }
+    if (!this.env.config.tenderly?.forkNetwork) {
+      return;
+    }
+
     const username: string = this.env.config.tenderly.username;
     const projectID: string = this.env.config.tenderly.project;
     try {
