@@ -22,6 +22,12 @@ export interface TenderlyPlugin {
     tenderlyProject: string,
     username: string
   ) => Promise<void>;
+  verifyForkAPI: (
+    request: TenderlyForkContractUploadRequest,
+    tenderlyProject: string,
+    username: string,
+    forkID: string
+  ) => Promise<void>;
   persistArtifacts: (...contracts) => Promise<void>;
   network: () => TenderlyNetwork;
   setNetwork: (network: TenderlyNetwork) => TenderlyNetwork;

@@ -84,10 +84,11 @@ export class Tenderly {
     username: string,
     forkID: string
   ) {
-    if (this.env.network.name === "tenderly") {
+    if (this.env.network.name !== "tenderly") {
       console.log(
         `Error in ${PluginName}: .verifyForkAPI() is only available for tenderly fork deployments, please use --network tenderly.`
       );
+      return;
     }
 
     try {
