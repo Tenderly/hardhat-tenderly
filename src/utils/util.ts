@@ -2,13 +2,13 @@ import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatConfig } from "hardhat/src/types/config";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import { PluginName } from "./index";
+import { PluginName } from "../index";
 import {
   ContractByName,
   Metadata,
   TenderlyContract,
   TenderlyContractConfig
-} from "./tenderly/types";
+} from "../tenderly/types";
 
 export const getCompilerDataFromContracts = (
   contracts: TenderlyContract[],

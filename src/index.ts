@@ -24,7 +24,7 @@ import {
   extractCompilerVersion,
   newCompilerConfig,
   resolveDependencies
-} from "./util";
+} from "./utils/util";
 
 export const PluginName = "hardhat-tenderly";
 
@@ -32,8 +32,6 @@ extendEnvironment(env => {
   env.tenderly = lazyObject(() => new Tenderly(env));
   extendProvider(env);
   populateNetworks(env);
-  extendEthers(env);
-  extendHardhatDeploy(env);
 });
 
 extendConfig((resolvedConfig, userConfig) => {
@@ -44,9 +42,6 @@ extendConfig((resolvedConfig, userConfig) => {
 
 export const setup = (): void => {
   extendEnvironment(env => {
-    env.tenderly = lazyObject(() => new Tenderly(env));
-    extendProvider(env);
-    populateNetworks(env);
     extendEthers(env);
     extendHardhatDeploy(env);
   });

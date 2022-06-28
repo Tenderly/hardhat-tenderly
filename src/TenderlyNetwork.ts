@@ -13,7 +13,8 @@ import {
   ContractByName,
   TenderlyForkContractUploadRequest
 } from "./tenderly/types";
-import { getCompilerDataFromContracts, getContracts } from "./util";
+import { logError } from "./utils/error_logger";
+import { getCompilerDataFromContracts, getContracts } from "./utils/util";
 
 export class TenderlyNetwork {
   public host: string;
@@ -79,7 +80,7 @@ export class TenderlyNetwork {
       this.writeHead();
       cb(null, resp.data);
     } catch (err) {
-      console.log(err.response.data);
+      logError(err);
       cb(err.response.data);
     }
   }
@@ -126,7 +127,7 @@ export class TenderlyNetwork {
         this.fork!
       );
     } catch (err) {
-      console.log(err.message);
+      logError(err);
     }
   }
 
@@ -144,7 +145,7 @@ export class TenderlyNetwork {
         forkID
       );
     } catch (err) {
-      console.log(err.message);
+      logError(err);
     }
   }
   public getHead(): string | undefined {
