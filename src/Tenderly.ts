@@ -1,4 +1,3 @@
-import { use } from "chai";
 import * as fs from "fs-extra";
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
