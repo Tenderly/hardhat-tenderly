@@ -24,7 +24,7 @@ import {
   extractCompilerVersion,
   newCompilerConfig,
   resolveDependencies
-} from "./util";
+} from "./utils/util";
 
 export const PluginName = "hardhat-tenderly";
 

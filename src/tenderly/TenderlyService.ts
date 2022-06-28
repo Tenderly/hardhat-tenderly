@@ -1,7 +1,8 @@
 import { PluginName, ReverseNetworkMap } from "../index";
+import { logError } from "../utils/error_logger";
 
 import {
-  API_REQUEST_ERROR,
+  API_VERIFICATION_REQUEST_ERROR,
   BYTECODE_MISMATCH_ERROR,
   NO_NEW_CONTRACTS_VERIFIED_ERROR,
   NO_VERIFIABLE_CONTRACTS_ERROR
@@ -85,10 +86,8 @@ export class TenderlyService {
       }
       console.groupEnd();
     } catch (error) {
-      console.log(error?.response.status);
-      console.log(error?.response.statusText);
-      console.log(error?.response?.data?.error?.message);
-      console.log(API_REQUEST_ERROR);
+      logError(error);
+      console.log(API_VERIFICATION_REQUEST_ERROR);
     }
   }
   public static async pushContracts(
@@ -127,10 +126,8 @@ export class TenderlyService {
         `Successfully pushed Smart Contracts for project ${tenderlyProject}. You can view your contracts at ${dashLink}`
       );
     } catch (error) {
-      console.log(error?.response.status);
-      console.log(error?.response.statusText);
-      console.log(error?.response?.data?.error?.message);
-      console.log(API_REQUEST_ERROR);
+      logError(error);
+      console.log(API_VERIFICATION_REQUEST_ERROR);
     }
   }
 
@@ -171,10 +168,8 @@ export class TenderlyService {
       }
       console.groupEnd();
     } catch (error) {
-      console.log(error?.response.status);
-      console.log(error?.response.statusText);
-      console.log(error?.response?.data?.error?.message);
-      console.log(API_REQUEST_ERROR);
+      logError(error);
+      console.log(API_VERIFICATION_REQUEST_ERROR);
     }
   }
 }

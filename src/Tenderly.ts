@@ -16,12 +16,13 @@ import {
   TenderlyContractUploadRequest
 } from "./tenderly/types";
 import { TenderlyNetwork } from "./TenderlyNetwork";
+import { logError } from "./utils/error_logger";
 import {
   extractCompilerVersion,
   getCompilerDataFromContracts,
   getContracts,
   resolveDependencies
-} from "./util";
+} from "./utils/util";
 
 export class Tenderly {
   public env: HardhatRuntimeEnvironment;
@@ -57,9 +58,7 @@ export class Tenderly {
     try {
       await TenderlyService.verifyContracts(requestData);
     } catch (err) {
-      if (err instanceof Error) {
-        console.log(err.message);
-      }
+      logError(err);
     }
   }
 
@@ -67,9 +66,7 @@ export class Tenderly {
     try {
       await TenderlyService.verifyContracts(request);
     } catch (err) {
-      if (err instanceof Error) {
-        console.log(err.message);
-      }
+      logError(err);
     }
   }
 
@@ -121,9 +118,7 @@ export class Tenderly {
         this.env.config.tenderly.username
       );
     } catch (err) {
-      if (err instanceof Error) {
-        console.log(err.message);
-      }
+      logError(err);
     }
   }
 
@@ -135,9 +130,7 @@ export class Tenderly {
     try {
       await TenderlyService.pushContracts(request, tenderlyProject, username);
     } catch (err) {
-      if (err instanceof Error) {
-        console.log(err.message);
-      }
+      logError(err);
     }
   }
 
