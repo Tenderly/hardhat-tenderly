@@ -1,3 +1,4 @@
+import { use } from "chai";
 import * as fs from "fs-extra";
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
@@ -13,7 +14,8 @@ import {
   ContractByName,
   Metadata,
   TenderlyArtifact,
-  TenderlyContractUploadRequest
+  TenderlyContractUploadRequest,
+  TenderlyForkContractUploadRequest
 } from "./tenderly/types";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 import { logError } from "./utils/error_logger";
@@ -63,8 +65,39 @@ export class Tenderly {
   }
 
   public async verifyAPI(request: TenderlyContractUploadRequest) {
+    if (this.env.network.name === "tenderly") {
+      console.log(
+        `Error in ${PluginName}: .verifyAPI() is not available for fork deployments, please use verifyForkAPI().`
+      );
+      return;
+    }
+
     try {
       await TenderlyService.verifyContracts(request);
+    } catch (err) {
+      logError(err);
+    }
+  }
+
+  public async verifyForkAPI(
+    request: TenderlyForkContractUploadRequest,
+    tenderlyProject: string,
+    username: string,
+    forkID: string
+  ) {
+    if (this.env.network.name === "tenderly") {
+      console.log(
+        `Error in ${PluginName}: .verifyForkAPI() is only available for tenderly fork deployments, please use --network tenderly.`
+      );
+    }
+
+    try {
+      await this.tenderlyNetwork.verifyAPI(
+        request,
+        tenderlyProject,
+        username,
+        forkID
+      );
     } catch (err) {
       logError(err);
     }
@@ -127,6 +160,13 @@ export class Tenderly {
     tenderlyProject: string,
     username: string
   ) {
+    if (this.env.network.name === "tenderly") {
+      console.log(
+        `Error in ${PluginName}: .pushAPI() is not available for fork deployments, please use verifyForkAPI().`
+      );
+      return;
+    }
+
     try {
       await TenderlyService.pushContracts(request, tenderlyProject, username);
     } catch (err) {

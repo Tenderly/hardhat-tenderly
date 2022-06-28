@@ -40,10 +40,19 @@ extendConfig((resolvedConfig, userConfig) => {
   };
 });
 
-export const setup = (): void => {
+export const setup = (automatic?: boolean): void => {
+  if (automatic === undefined) {
+    automatic = true;
+  }
+
   extendEnvironment(env => {
-    extendEthers(env);
-    extendHardhatDeploy(env);
+    env.tenderly = lazyObject(() => new Tenderly(env));
+    extendProvider(env);
+    populateNetworks(env);
+    if (automatic) {
+      extendEthers(env);
+      extendHardhatDeploy(env);
+    }
   });
 };
 
