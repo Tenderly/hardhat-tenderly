@@ -40,9 +40,10 @@ extendConfig((resolvedConfig, userConfig) => {
   };
 });
 
-export const setup = (automatic?: boolean): void => {
-  if (automatic === undefined) {
-    automatic = true;
+export const setup = (cfg?: { automaticVerifications: boolean }): void => {
+  let automatic = true;
+  if (cfg !== undefined && cfg?.automaticVerifications !== undefined) {
+    automatic = cfg.automaticVerifications;
   }
 
   extendEnvironment(env => {

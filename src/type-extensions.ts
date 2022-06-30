@@ -2,21 +2,17 @@ import "hardhat/types/config";
 import "hardhat/types/runtime";
 
 import {
+  ContractByName,
   TenderlyConfig,
   TenderlyContractUploadRequest,
   TenderlyForkContractUploadRequest
 } from "./tenderly/types";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 
-export interface TdlyContract {
-  name: string;
-  address: string;
-}
-
 export interface TenderlyPlugin {
-  verify: (...contracts: TdlyContract[]) => Promise<void>;
+  verify: (...contracts: ContractByName[]) => Promise<void>;
   verifyAPI: (request: TenderlyContractUploadRequest) => Promise<void>;
-  push: (...contracts: TdlyContract[]) => Promise<void>;
+  push: (...contracts: ContractByName[]) => Promise<void>;
   pushAPI: (
     request: TenderlyContractUploadRequest,
     tenderlyProject: string,
