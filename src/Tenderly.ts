@@ -300,9 +300,11 @@ export class Tenderly {
         );
         return null;
       }
+      console.log(contract.libraries);
       requestData.contracts[index].networks = {
         [chainID]: {
-          address: contract.address
+          address: contract.address,
+          links: contract.libraries
         }
       };
     }

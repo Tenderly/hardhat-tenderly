@@ -1,3 +1,5 @@
+import {Libraries} from "@nomiclabs/hardhat-ethers/types";
+
 export interface TenderlyContractConfig {
   compiler_version?: string;
   optimizations_used?: boolean;
@@ -41,7 +43,8 @@ export interface ContractNetwork {
 export interface ContractByName {
   name: string;
   address: string;
-  network: string;
+  network?: string;
+  libraries?: Libraries;
 }
 
 export interface ApiContract {
