@@ -2,6 +2,7 @@ import {
   FactoryOptions,
   HardhatEthersHelpers
 } from "@nomiclabs/hardhat-ethers/src/types";
+import { Libraries } from "@nomiclabs/hardhat-ethers/types";
 import { ethers } from "ethers";
 import { Artifact } from "hardhat/types";
 
@@ -65,7 +66,15 @@ function wrapGetContractFactory(
         bytecodeOrFactoryOptions as ethers.Signer | FactoryOptions
       );
 
-      return wrapContractFactory(contractFactory, tenderly, nameOrAbi);
+      let libs;
+      const factoryOpts = bytecodeOrFactoryOptions as
+        | ethers.Signer
+        | FactoryOptions;
+      if (factoryOpts !== undefined && "libraries" in factoryOpts) {
+        libs = factoryOpts.libraries;
+      }
+
+      return wrapContractFactory(contractFactory, tenderly, nameOrAbi, libs);
     }
 
     return (func as typeof getContractFactoryABI)(
@@ -117,10 +126,17 @@ function wrapGetContractFactoryFromArtifact(
   ): Promise<ethers.ContractFactory> {
     const contractFactory = await func(artifact, signerOrOptions);
 
+    let libs;
+    const factoryOpts = signerOrOptions as ethers.Signer | FactoryOptions;
+    if (factoryOpts !== undefined && "libraries" in factoryOpts) {
+      libs = factoryOpts.libraries;
+    }
+
     return wrapContractFactory(
       contractFactory,
       tenderly,
-      artifact.contractName
+      artifact.contractName,
+      libs
     );
   };
 }
@@ -150,12 +166,14 @@ function wrapGetContractAtFromArtifact(
 function wrapContractFactory(
   contractFactory: ethers.ContractFactory,
   tenderly: TenderlyPlugin,
-  name: string
+  name: string,
+  libraries?: Libraries
 ): ethers.ContractFactory {
   contractFactory = (new TdlyContractFactory(
     contractFactory,
     tenderly,
-    name
+    name,
+    libraries
   ) as unknown) as ethers.ContractFactory;
 
   return contractFactory;

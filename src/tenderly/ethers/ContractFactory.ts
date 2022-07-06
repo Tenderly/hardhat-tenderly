@@ -1,3 +1,4 @@
+import { Libraries } from "@nomiclabs/hardhat-ethers/types";
 import { Contract, ethers } from "ethers";
 
 import { TenderlyPlugin } from "../../type-extensions";
@@ -8,17 +9,20 @@ export class TdlyContractFactory {
   [key: string]: any;
 
   private readonly contractName: string;
+  private libs: Libraries | undefined;
   private nativeContractFactory: ethers.ContractFactory;
   private tenderly: TenderlyPlugin;
 
   constructor(
     nativeContractFactory: ethers.ContractFactory,
     tenderly: TenderlyPlugin,
-    contractName: string
+    contractName: string,
+    libs?: Libraries
   ) {
     this.contractName = contractName;
     this.nativeContractFactory = nativeContractFactory;
     this.tenderly = tenderly;
+    this.libs = libs;
 
     Object.keys(nativeContractFactory).forEach(key => {
       if (this[key] !== undefined) {
@@ -35,7 +39,8 @@ export class TdlyContractFactory {
     return (new TdlyContract(
       contract,
       this.tenderly,
-      this.contractName
+      this.contractName,
+      this.libs
     ) as unknown) as Contract;
   }
 }

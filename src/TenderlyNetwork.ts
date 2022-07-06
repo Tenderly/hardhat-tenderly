@@ -228,7 +228,8 @@ export class TenderlyNetwork {
       }
       requestData.contracts[index].networks = {
         [this.fork!]: {
-          address: contract.address
+          address: contract.address,
+          links: contract.libraries
         }
       };
     }
