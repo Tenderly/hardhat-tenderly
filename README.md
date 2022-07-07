@@ -35,6 +35,13 @@ tdly.setup();
 
 Contract verification works out-of-the box if contracts is deployed via ethers provided in HRE object.
 
+Turning off the automatic verification:
+```typescript
+tdly.setup({
+    automaticVerifications: false
+});
+```
+
 ## Manual contract verification - Environment extensions
 
 This plugin extends the Hardhat Runtime Environment by adding a `tenderly` field
