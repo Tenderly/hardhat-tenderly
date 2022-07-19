@@ -12,13 +12,13 @@ export const LoginCommand = new commander.Command("login")
     }
 
     if (isAccessTokenSet()) {
-      const overwrite = await promptly.confirm("Access token already set. Would you like to overwrite it? (y/n)")
+      const overwrite = await promptly.confirm("Access token already set. Would you like to overwrite it? (y/n)", { default: "y" })
       if (!overwrite) {
         return
       }
     }
 
-    setAccessToken(await getAccessToken());
+    setAccessToken(await promptAccessToken());
 
     console.log("Successfully logged in.")
   });
@@ -31,7 +31,7 @@ const validator = function (value: string) {
   return value;
 };
 
-async function getAccessToken(): Promise<string> {
+async function promptAccessToken(): Promise<string> {
   console.log('Redirecting to https://dashboard.tenderly.co/account/authorization')
   await open('https://dashboard.tenderly.co/account/authorization');
 
