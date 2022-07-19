@@ -1,4 +1,4 @@
-import { PluginName, ReverseNetworkMap } from "../index";
+import { PluginName, ReverseNetworkMap } from "../constants";
 import { logError } from "../utils/error_logger";
 
 import {
@@ -21,6 +21,7 @@ export const TENDERLY_DASHBOARD_BASE_URL = "https://dashboard.tenderly.co";
 export const TENDERLY_RPC_BASE = "https://rpc.tenderly.co";
 
 export class TenderlyService {
+
   public static async getPublicNetworks(): Promise<TenderlyPublicNetwork[]> {
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
     const apiPath = "/api/v1/public-networks";
@@ -39,6 +40,7 @@ export class TenderlyService {
     }
     return response;
   }
+
   public static async verifyContracts(request: TenderlyContractUploadRequest) {
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
     const apiPath = "/api/v1/public/verify-contracts";
@@ -90,6 +92,7 @@ export class TenderlyService {
       console.log(API_VERIFICATION_REQUEST_ERROR);
     }
   }
+
   public static async pushContracts(
     request: TenderlyContractUploadRequest,
     tenderlyProject: string,

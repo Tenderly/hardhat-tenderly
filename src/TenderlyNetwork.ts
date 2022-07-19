@@ -5,7 +5,7 @@ import * as yaml from "js-yaml";
 import os from "os";
 import path from "path";
 
-import { PluginName } from "./index";
+import { PluginName } from "./constants";
 import { NO_COMPILER_FOUND_FOR_CONTRACT } from "./tenderly/errors";
 import { TenderlyApiService } from "./tenderly/TenderlyApiService";
 import { TenderlyService } from "./tenderly/TenderlyService";
