@@ -7,7 +7,7 @@ export const NetworksCommand = new commander.Command("networks")
   .description("list all Tenderly supported networks")
   .action(async () => {
     const table = new Table({
-      head: ["Network slug", "Network ID"]
+      head: ["Network ID", "Network slug"]
     });
 
     const networks = await TenderlyService.getPublicNetworks();
@@ -17,7 +17,7 @@ export const NetworksCommand = new commander.Command("networks")
     filteredNetworks.sort((a, b) => a.sort_order - b.sort_order);
 
     filteredNetworks.forEach((network, index) => {
-      table.push([network.slug, network.ethereum_network_id]);
+      table.push([network.ethereum_network_id ,network.slug]);
     });
 
     console.log(table.toString());
