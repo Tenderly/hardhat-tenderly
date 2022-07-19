@@ -3,6 +3,7 @@ export interface TenderlyPublicNetwork {
   name: string;
   slug: string;
   metadata: TenderlyNetworkMetadata;
+  sort_order: number;
 }
 
 export interface TenderlyNetworkMetadata {
@@ -10,4 +11,5 @@ export interface TenderlyNetworkMetadata {
   slug: string;
   secondary_slugs: string[];
   short_identifier: string;
+  exclude_from_listing: boolean;
 }

@@ -5,7 +5,7 @@ import * as yaml from "js-yaml";
 import { homedir } from "os";
 import { sep } from "path";
 
-import { PluginName } from "../index";
+import { PluginName } from "../constants";
 
 import {
   TENDERLY_API_BASE_URL,

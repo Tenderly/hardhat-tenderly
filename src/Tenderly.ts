@@ -3,7 +3,7 @@ import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { sep } from "path";
 
-import { DefaultChainId, NetworkMap, PluginName } from "./index";
+import { DefaultChainId, NetworkMap, PluginName } from "./constants";
 import {
   CONTRACTS_NOT_DETECTED,
   NO_COMPILER_FOUND_FOR_CONTRACT
