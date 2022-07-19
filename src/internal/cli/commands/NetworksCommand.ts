@@ -16,7 +16,7 @@ export const NetworksCommand = new commander.Command("networks")
 
     filteredNetworks.sort((a, b) => a.sort_order - b.sort_order);
 
-    filteredNetworks.forEach(function (network, index) {
+    filteredNetworks.forEach((network, index) => {
       table.push([network.slug, network.ethereum_network_id]);
     });
 
