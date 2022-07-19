@@ -1,6 +1,6 @@
 import Table from "cli-table";
 import commander from "commander";
-import { TenderlyPublicNetwork } from "../../../Tenderly/types/Network";
+import { TenderlyPublicNetwork } from "../../../tenderly/types/Network";
 import { TenderlyService } from "../../../tenderly/TenderlyService";
 
 export const NetworksCommand = new commander.Command("networks")
