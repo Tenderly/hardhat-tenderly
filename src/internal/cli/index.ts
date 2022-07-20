@@ -3,6 +3,12 @@ import { Command } from "commander";
 import { NetworksCommand } from "./commands";
 import { LoginCommand } from "./commands";
 
+process.openStdin().on("keypress", function (chunk, key) {
+  if (key && key.name === "c" && key.ctrl) {
+    process.exit();
+  }
+});
+
 (async () => {
   try {
     const program = new Command();
