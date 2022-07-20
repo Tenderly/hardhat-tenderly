@@ -1,3 +1,4 @@
 import { NetworksCommand } from "./NetworksCommand";
+import { LoginCommand } from "./LoginCommand";
 
-export { NetworksCommand };
+export { NetworksCommand, LoginCommand };
