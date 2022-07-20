@@ -38,7 +38,7 @@
     "chai": "^4.2.0",
     "dotenv": "^6.2.0",
     "hardhat": "^2.9.9",
-    "mocha": "^5.2.0",
+    "mocha": "^10.0.0",
     "prettier": "^1.17.0",
     "source-map-support": "^0.5.12",
     "ts-node": "^8.1.0",
