@@ -11,10 +11,11 @@ export const NetworksCommand = new commander.Command("networks")
 
     const headers = ["Network ID", "Network slug"];
     if (verbose) {
-      headers.push("Latest block");
+      headers.push("Latest block number");
     }
 
     const table = new Table({
+      style: { head: ["magenta"] },
       head: headers,
     });
 
