@@ -41,6 +41,25 @@ export class TenderlyService {
     return response;
   }
 
+  public static async getLatestBlockNumber(networkId: string): Promise<string> {
+    let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
+    const apiPath = `/api/v1/network/${networkId}/block-number`;
+
+    if (TenderlyApiService.isAuthenticated()) {
+      tenderlyApi = TenderlyApiService.configureInstance();
+    }
+
+    let response: string = '';
+    try {
+      response = (await tenderlyApi.get(apiPath)).data.block_number;
+    } catch (e) {
+      console.log(
+        `Error in ${PluginName}: There was an error during the request. Latest block number fetch failed`
+      );
+    }
+    return response;
+  }
+
   public static async verifyContracts(request: TenderlyContractUploadRequest) {
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
     const apiPath = "/api/v1/public/verify-contracts";
