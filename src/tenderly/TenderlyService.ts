@@ -5,14 +5,14 @@ import {
   API_VERIFICATION_REQUEST_ERROR,
   BYTECODE_MISMATCH_ERROR,
   NO_NEW_CONTRACTS_VERIFIED_ERROR,
-  NO_VERIFIABLE_CONTRACTS_ERROR
+  NO_VERIFIABLE_CONTRACTS_ERROR,
 } from "./errors";
 import { TenderlyApiService } from "./TenderlyApiService";
 import {
   ApiContract,
   ContractResponse,
   TenderlyContractUploadRequest,
-  TenderlyForkContractUploadRequest
+  TenderlyForkContractUploadRequest,
 } from "./types";
 import { TenderlyPublicNetwork } from "./types/Network";
 
@@ -81,7 +81,7 @@ export class TenderlyService {
           ReverseNetworkMap[contract.network_id]
         }/${contract.address}`;
         console.log(
-          `Contract ${contract.address} verified. You can view the contract at ${contractLink}`
+          `Contract ${contract.address} verified. \nYou can view the contract at ${contractLink}`
         );
       }
       console.groupEnd();
@@ -164,7 +164,10 @@ export class TenderlyService {
 
       console.group();
       for (const contract of responseData.contracts) {
-        console.log(`Contract at ${contract.address} verified.`);
+        const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/${username}/${tenderlyProject}/fork/${fork}/contract/${contract.address}`;
+        console.log(
+          `Contract ${contract.address} verified. \nYou can view the contract at ${contractLink}`
+        );
       }
       console.groupEnd();
     } catch (error) {
