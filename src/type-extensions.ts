@@ -5,7 +5,7 @@ import {
   ContractByName,
   TenderlyConfig,
   TenderlyContractUploadRequest,
-  TenderlyForkContractUploadRequest
+  TenderlyForkContractUploadRequest,
 } from "./tenderly/types";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 
@@ -23,7 +23,7 @@ export interface TenderlyPlugin {
   /***
    * @description Verifying deployed contracts on fork via API.
    * @param request - raw contract verification request param
-   * @param tenderlyProject - Tenderly project name
+   * @param tenderlyProject - Tenderly project slug
    * @param username - Tenderly project username (or organization username)
    * @param forkID - Fork id on which verification is occurring
    */
@@ -40,7 +40,7 @@ export interface TenderlyPlugin {
   persistArtifacts: (...contracts) => Promise<void>;
 
   /***
-   * @deprecated
+   * @deprecated since version 1.1.4. Use `verifyAPI` instead.
    */
   pushAPI: (
     request: TenderlyContractUploadRequest,
@@ -48,16 +48,16 @@ export interface TenderlyPlugin {
     username: string
   ) => Promise<void>;
   /***
-   * @deprecated
+   * @deprecated since version 1.1.4. Use `verify` instead.
    */
   push: (...contracts: ContractByName[]) => Promise<void>;
 
   /***
-   * @deprecated
+   * @deprecated since version 1.1.4.
    */
   network: () => TenderlyNetwork;
   /***
-   * @deprecated
+   * @deprecated since version 1.1.4.
    */
   setNetwork: (network: TenderlyNetwork) => TenderlyNetwork;
 }
