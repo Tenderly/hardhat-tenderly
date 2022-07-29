@@ -36,7 +36,7 @@ cp .tpl.env .env
 To get going, run
 
 ```
-npm install
+yarn install
 ```
 
 Try running automatic verification:
@@ -72,7 +72,7 @@ TENDERLY_AUTOMATIC_VERIFICATION=false \
 hardhat run scripts/greeter/manual-simple.ts --network ropsten
 ```
 
-Don't worry, we generated [NPM run scripts](#npm-run-scripts) to speed things up.
+Don't worry, we generated [Run scripts](#run-scripts) to speed things up.
 
 ### Modes of verification: `public`, `private`, and `fork`
 
@@ -87,7 +87,7 @@ Don't worry, we generated [NPM run scripts](#npm-run-scripts) to speed things up
 - Default: `false`
 - To run an automatic verification set `TENDERLY_AUTOMATIC_VERIFICATION=true`
 
-## NPM run scripts
+## Run scripts
 
 The pre-populated (generated) scripts in package.json are there to help you quickly run a particular build (out of 18 possibilities), so you don't need to specify environment variables and the tartet deployment script every time you're trying stuff out.
 
@@ -102,8 +102,8 @@ You can choose
 To run `private` verification of the `Greeter` using `manual-simple` method, you need to run the following:
 
 ```
-npm run private:greeter:manual-simple --network ropsten
-npm run fork:calculatr:manual-advanced
+yarn run private:greeter:manual-simple --network ropsten
+yarn run fork:calculatr:manual-advanced
 ```
 
 The `fork:` scripts have `--network tenderly` already included.
