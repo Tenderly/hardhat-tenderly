@@ -1946,7 +1946,7 @@ hardhat-deploy@^0.11.10:
     qs "^6.9.4"
     zksync-web3 "^0.4.0"
 
-hardhat@^2.9.9:
+hardhat@^2.10.1:
   version "2.10.1"
   resolved "https://registry.yarnpkg.com/hardhat/-/hardhat-2.10.1.tgz#37fdc0c96d6a5d16b322269db2ad8f9f115c4046"
   integrity sha512-0FN9TyCtn7Lt25SB2ei2G7nA2rZjP+RN6MvFOm+zYwherxLZNo6RbD8nDz88eCbhRapevmXqOiL2nM8INKsjmA==
