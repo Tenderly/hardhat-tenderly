@@ -10,3 +10,5 @@ cache
 artifacts
 
 .DS_Store
+
+dist

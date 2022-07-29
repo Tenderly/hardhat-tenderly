@@ -102,5 +102,8 @@ You can choose
 To run `private` verification of the `Greeter` using `manual-simple` method, you need to run the following:
 
 ```
-npm run private:greeter:manual-simple
+npm run private:greeter:manual-simple --network ropsten
+npm run fork:calculatr:manual-advanced
 ```
+
+The `fork:` scripts have `--network tenderly` already included.
