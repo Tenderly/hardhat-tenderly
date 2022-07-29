@@ -18,9 +18,7 @@
     "fork:greeter:manual-advanced": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=false hardhat run scripts/greeter/manual-advanced-fork.ts --network tenderly",
     "fork:calculator:automatic": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=true hardhat run scripts/calculator/automatic.ts --network tenderly",
     "fork:calculator:manual-simple": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=false hardhat run scripts/calculator/manual-simple.ts --network tenderly",
-    "fork:calculator:manual-advanced": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=false hardhat run scripts/calculator/manual-advanced-fork.ts --network tenderly",
-    "gen:scripts": "ts-node lib/genRunScripts.ts",
-    "all": "ts-node lib/runall.ts"
+    "fork:calculator:manual-advanced": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=false hardhat run scripts/calculator/manual-advanced-fork.ts --network tenderly"
   },
   "devDependencies": {
     "@ethersproject/abi": "^5.6.4",
