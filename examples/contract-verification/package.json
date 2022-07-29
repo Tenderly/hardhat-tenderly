@@ -1,5 +1,9 @@
 {
   "name": "hardhat-project",
+  "license": "SEE LICENSE IN LICENSE",
+  "files": [
+    "LICENSE"
+  ],
   "scripts": {
     "public:greeter:automatic": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=true hardhat run scripts/greeter/automatic.ts",
     "public:greeter:manual-simple": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=false hardhat run scripts/greeter/manual-simple.ts",

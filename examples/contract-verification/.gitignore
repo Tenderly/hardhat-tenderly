@@ -1,14 +1,20 @@
+.DS_Store
+
 node_modules
-.env
 coverage
 coverage.json
 typechain
 typechain-types
 
+# env Variables files (dotenv package)
+.env
+
 #Hardhat files
 cache
 artifacts
 
-.DS_Store
-
+# ts
 dist
+
+# hardhat-tenderly plugin
+deployments
