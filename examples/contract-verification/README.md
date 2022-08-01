@@ -3,7 +3,6 @@
 This repo demonstrates deployment and verification of Smart Contracts in Tenderly platform, using:
 
 - **Tenderly Hardhat plugin** to perform verification using Ethers in several ways (automatic and manual). There are 18 different possibilities you can play around with.
-- **API access** to perform verification using the API (TBD)
 
 To learn more explore [Tenderly documentation](https://docs.tenderly.co/monitoring/smart-contract-verification).
 
@@ -106,4 +105,5 @@ yarn run private:greeter:manual-simple --network ropsten
 yarn run fork:calculatr:manual-advanced
 ```
 
+When running against a specific network, you must add `--network <NETWORK_NAME>` .
 The `fork:` scripts have `--network tenderly` already included.
