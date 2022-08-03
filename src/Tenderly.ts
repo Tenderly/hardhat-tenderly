@@ -300,7 +300,6 @@ export class Tenderly {
         );
         return null;
       }
-      console.log(contract.libraries);
       requestData.contracts[index].networks = {
         [chainID]: {
           address: contract.address,
@@ -325,7 +324,6 @@ export class Tenderly {
 
     if (config === undefined) {
       console.log(NO_COMPILER_FOUND_FOR_CONTRACT);
-      console.log(flatContracts);
     }
 
     return {
