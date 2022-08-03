@@ -115,12 +115,10 @@ export class TenderlyNetwork {
     const requestData = await this.filterContracts(flatContracts);
 
     if (requestData == null) {
-      console.log("Fork verification failed");
       return;
     }
 
     if (requestData?.contracts.length === 0) {
-      console.log("No contracts to verify");
       return;
     }
 
@@ -246,6 +244,9 @@ export class TenderlyNetwork {
     flatContracts: ContractByName[]
   ): Promise<TenderlyForkContractUploadRequest> {
     const contracts = await getContracts(this.env, flatContracts);
+    if (contracts.length === 0) {
+      throw new Error("Failed to get contracts");
+    }
 
     const solcConfig = getCompilerDataFromContracts(
       contracts,
