@@ -1,5 +1,5 @@
 import { Libraries } from "@nomiclabs/hardhat-ethers/types";
-import { Contract, ethers } from "ethers";
+import { Contract, ContractFactory, ethers, Signer } from "ethers";
 
 import { TenderlyPlugin } from "../../type-extensions";
 
@@ -19,18 +19,19 @@ export class TdlyContractFactory {
     contractName: string,
     libs?: Libraries
   ) {
-    this.contractName = contractName;
     this.nativeContractFactory = nativeContractFactory;
     this.tenderly = tenderly;
+    this.contractName = contractName;
     this.libs = libs;
 
-    Object.keys(nativeContractFactory).forEach(key => {
-      if (this[key] !== undefined) {
-        return;
+    // tslint:disable-next-line:forin
+    for (const attribute in nativeContractFactory) {
+      if (this[attribute] !== undefined) {
+        continue;
       }
 
-      this[key] = nativeContractFactory[key];
-    });
+      this[attribute] = nativeContractFactory[attribute];
+    }
   }
 
   public async deploy(...args: any[]): Promise<Contract> {
@@ -42,5 +43,16 @@ export class TdlyContractFactory {
       this.contractName,
       this.libs
     ) as unknown) as Contract;
+  }
+
+  public async connect(signer: Signer) {
+    const contractFactory = this.nativeContractFactory.connect(signer);
+
+    return new TdlyContractFactory(
+      contractFactory,
+      this.tenderly,
+      this.contractName,
+      this.libs
+    );
   }
 }

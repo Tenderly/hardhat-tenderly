@@ -48,7 +48,10 @@ export class TdlyContract {
 
   public async deployed(): Promise<Contract> {
     const contract = await this.nativeContract.deployed();
-    await this.tdlyVerify(contract.address);
+    if (!this.nativeContract.deployTransaction) {
+      await this.tdlyVerify(contract.address);
+    }
+
     return contract;
   }
 
