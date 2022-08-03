@@ -119,6 +119,11 @@ export class TenderlyNetwork {
       return;
     }
 
+    if (requestData?.contracts.length === 0) {
+      console.log("No contracts to verify");
+      return;
+    }
+
     try {
       await TenderlyService.verifyForkContracts(
         requestData,
