@@ -250,7 +250,6 @@ export class TenderlyNetwork {
 
     if (solcConfig === undefined) {
       console.log(NO_COMPILER_FOUND_FOR_CONTRACT);
-      console.log(flatContracts);
     }
 
     return {
