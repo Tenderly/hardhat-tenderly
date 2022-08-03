@@ -2,6 +2,7 @@ import { Contract, ethers } from "ethers";
 import { Libraries } from "hardhat-deploy/dist/types";
 
 import { TenderlyPlugin } from "../../type-extensions";
+import { ContractByName } from "../types";
 
 export class TdlyContract {
   [key: string]: any;
@@ -33,11 +34,16 @@ export class TdlyContract {
 
   public async deployed(): Promise<Contract> {
     const contract = await this.nativeContract.deployed();
-    const contPair = {
+
+    // if contract is library skip verification
+
+    const contPair: ContractByName = {
       name: this.contractName,
-      address: contract.address,
-      libraries: this.libraries
+      address: contract.address
     };
+    if (this.libraries) {
+      contPair.libraries = this.libraries;
+    }
 
     await this.tenderly.persistArtifacts(contPair);
     await this.tenderly.verify(contPair);
