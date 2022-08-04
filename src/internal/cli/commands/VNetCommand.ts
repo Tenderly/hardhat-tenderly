@@ -1,42 +1,28 @@
-import commander, { program } from "commander";
-import express from "express";
-import got from "got";
+import commander from "commander";
+import * as path from "path";
+import * as childProcess from "child_process";
 
 export const VNetCommand = new commander.Command("vnet")
   .description("configure and start Tenderly VNet")
-  .action(() => {
-    console.log(
-      "Forwarding: http://localhost:1337 --> https://rpc.tenderly.co/vnet/{{fork_id}}"
+  .action(async () => {
+    const child = childProcess.exec(
+      `node ${path.resolve(
+        __dirname,
+        "..",
+        "..",
+        "..",
+        "..",
+        "dist",
+        "internal",
+        "cli",
+        "commands",
+        "vnetServer.js"
+      )}`
     );
+    child.stdout.pipe(process.stdout);
+    child.stderr.pipe(process.stderr);
 
-    const app = express();
-    app.use(express.json());
-
-    app.use(async (req, res) => {
-      console.log(req.body.method);
-
-      const tdlyRes: any = await got
-        .post(
-          "https://rpc.tenderly.co/fork/ed6f31c5-9d52-46b3-9181-54b8970e12cc",
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(req.body),
-          }
-        )
-        .json();
-
-      // if (tdlyRes?.result?.hash) {
-      //   console.log(
-      //     "https://dashboard.tenderly.co/Riphal/project1/fork/ed6f31c5-9d52-46b3-9181-54b8970e12cc/simulation/" +
-      //       tdlyRes.result
-      //   );
-      //   console.log(tdlyRes);
-      // }
-
-      res.send(tdlyRes);
+    await new Promise((resolve) => {
+      child.on("close", resolve);
     });
-
-    app.listen(1337);
   });
