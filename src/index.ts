@@ -15,7 +15,7 @@ import { Tenderly } from "./Tenderly";
 import { CONTRACTS_NOT_DETECTED } from "./tenderly/errors";
 import { wrapEthers } from "./tenderly/ethers";
 import { wrapHHDeployments } from "./tenderly/hardhat-deploy";
-import { TENDERLY_RPC_BASE, TenderlyService } from "./tenderly/TenderlyService";
+import { TenderlyService, TENDERLY_RPC_BASE } from "./tenderly/TenderlyService";
 import { Metadata, TenderlyContract } from "./tenderly/types";
 import { TenderlyPublicNetwork } from "./tenderly/types/Network";
 import { TenderlyNetwork } from "./TenderlyNetwork";
