@@ -34,6 +34,7 @@
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/cli-table": "^0.3.0",
+    "@types/express": "^4.17.13",
     "@types/find-up": "^4.0.0",
     "@types/fs-extra": "^5.0.4",
     "@types/js-yaml": "^3.12.5",
@@ -61,7 +62,9 @@
     "cli-table": "^0.3.11",
     "commander": "^9.4.0",
     "ethers": "^5.6.8",
+    "express": "^4.18.1",
     "fs-extra": "^9.0.1",
+    "got": "11.8.3",
     "hardhat-deploy": "^0.11.10",
     "js-yaml": "^3.14.0",
     "open": "^8.4.0",

@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "target": "es2020",
+    "lib": [
+      "es2020"
+    ],
     "module": "commonjs",
     "declaration": true,
     "declarationMap": true,
@@ -13,7 +16,9 @@
       "./test"
     ],
     "esModuleInterop": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true
   },
   "exclude": [
     "dist",
