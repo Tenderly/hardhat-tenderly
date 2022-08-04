@@ -58,7 +58,7 @@ export const getContracts = async (
   let contract: ContractByName;
   const requestContracts: TenderlyContract[] = [];
   const metadata: Metadata = {
-    compiler: {
+    defaultCompiler: {
       version: extractCompilerVersion(hre.config)
     },
     sources: {}
@@ -77,7 +77,8 @@ export const getContracts = async (
       }
 
       metadata.sources[sourcePath] = {
-        content: resolvedFile.content.rawContent
+        content: resolvedFile.content.rawContent,
+        versionPragma: resolvedFile.content.versionPragmas[0]
       };
       const visited: Record<string, boolean> = {};
       resolveDependencies(data, sourcePath, metadata, visited);
@@ -96,7 +97,7 @@ export const getContracts = async (
       networks: {},
       compiler: {
         name: "solc",
-        version: extractCompilerVersion(hre.config, key)
+        version: extractCompilerVersion(hre.config, key, value.versionPragma)
       }
     };
     requestContracts.push(contractToPush);
@@ -126,7 +127,8 @@ export const resolveDependencies = (
         visited
       );
       metadata.sources[resolvedDependency.sourceName] = {
-        content: resolvedDependency.content.rawContent
+        content: resolvedDependency.content.rawContent,
+        versionPragma: resolvedDependency.content.versionPragmas[0]
       };
     });
 };
@@ -179,7 +181,8 @@ export const newCompilerConfig = (
 
 export const extractCompilerVersion = (
   config: HardhatConfig,
-  sourcePath?: string
+  sourcePath?: string,
+  versionPragma?: string
 ): string => {
   if (
     sourcePath !== undefined &&
@@ -187,5 +190,31 @@ export const extractCompilerVersion = (
   ) {
     return config.solidity.overrides[sourcePath].version;
   }
+  if (versionPragma !== undefined) {
+    for (const compiler of config.solidity.compilers) {
+      if (compareVersions(compiler.version, versionPragma)) {
+        return compiler.version;
+      }
+    }
+  }
+
   return config.solidity.compilers[0].version;
+};
+
+const compareVersions = (
+  compilerVersion: string,
+  contractVersionPragma: string
+): boolean => {
+  const compilerVersionSplit = compilerVersion.split(".");
+  const contractVersionSplit = contractVersionPragma.slice(1).split(".");
+  for (let i = 0; i < compilerVersionSplit.length; i++) {
+    if (compilerVersionSplit[i] > contractVersionSplit[i]) {
+      break;
+    }
+    if (compilerVersionSplit[i] < contractVersionSplit[i]) {
+      return false;
+    }
+  }
+
+  return true;
 };

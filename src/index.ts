@@ -209,7 +209,7 @@ const extractContractData = async (
   }
 
   const metadata: Metadata = {
-    compiler: {
+    defaultCompiler: {
       version: extractCompilerVersion(config)
     },
     sources: {}
@@ -235,7 +235,8 @@ const extractContractData = async (
         continue;
       }
       metadata.sources[sourcePath] = {
-        content: resolvedFile.content.rawContent
+        content: resolvedFile.content.rawContent,
+        versionPragma: resolvedFile.content.versionPragmas[0]
       };
       const visited: Record<string, boolean> = {};
       resolveDependencies(data, sourcePath, metadata, visited);
@@ -255,7 +256,7 @@ const extractContractData = async (
       networks: {},
       compiler: {
         name: "solc",
-        version: extractCompilerVersion(config, key)
+        version: extractCompilerVersion(config, key, value.versionPragma)
       }
     };
 
