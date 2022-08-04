@@ -1,5 +1,5 @@
 import Table from "cli-table";
-import commander, { Option } from "commander";
+import commander from "commander";
 import { TenderlyPublicNetwork } from "../../../tenderly/types/Network";
 import { TenderlyService } from "../../../tenderly/TenderlyService";
 
@@ -44,11 +44,7 @@ export const NetworksCommand = new commander.Command("networks")
     console.log(table.toString());
   });
 
-function isNotExcluded(
-  element: TenderlyPublicNetwork,
-  index: number,
-  array: TenderlyPublicNetwork[]
-): boolean {
+function isNotExcluded(element: TenderlyPublicNetwork): boolean {
   return (
     element.metadata.exclude_from_listing === undefined ||
     element.metadata.exclude_from_listing === false
