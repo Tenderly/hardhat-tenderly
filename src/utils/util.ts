@@ -240,16 +240,76 @@ const compareVersions = (
   compilerVersion: string,
   contractVersionPragma: string
 ): boolean => {
-  const compilerVersionSplit = compilerVersion.split(".");
-  if (contractVersionPragma[0] == '^') {
-    contractVersionPragma = contractVersionPragma.slice(1)
+  switch (contractVersionPragma[0]) {
+    case "^":
+      return checkGTEVersion(compilerVersion, contractVersionPragma.slice(1));
+    case ">":
+      if (contractVersionPragma.length === 6) {
+        return checkGTVersion(compilerVersion, contractVersionPragma.slice(1));
+      }
+      if (contractVersionPragma.length === 7) {
+        return checkGTEVersion(compilerVersion, contractVersionPragma.slice(2));
+      }
+
+      if (contractVersionPragma.length > 8) {
+        const [gt, lt] = contractVersionPragma.split(" ");
+
+        let isGT = false;
+        let isLT = false;
+        if (gt.length === 6) {
+          isGT = checkGTVersion(compilerVersion, gt.slice(1));
+        }
+        if (gt.length === 7) {
+          isGT = checkGTEVersion(compilerVersion, gt.slice(2));
+        }
+
+        if (lt.length === 6) {
+          isLT = !checkGTEVersion(compilerVersion, lt.slice(1));
+        }
+        if (lt.length === 7) {
+          isLT = !checkGTVersion(compilerVersion, lt.slice(2));
+        }
+
+        return isGT && isLT;
+      }
+
+      break;
+    default:
+      return checkGTEVersion(compilerVersion, contractVersionPragma);
   }
+
+  return false;
+};
+
+const checkGTEVersion = (
+  compilerVersion: string,
+  contractVersionPragma: string
+) => {
+  const compilerVersionSplit = compilerVersion.split(".");
   const contractVersionSplit = contractVersionPragma.split(".");
   for (let i = 0; i < compilerVersionSplit.length; i++) {
     if (compilerVersionSplit[i] > contractVersionSplit[i]) {
       break;
     }
     if (compilerVersionSplit[i] < contractVersionSplit[i]) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+const checkGTVersion = (
+  compilerVersion: string,
+  contractVersionPragma: string
+) => {
+  const compilerVersionSplit = compilerVersion.split(".");
+  const contractVersionSplit = contractVersionPragma.split(".");
+  for (let i = 0; i < compilerVersionSplit.length; i++) {
+    if (compilerVersionSplit[i] > contractVersionSplit[i]) {
+      break;
+    }
+    if (compilerVersionSplit[i] <= contractVersionSplit[i]) {
       return false;
     }
   }
