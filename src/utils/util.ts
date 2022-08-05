@@ -1,6 +1,6 @@
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatConfig } from "hardhat/src/types/config";
-import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { HardhatRuntimeEnvironment, SolcConfig } from "hardhat/types";
 
 import { PluginName } from "../index";
 import {
@@ -23,7 +23,11 @@ export const getCompilerDataFromContracts = (
       if (mainContract.name !== contract.contractName) {
         continue;
       }
-      const contractConfig = newCompilerConfig(hhConfig, contract.sourcePath);
+      const contractConfig = newCompilerConfig(
+        hhConfig,
+        contract.sourcePath,
+        contract.compiler?.version
+      );
       if (config && !compareConfigs(contractConfig, config)) {
         console.log(
           `Error in ${PluginName}: Different compiler versions provided in same request`
@@ -34,6 +38,7 @@ export const getCompilerDataFromContracts = (
       }
     }
   }
+
   return config;
 };
 
@@ -58,7 +63,7 @@ export const getContracts = async (
   let contract: ContractByName;
   const requestContracts: TenderlyContract[] = [];
   const metadata: Metadata = {
-    compiler: {
+    defaultCompiler: {
       version: extractCompilerVersion(hre.config)
     },
     sources: {}
@@ -77,7 +82,8 @@ export const getContracts = async (
       }
 
       metadata.sources[sourcePath] = {
-        content: resolvedFile.content.rawContent
+        content: resolvedFile.content.rawContent,
+        versionPragma: resolvedFile.content.versionPragmas[0]
       };
       const visited: Record<string, boolean> = {};
       resolveDependencies(data, sourcePath, metadata, visited);
@@ -96,7 +102,7 @@ export const getContracts = async (
       networks: {},
       compiler: {
         name: "solc",
-        version: extractCompilerVersion(hre.config, key)
+        version: extractCompilerVersion(hre.config, key, value.versionPragma)
       }
     };
     requestContracts.push(contractToPush);
@@ -126,7 +132,8 @@ export const resolveDependencies = (
         visited
       );
       metadata.sources[resolvedDependency.sourceName] = {
-        content: resolvedDependency.content.rawContent
+        content: resolvedDependency.content.rawContent,
+        versionPragma: resolvedDependency.content.versionPragmas[0]
       };
     });
 };
@@ -152,7 +159,8 @@ export const compareConfigs = (
 
 export const newCompilerConfig = (
   config: HardhatConfig,
-  sourcePath?: string
+  sourcePath?: string,
+  contractCompiler?: string
 ): TenderlyContractConfig => {
   if (
     sourcePath !== undefined &&
@@ -168,6 +176,10 @@ export const newCompilerConfig = (
       debug: config.solidity.overrides[sourcePath].settings.debug
     };
   }
+  if (contractCompiler !== undefined) {
+    return determineCompilerConfig(config.solidity.compilers, contractCompiler);
+  }
+
   return {
     compiler_version: config.solidity.compilers[0].version,
     optimizations_used: config.solidity.compilers[0].settings.optimizer.enabled,
@@ -179,7 +191,8 @@ export const newCompilerConfig = (
 
 export const extractCompilerVersion = (
   config: HardhatConfig,
-  sourcePath?: string
+  sourcePath?: string,
+  versionPragma?: string
 ): string => {
   if (
     sourcePath !== undefined &&
@@ -187,5 +200,119 @@ export const extractCompilerVersion = (
   ) {
     return config.solidity.overrides[sourcePath].version;
   }
+  if (versionPragma !== undefined) {
+    for (const compiler of config.solidity.compilers) {
+      if (compareVersions(compiler.version, versionPragma)) {
+        return compiler.version;
+      }
+    }
+  }
+
   return config.solidity.compilers[0].version;
+};
+
+const determineCompilerConfig = (
+  compilers: SolcConfig[],
+  contractCompiler: string
+): TenderlyContractConfig => {
+  for (const compiler of compilers) {
+    if (compareVersions(compiler.version, contractCompiler)) {
+      return {
+        compiler_version: compiler.version,
+        optimizations_used: compiler.settings.optimizer.enabled,
+        optimizations_count: compiler.settings.optimizer.runs,
+        evm_version: compiler.settings.evmVersion,
+        debug: compiler.settings.debug
+      };
+    }
+  }
+
+  return {
+    compiler_version: compilers[0].version,
+    optimizations_used: compilers[0].settings.optimizer.enabled,
+    optimizations_count: compilers[0].settings.optimizer.runs,
+    evm_version: compilers[0].settings.evmVersion,
+    debug: compilers[0].settings.debug
+  };
+};
+
+const compareVersions = (
+  compilerVersion: string,
+  contractVersionPragma: string
+): boolean => {
+  switch (contractVersionPragma[0]) {
+    case "^":
+      return checkGTEVersion(compilerVersion, contractVersionPragma.slice(1));
+    case ">":
+      if (contractVersionPragma.length === 6) {
+        return checkGTVersion(compilerVersion, contractVersionPragma.slice(1));
+      }
+      if (contractVersionPragma.length === 7) {
+        return checkGTEVersion(compilerVersion, contractVersionPragma.slice(2));
+      }
+
+      if (contractVersionPragma.length > 8) {
+        const [gt, lt] = contractVersionPragma.split(" ");
+
+        let isGT = false;
+        let isLT = false;
+        if (gt.length === 6) {
+          isGT = checkGTVersion(compilerVersion, gt.slice(1));
+        }
+        if (gt.length === 7) {
+          isGT = checkGTEVersion(compilerVersion, gt.slice(2));
+        }
+
+        if (lt.length === 6) {
+          isLT = !checkGTEVersion(compilerVersion, lt.slice(1));
+        }
+        if (lt.length === 7) {
+          isLT = !checkGTVersion(compilerVersion, lt.slice(2));
+        }
+
+        return isGT && isLT;
+      }
+
+      break;
+    default:
+      return checkGTEVersion(compilerVersion, contractVersionPragma);
+  }
+
+  return false;
+};
+
+const checkGTEVersion = (
+  compilerVersion: string,
+  contractVersionPragma: string
+) => {
+  const compilerVersionSplit = compilerVersion.split(".");
+  const contractVersionSplit = contractVersionPragma.split(".");
+  for (let i = 0; i < compilerVersionSplit.length; i++) {
+    if (compilerVersionSplit[i] > contractVersionSplit[i]) {
+      break;
+    }
+    if (compilerVersionSplit[i] < contractVersionSplit[i]) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+const checkGTVersion = (
+  compilerVersion: string,
+  contractVersionPragma: string
+) => {
+  const compilerVersionSplit = compilerVersion.split(".");
+  const contractVersionSplit = contractVersionPragma.split(".");
+  for (let i = 0; i < compilerVersionSplit.length; i++) {
+    if (compilerVersionSplit[i] > contractVersionSplit[i]) {
+      break;
+    }
+    if (compilerVersionSplit[i] <= contractVersionSplit[i]) {
+      return false;
+    }
+  }
+
+  return true;
 };

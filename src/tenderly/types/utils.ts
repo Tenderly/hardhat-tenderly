@@ -20,10 +20,11 @@ export interface TenderlyConfig {
 }
 
 export interface Metadata {
-  compiler: ContractCompiler;
+  defaultCompiler: ContractCompiler;
   sources: Record<string, MetadataSources>;
 }
 
 export interface MetadataSources {
   content: string;
+  versionPragma: string;
 }
