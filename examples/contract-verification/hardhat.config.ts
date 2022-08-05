@@ -1,5 +1,4 @@
 import { HardhatUserConfig } from "hardhat/config";
-import "@nomicfoundation/hardhat-toolbox";
 import * as tdly from "@tenderly/hardhat-tenderly";
 import * as dotenv from "dotenv";
 
