@@ -5,6 +5,10 @@ import * as childProcess from "child_process";
 export const VNetCommand = new commander.Command("vnet")
   .description("configure and start Tenderly VNet")
   .action(async () => {
+    await startServer();
+  });
+
+  async function startServer() {
     const child = childProcess.exec(
       `node ${path.resolve(
         __dirname,
@@ -25,4 +29,4 @@ export const VNetCommand = new commander.Command("vnet")
     await new Promise((resolve) => {
       child.on("close", resolve);
     });
-  });
+  }
