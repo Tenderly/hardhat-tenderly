@@ -5,15 +5,16 @@ import {
   API_VERIFICATION_REQUEST_ERROR,
   BYTECODE_MISMATCH_ERROR,
   NO_NEW_CONTRACTS_VERIFIED_ERROR,
-  NO_VERIFIABLE_CONTRACTS_ERROR
+  NO_VERIFIABLE_CONTRACTS_ERROR,
 } from "./errors";
 import { TenderlyApiService } from "./TenderlyApiService";
 import {
   ApiContract,
   ContractResponse,
   TenderlyContractUploadRequest,
-  TenderlyForkContractUploadRequest
+  TenderlyForkContractUploadRequest,
 } from "./types";
+import { TenderlyForkTransaction } from "./types/ForkTransaction";
 import { TenderlyPublicNetwork } from "./types/Network";
 
 export const TENDERLY_API_BASE_URL = "https://api.tenderly.co";
@@ -21,7 +22,6 @@ export const TENDERLY_DASHBOARD_BASE_URL = "https://dashboard.tenderly.co";
 export const TENDERLY_RPC_BASE = "https://rpc.tenderly.co";
 
 export class TenderlyService {
-
   public static async getPublicNetworks(): Promise<TenderlyPublicNetwork[]> {
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
     const apiPath = "/api/v1/public-networks";
@@ -49,7 +49,7 @@ export class TenderlyService {
       tenderlyApi = TenderlyApiService.configureInstance();
     }
 
-    let response: string = '';
+    let response: string = "";
     try {
       response = (await tenderlyApi.get(apiPath)).data.block_number;
     } catch (e) {
@@ -193,5 +193,26 @@ export class TenderlyService {
       logError(error);
       console.log(API_VERIFICATION_REQUEST_ERROR);
     }
+  }
+
+  public static async getForkTransaction(
+    accountId: string,
+    projectSlug: string,
+    forkId: string,
+    transactionId: string
+  ): Promise<TenderlyForkTransaction> {
+    const tenderlyApi = TenderlyApiService.configureInstance();
+
+    const apiPath = `/api/v1/account/${accountId}/project/${projectSlug}/fork/${forkId}/transaction/${transactionId}`;
+
+    let response: TenderlyForkTransaction;
+    try {
+      response = (await tenderlyApi.get(apiPath)).data.fork_transaction;
+    } catch (e) {
+      console.log(
+        `Error in ${PluginName}: There was an error during the request. Fork transaction fetch failed`
+      );
+    }
+    return response!;
   }
 }

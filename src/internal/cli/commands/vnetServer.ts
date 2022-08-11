@@ -2,6 +2,7 @@ import express from "express";
 import got from "got";
 import supportsHyperlinks from "supports-hyperlinks";
 import hyperlinker from "hyperlinker";
+import { TenderlyService } from "../../../tenderly/TenderlyService";
 
 const app = express();
 app.use(express.json());
@@ -41,8 +42,20 @@ app.use(async (req, res) => {
   res.send(tdlyRes);
 });
 
-app.listen(1337, () => {
+app.listen(1337, async () => {
   console.log(
-    "Forwarding: http://localhost:1337 --> https://rpc.tenderly.co/vnet/{{fork_id}}"
+    "Forwarding: http://localhost:1337 --> https://rpc.tenderly.co/vnet/{{fork_id}}\n"
   );
+
+  const forkTx = await TenderlyService.getForkTransaction(
+    "igorpetkovic",
+    "project",
+    "e2467cfc-1a6a-4e01-b365-3a0406c9e0e2",
+    "fd7d7af1-b43d-428d-bca3-bde5625daea6"
+  );
+  forkTx.state_objects.forEach(function(stateObject, index) {
+    console.log(
+      "Account #" + index + ": " + stateObject.address + " (100 ETH)\n"
+    );
+  });
 });
