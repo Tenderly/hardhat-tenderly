@@ -1,4 +1,9 @@
-export interface TenderlyForkTransaction {
+export interface VNet {
+  vnetId: string;
+  rootTxId: string;
+}
+
+export interface VNetTransaction {
   id: string;
   project_id: string;
   fork_id: string;

@@ -5,17 +5,17 @@ import {
   API_VERIFICATION_REQUEST_ERROR,
   BYTECODE_MISMATCH_ERROR,
   NO_NEW_CONTRACTS_VERIFIED_ERROR,
-  NO_VERIFIABLE_CONTRACTS_ERROR,
+  NO_VERIFIABLE_CONTRACTS_ERROR
 } from "./errors";
 import { TenderlyApiService } from "./TenderlyApiService";
 import {
   ApiContract,
   ContractResponse,
   TenderlyContractUploadRequest,
-  TenderlyForkContractUploadRequest,
+  TenderlyForkContractUploadRequest
 } from "./types";
-import { TenderlyForkTransaction } from "./types/ForkTransaction";
 import { TenderlyPublicNetwork } from "./types/Network";
+import { VNet, VNetTransaction } from "./types/VNet";
 
 export const TENDERLY_API_BASE_URL = "https://api.tenderly.co";
 export const TENDERLY_DASHBOARD_BASE_URL = "https://dashboard.tenderly.co";
@@ -195,22 +195,52 @@ export class TenderlyService {
     }
   }
 
-  public static async getForkTransaction(
+  public static async createVNet(
+    accountId: string,
+    projectSlug: string,
+    networkId: string,
+    blockNumber: string
+  ): Promise<VNet> {
+    const tenderlyApi = TenderlyApiService.configureInstance();
+
+    const apiPath = `/api/v1/account/${accountId}/project/${projectSlug}/fork`;
+
+    let response;
+    try {
+      response = (
+        await tenderlyApi.post(apiPath, {
+          network_id: networkId,
+          blockNumber: blockNumber,
+          vnet: true,
+        })
+      ).data;
+    } catch (e) {
+      console.log(
+        `Error in ${PluginName}: There was an error during the request. VNet creation failed`
+      );
+    }
+    return {
+      vnetId: response.simulation_fork.id,
+      rootTxId: response.root_transaction.id,
+    };
+  }
+
+  public static async getVNetTransaction(
     accountId: string,
     projectSlug: string,
     forkId: string,
     transactionId: string
-  ): Promise<TenderlyForkTransaction> {
+  ): Promise<VNetTransaction> {
     const tenderlyApi = TenderlyApiService.configureInstance();
 
     const apiPath = `/api/v1/account/${accountId}/project/${projectSlug}/fork/${forkId}/transaction/${transactionId}`;
 
-    let response: TenderlyForkTransaction;
+    let response: VNetTransaction;
     try {
       response = (await tenderlyApi.get(apiPath)).data.fork_transaction;
     } catch (e) {
       console.log(
-        `Error in ${PluginName}: There was an error during the request. Fork transaction fetch failed`
+        `Error in ${PluginName}: There was an error during the request. VNet transaction fetch failed`
       );
     }
     return response!;

@@ -718,6 +718,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/promptly@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@types/promptly/-/promptly-3.0.2.tgz#598674d4b78b3dffcb2d756b344f28a2cf7459f8"
+  integrity sha512-cJFwE7d8GlraY+DJoZ0NhpoJ55slkcbNsGIKMY0H+5h0xaGqXBqXz9zeu+Ey9KfN1UiHQXiIT0GroxyPYMPP/w==
+  dependencies:
+    "@types/node" "*"
+
 "@types/qs@*", "@types/qs@^6.9.7":
   version "6.9.7"
   resolved "https://registry.npmjs.org/@types/qs/-/qs-6.9.7.tgz"
