@@ -14,6 +14,10 @@ const filepath = process.argv[2];
 const template = getTemplate(filepath);
 let vnet: VNet;
 
+app.get("/vnet-id", (_, res) => {
+  res.json({ vnetId: vnet.vnetId });
+});
+
 app.use(async (req, res) => {
   console.log(req.body.method);
 

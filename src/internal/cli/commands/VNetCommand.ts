@@ -5,7 +5,7 @@ import promptly from "promptly";
 import {
   initTemplate,
   templateExists,
-  writeTemplate
+  writeTemplate,
 } from "../../../utils/template";
 
 export const VNetCommand = new commander.Command("vnet")

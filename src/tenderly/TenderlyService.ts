@@ -5,14 +5,14 @@ import {
   API_VERIFICATION_REQUEST_ERROR,
   BYTECODE_MISMATCH_ERROR,
   NO_NEW_CONTRACTS_VERIFIED_ERROR,
-  NO_VERIFIABLE_CONTRACTS_ERROR
+  NO_VERIFIABLE_CONTRACTS_ERROR,
 } from "./errors";
 import { TenderlyApiService } from "./TenderlyApiService";
 import {
   ApiContract,
   ContractResponse,
   TenderlyContractUploadRequest,
-  TenderlyForkContractUploadRequest
+  TenderlyForkContractUploadRequest,
 } from "./types";
 import { TenderlyPublicNetwork } from "./types/Network";
 import { VNet, VNetTransaction } from "./types/VNet";

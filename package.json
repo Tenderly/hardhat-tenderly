@@ -71,6 +71,7 @@
     "js-yaml": "^3.14.0",
     "open": "^8.4.0",
     "promptly": "^3.2.0",
-    "supports-hyperlinks": "^2.2.0"
+    "supports-hyperlinks": "^2.2.0",
+    "uuid": "^8.3.2"
   }
 }

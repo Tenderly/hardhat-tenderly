@@ -10,7 +10,7 @@ import { PluginName } from "../constants";
 import {
   TENDERLY_API_BASE_URL,
   TENDERLY_DASHBOARD_BASE_URL,
-  TENDERLY_RPC_BASE
+  TENDERLY_RPC_BASE,
 } from "./TenderlyService";
 import { TenderlyKeyConfig } from "./types";
 
@@ -19,7 +19,7 @@ export class TenderlyApiService {
     const yamlData = this.getTenderlyConfig();
     return axios.default.create({
       baseURL: TENDERLY_API_BASE_URL,
-      headers: { "x-access-key": yamlData.access_key }
+      headers: { "x-access-key": yamlData.access_key },
     });
   }
 
@@ -29,14 +29,14 @@ export class TenderlyApiService {
       baseURL: TENDERLY_RPC_BASE,
       headers: {
         "x-access-key": yamlData.access_key,
-        Head: yamlData.head !== undefined ? yamlData.head : ""
-      }
+        Head: yamlData.head !== undefined ? yamlData.head : "",
+      },
     });
   }
 
   public static configureAnonymousInstance(): axios.AxiosInstance {
     return axios.default.create({
-      baseURL: TENDERLY_API_BASE_URL
+      baseURL: TENDERLY_API_BASE_URL,
     });
   }
 

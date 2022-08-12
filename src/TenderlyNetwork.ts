@@ -4,6 +4,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import * as yaml from "js-yaml";
 import os from "os";
 import path from "path";
+import { validate } from "uuid";
 
 import { PluginName } from "./constants";
 import { NO_COMPILER_FOUND_FOR_CONTRACT } from "./tenderly/errors";
@@ -11,7 +12,7 @@ import { TenderlyApiService } from "./tenderly/TenderlyApiService";
 import { TenderlyService } from "./tenderly/TenderlyService";
 import {
   ContractByName,
-  TenderlyForkContractUploadRequest
+  TenderlyForkContractUploadRequest,
 } from "./tenderly/types";
 import { logError } from "./utils/error_logger";
 import { getCompilerDataFromContracts, getContracts } from "./utils/util";
@@ -47,6 +48,9 @@ export class TenderlyNetwork {
       hre.network.config.url !== undefined
     ) {
       this.fork = hre.network.config.url.split("/").pop();
+      if (!validate(this.fork)) {
+        //TODO set vnetId
+      }
     }
   }
 
@@ -224,7 +228,7 @@ export class TenderlyNetwork {
 
     for (contract of flatContracts) {
       const index = requestData.contracts.findIndex(
-        requestContract => requestContract.contractName === contract.name
+        (requestContract) => requestContract.contractName === contract.name
       );
       if (index === -1) {
         continue;
@@ -232,8 +236,8 @@ export class TenderlyNetwork {
       requestData.contracts[index].networks = {
         [this.fork!]: {
           address: contract.address,
-          links: contract.libraries
-        }
+          links: contract.libraries,
+        },
       };
     }
 
@@ -261,7 +265,7 @@ export class TenderlyNetwork {
     return {
       contracts,
       config: solcConfig!,
-      root: this.head!
+      root: this.head!,
     };
   }
 
