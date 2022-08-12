@@ -1,8 +1,7 @@
 import "@nomiclabs/hardhat-ethers";
-import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/src/types";
-import axios from "axios";
 import { validate } from "uuid";
 import { ethers } from "ethers";
+import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/src/types";
 import { extendConfig, extendEnvironment, task } from "hardhat/config";
 import { HardhatPluginError, lazyObject } from "hardhat/plugins";
 import { RunTaskFunction } from "hardhat/src/types";
@@ -98,7 +97,7 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
 
   if ("url" in hre.network.config && hre.network.config.url !== undefined) {
     let forkID = hre.network.config.url.split("/").pop();
-    if (!validate(forkID)) {
+    if (forkID == undefined || validate(forkID)) {
       //TODO set vnetId
     }
 
