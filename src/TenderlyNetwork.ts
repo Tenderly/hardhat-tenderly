@@ -16,6 +16,7 @@ import {
 } from "./tenderly/types";
 import { logError } from "./utils/error_logger";
 import { getCompilerDataFromContracts, getContracts } from "./utils/util";
+import { VNet } from "./VNet";
 
 export class TenderlyNetwork {
   public host: string;
@@ -48,9 +49,6 @@ export class TenderlyNetwork {
       hre.network.config.url !== undefined
     ) {
       this.fork = hre.network.config.url.split("/").pop();
-      if (!validate(this.fork)) {
-        //TODO set vnetId
-      }
     }
   }
 
@@ -107,6 +105,13 @@ export class TenderlyNetwork {
     if (!this.checkNetwork()) {
       return;
     }
+
+    // Try to override forkID with VNet fork ID
+    const vnetForkID = await VNet.getForkID();
+    if (vnetForkID) {
+      this.fork = vnetForkID;
+    }
+
     if (this.head === undefined && this.fork === undefined) {
       await this.initializeFork();
     }
@@ -144,6 +149,12 @@ export class TenderlyNetwork {
     username: string,
     forkID: string
   ) {
+    // Try to override forkID with VNet fork ID
+    const vnetForkID = await VNet.getForkID();
+    if (vnetForkID) {
+      forkID = vnetForkID;
+    }
+
     try {
       await TenderlyService.verifyForkContracts(
         request,
@@ -169,10 +180,17 @@ export class TenderlyNetwork {
     this.head = head;
   }
 
-  public getFork(): string | undefined {
+  public async getFork(): Promise<string | undefined> {
     if (!this.checkNetwork()) {
       return;
     }
+
+    // Try to override forkID with VNet fork ID
+    const vnetForkID = await VNet.getForkID();
+    if (vnetForkID) {
+      this.fork = vnetForkID;
+    }
+
     return this.fork;
   }
 

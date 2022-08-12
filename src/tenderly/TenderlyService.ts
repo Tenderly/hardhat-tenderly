@@ -225,7 +225,7 @@ export class TenderlyService {
     };
   }
 
-  public static async getVNetTransaction(
+  public static async getTransaction(
     accountId: string,
     projectSlug: string,
     forkId: string,
@@ -240,7 +240,7 @@ export class TenderlyService {
       response = (await tenderlyApi.get(apiPath)).data.fork_transaction;
     } catch (e) {
       console.log(
-        `Error in ${PluginName}: There was an error during the request. VNet transaction fetch failed`
+        `Error in ${PluginName}: There was an error during the request. Transaction fetch failed`
       );
     }
     return response!;

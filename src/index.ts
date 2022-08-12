@@ -13,6 +13,7 @@ import {
 } from "hardhat/types";
 import { NetworkMap, PluginName, ReverseNetworkMap } from "./constants";
 
+import { VNet } from "./VNet";
 import { Tenderly } from "./Tenderly";
 import { CONTRACTS_NOT_DETECTED } from "./tenderly/errors";
 import { wrapEthers } from "./tenderly/ethers";
@@ -97,10 +98,6 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
 
   if ("url" in hre.network.config && hre.network.config.url !== undefined) {
     let forkID = hre.network.config.url.split("/").pop();
-    if (forkID == undefined || validate(forkID)) {
-      //TODO set vnetId
-    }
-
     hre.tenderly.network().setFork(forkID);
     return;
   }
@@ -108,10 +105,10 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
   const fork = new TenderlyNetwork(hre);
   fork
     .initializeFork()
-    .then((_) => {
+    .then(async (_) => {
       hre.tenderly.setNetwork(fork);
       (hre.network.config as HttpNetworkConfig).url =
-        TENDERLY_RPC_BASE + `/fork/${hre.tenderly.network().getFork()}`;
+        TENDERLY_RPC_BASE + `/fork/${await hre.tenderly.network().getFork()}`;
       hre.ethers.provider = new hre.ethers.providers.Web3Provider(
         hre.tenderly.network()
       );

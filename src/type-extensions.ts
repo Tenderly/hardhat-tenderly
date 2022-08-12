@@ -5,7 +5,7 @@ import {
   ContractByName,
   TenderlyConfig,
   TenderlyContractUploadRequest,
-  TenderlyForkContractUploadRequest
+  TenderlyForkContractUploadRequest,
 } from "./tenderly/types";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 
@@ -83,7 +83,7 @@ declare module "hardhat/types/runtime" {
       resetFork: () => string | undefined;
       getHead: () => string | undefined;
       setHead: (head: string | undefined) => void;
-      getFork: () => string | undefined;
+      getFork: () => Promise<string | undefined>;
       setFork: (fork: string | undefined) => void;
       initializeFork: () => Promise<void>;
     };

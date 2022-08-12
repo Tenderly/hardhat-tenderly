@@ -69,7 +69,7 @@ app.listen(1337, async () => {
 });
 
 async function listAccounts(vnet: VNet) {
-  const forkTx = await TenderlyService.getVNetTransaction(
+  const forkTx = await TenderlyService.getTransaction(
     template.username,
     template.projectSlug,
     vnet.vnetId,
