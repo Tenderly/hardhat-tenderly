@@ -19,7 +19,7 @@ export const VNetCommand = new commander.Command("vnet")
 
       const projectSlug = await promptly.prompt("Tenderly project slug:");
       const username = await promptly.prompt(
-        "Tenderly username/organization name:"
+        "Tenderly username/organization slug:"
       );
       const network = await promptly.prompt(
         "Network name (see tenderly networks for list of supported networks):"
