@@ -1,4 +1,3 @@
-import e from "express";
 import express from "express";
 import got from "got";
 import hyperlinker from "hyperlinker";
