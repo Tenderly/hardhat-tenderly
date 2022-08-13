@@ -1,7 +1,9 @@
 import * as childProcess from "child_process";
-import commander from "commander";
 import * as path from "path";
+import supportsHyperlinks from "supports-hyperlinks";
+import commander from "commander";
 import promptly from "promptly";
+
 import {
   initTemplate,
   templateExists,
@@ -11,8 +13,10 @@ import {
 export const VNetCommand = new commander.Command("vnet")
   .description("configure and start Tenderly VNet")
   .option("-t, --template <path>", "vnet template path", "vnet.template.json")
+  .option("-v, --verbose", "print all json rpc calls")
   .action(async (options) => {
-    const filepath = options.template;
+    const filepath: string = options.template;
+    const verbose: boolean = options.verbose;
 
     if (!templateExists(filepath)) {
       initTemplate(filepath);
@@ -31,12 +35,12 @@ export const VNetCommand = new commander.Command("vnet")
       writeTemplate(filepath, projectSlug, username, network, blockNumber);
     }
 
-    await startServer(filepath);
+    await startServer(filepath, verbose);
   });
 
-async function startServer(filepath: string) {
+async function startServer(filepath: string, verbose: boolean) {
   const child = childProcess.exec(
-    `node ${path.resolve(
+    `SUPPORTS_HYPERLINKS=${supportsHyperlinks.stdout} node ${path.resolve(
       __dirname,
       "..",
       "..",
@@ -47,7 +51,7 @@ async function startServer(filepath: string) {
       "cli",
       "commands",
       "vnetServer.js"
-    )} ${filepath}`
+    )} ${filepath} ${verbose}`
   );
   child.stdout.pipe(process.stdout);
   child.stderr.pipe(process.stderr);
