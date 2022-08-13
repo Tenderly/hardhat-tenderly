@@ -1,3 +1,4 @@
+import e from "express";
 import express from "express";
 import got from "got";
 import hyperlinker from "hyperlinker";
@@ -12,6 +13,7 @@ app.use(express.json());
 let vnet: VNet;
 
 const SUPPORTS_HYPERLINKS: boolean = process.env.SUPPORTS_HYPERLINKS == "true";
+const TAB: string = "    ";
 
 const filepath: string = process.argv[2];
 const template: VNetTemplate = getTemplate(filepath);
@@ -36,33 +38,10 @@ app.use(async (req, res) => {
       }
     );
 
-    const tdlyRes = JSON.parse(response.body);
+    // Log methods
+    printRPCCall(req, response);
 
-    // Log all methodes
-    const method = req.body.method;
-    if (verbose && !isWriteMethod(method)) {
-      console.log(method);
-    }
-
-    if (isWriteMethod(method)) {
-      const forkTxID = response.headers["x-transaction-id"];
-
-      console.log(method);
-      if (SUPPORTS_HYPERLINKS) {
-        console.log(
-          hyperlinker(
-            "View in Tenderly",
-            `https://dashboard.tenderly.co/${template.username}/${template.projectSlug}/fork/${vnet.vnetId}/simulation/${forkTxID}`
-          )
-        );
-      } else {
-        console.log(
-          `https://dashboard.tenderly.co/${template.username}/${template.projectSlug}/fork/${vnet.vnetId}/simulation/${forkTxID}`
-        );
-      }
-    }
-
-    res.send(tdlyRes);
+    res.send(JSON.parse(response.body));
   } catch (err) {
     console.error(err);
     res.send(err);
@@ -92,21 +71,70 @@ async function listAccounts(vnet: VNet) {
     vnet.rootTxId
   );
 
-  console.log(
-    "Accounts\n========\n\nWARNING: These accounts, and their private keys, are publicly known.\nAny funds sent to them on Mainnet or any other live network WILL BE LOST.\n"
-  );
+  const warningMessage =
+    "WARNING: These accounts, and their private keys, are publicly known.\nAny funds sent to them on Mainnet or any other live network WILL BE LOST.\n";
 
+  console.log("Accounts\n========\n");
+  console.log(warningMessage);
   forkTx.state_objects.forEach(function(stateObject, index) {
-    console.log(
-      "Account #" + index + ": " + stateObject.address + " (100 ETH)\n"
-    );
+    console.log(`Account #${index}: ${stateObject.address} (100 ETH)\n`);
   });
-
-  console.log(
-    "WARNING: These accounts, and their private keys, are publicly known.\nAny funds sent to them on Mainnet or any other live network WILL BE LOST.\n"
-  );
+  console.log(warningMessage);
 }
 
 function isWriteMethod(method: string): boolean {
   return ["eth_sendTransaction", "eth_sendRawTransaction"].includes(method);
+}
+
+function printRPCCall(req: any, rawRes: any): void {
+  const method = req.body.method;
+
+  if (verbose && !isWriteMethod(method)) {
+    console.log(method);
+  }
+
+  if (isWriteMethod(method)) {
+    const params = req.body?.params[0];
+    const simulationID = rawRes.headers["x-simulation-id"];
+    const res = JSON.parse(rawRes.body);
+
+    console.log(method);
+
+    // to is optional when creating new contract
+    if (params?.to) {
+      console.log(`${TAB}Contract call:\t`, "TODO"); // TODO: get contract name form deployments file
+    } else {
+      console.log(`${TAB}Contract deployment:`, "TODO"); // TODO: get contract name form deployments file
+    }
+
+    console.log(`${TAB}From:\t\t`, params?.from);
+
+    if (params?.to) {
+      console.log(`${TAB}To:\t\t\t`, params?.to);
+    }
+
+    if (params?.value) {
+      console.log(`${TAB}Value:\t\t`, params?.value);
+    }
+
+    if (res.error) {
+      console.log(`\n${TAB}Error:\t\t`, res.error.message, "\n");
+      return;
+    }
+
+    if (SUPPORTS_HYPERLINKS) {
+      const hyperlink = hyperlinker(
+        res.result,
+        `https://dashboard.tenderly.co/${template.username}/${template.projectSlug}/fork/${vnet.vnetId}/simulation/${simulationID}`
+      );
+      console.log(`${TAB}Hash:\t\t`, hyperlink, "\n");
+      return;
+    }
+
+    console.log(`${TAB}Hash:\t\t`, res.result);
+    console.log(
+      `${TAB}Open in Tenderly:`,
+      `https://dashboard.tenderly.co/${template.username}/${template.projectSlug}/fork/${vnet.vnetId}/simulation/${simulationID}`
+    );
+  }
 }
