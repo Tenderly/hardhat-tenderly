@@ -24,7 +24,6 @@ app.get("/vnet-id", (_, res) => {
 
 app.use(async (req, res) => {
   try {
-    //TODO change to vnet route
     const response: any = await got.post(
       `https://rpc.tenderly.co/vnet/${vnet.vnetId}`,
       {
@@ -36,7 +35,6 @@ app.use(async (req, res) => {
       }
     );
 
-    // Log methods
     printRPCCall(req, response);
 
     res.send(JSON.parse(response.body));
@@ -92,27 +90,28 @@ function printRPCCall(req: any, rawRes: any): void {
   }
 
   if (isWriteMethod(method)) {
-    const params = req.body?.params[0];
+    const callArgs = req.body?.params[0];
     const simulationID = rawRes.headers["x-simulation-id"];
     const res = JSON.parse(rawRes.body);
+    const txHash = res.result;
 
     console.log(method);
 
     // to is optional when creating new contract
-    if (params?.to) {
+    if (callArgs?.to) {
       console.log(`${TAB}Contract call:\t`, "TODO"); // TODO: get contract name form deployments file
     } else {
       console.log(`${TAB}Contract deployment:`, "TODO"); // TODO: get contract name form deployments file
     }
 
-    console.log(`${TAB}From:\t\t`, params?.from);
+    console.log(`${TAB}From:\t\t`, callArgs?.from);
 
-    if (params?.to) {
-      console.log(`${TAB}To:\t\t\t`, params?.to);
+    if (callArgs?.to) {
+      console.log(`${TAB}To:\t\t\t`, callArgs?.to);
     }
 
-    if (params?.value) {
-      console.log(`${TAB}Value:\t\t`, params?.value);
+    if (callArgs?.value) {
+      console.log(`${TAB}Value:\t\t`, callArgs?.value);
     }
 
     if (res.error) {
@@ -122,16 +121,16 @@ function printRPCCall(req: any, rawRes: any): void {
 
     if (SUPPORTS_HYPERLINKS) {
       const hyperlink = hyperlinker(
-        res.result,
+        "View in Tenderly",
         `https://dashboard.tenderly.co/${template.username}/${template.projectSlug}/fork/${vnet.vnetId}/simulation/${simulationID}`
       );
-      console.log(`${TAB}Hash:\t\t`, hyperlink, "\n");
+      console.log(`${TAB}Hash:\t\t`, `${txHash}(${hyperlink})`, "\n");
       return;
     }
 
-    console.log(`${TAB}Hash:\t\t`, res.result);
+    console.log(`${TAB}Hash:\t\t`, txHash);
     console.log(
-      `${TAB}Open in Tenderly:\t`,
+      `${TAB}View in Tenderly:\t`,
       `https://dashboard.tenderly.co/${template.username}/${template.projectSlug}/fork/${vnet.vnetId}/simulation/${simulationID}`
     );
   }
