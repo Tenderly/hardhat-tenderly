@@ -1,7 +1,7 @@
 {
   "name": "@tenderly/hardhat-tenderly",
   "description": "Hardhat plugin for integration with Tenderly",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "main": "dist/index.js",
   "bin": {
     "tenderly": "dist/internal/cli/index.js"

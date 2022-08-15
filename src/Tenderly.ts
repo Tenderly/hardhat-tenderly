@@ -236,12 +236,13 @@ export class Tenderly {
           );
 
           const metadata: Metadata = {
-            compiler: {
+            defaultCompiler: {
               version: extractCompilerVersion(this.env.config, sourcePath),
             },
             sources: {
               [sourcePath]: {
                 content: resolvedFile.content.rawContent,
+                versionPragma: resolvedFile.content.versionPragmas[0],
               },
             },
           };
