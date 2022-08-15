@@ -16,7 +16,7 @@ import { Tenderly } from "./Tenderly";
 import { CONTRACTS_NOT_DETECTED } from "./tenderly/errors";
 import { wrapEthers } from "./tenderly/ethers";
 import { wrapHHDeployments } from "./tenderly/hardhat-deploy";
-import { TENDERLY_RPC_BASE, TenderlyService } from "./tenderly/TenderlyService";
+import { TenderlyService, TENDERLY_RPC_BASE } from "./tenderly/TenderlyService";
 import { Metadata, TenderlyContract } from "./tenderly/types";
 import { TenderlyPublicNetwork } from "./tenderly/types/Network";
 import { TenderlyNetwork } from "./TenderlyNetwork";
@@ -170,7 +170,7 @@ const extractContractData = async (
   }
 
   const metadata: Metadata = {
-    compiler: {
+    defaultCompiler: {
       version: extractCompilerVersion(config)
     },
     sources: {}
@@ -196,7 +196,8 @@ const extractContractData = async (
         continue;
       }
       metadata.sources[sourcePath] = {
-        content: resolvedFile.content.rawContent
+        content: resolvedFile.content.rawContent,
+        versionPragma: resolvedFile.content.versionPragmas[0]
       };
       const visited: Record<string, boolean> = {};
       resolveDependencies(data, sourcePath, metadata, visited);
@@ -216,7 +217,7 @@ const extractContractData = async (
       networks: {},
       compiler: {
         name: "solc",
-        version: extractCompilerVersion(config, key)
+        version: extractCompilerVersion(config, key, value.versionPragma)
       }
     };
 

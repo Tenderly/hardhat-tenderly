@@ -43,6 +43,7 @@ export declare function getContractFactoryName(
   name: string,
   signerOrOptions?: ethers.Signer | FactoryOptions
 ): Promise<ethers.ContractFactory>;
+
 export declare function getContractFactoryABI(
   abi: any[],
   bytecode: ethers.utils.BytesLike,

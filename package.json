@@ -1,7 +1,7 @@
 {
   "name": "@tenderly/hardhat-tenderly",
   "description": "Hardhat plugin for integration with Tenderly",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "main": "dist/index.js",
   "bin": {
     "tenderly": "dist/internal/cli/index.js"
@@ -55,6 +55,7 @@
     "hardhat": "^2.10.1"
   },
   "dependencies": {
+    "@ethersproject/bignumber": "^5.6.2",
     "@nomiclabs/hardhat-ethers": "^2.0.6",
     "axios": "^0.21.1",
     "cli-table": "^0.3.11",

@@ -229,12 +229,13 @@ export class Tenderly {
           );
 
           const metadata: Metadata = {
-            compiler: {
+            defaultCompiler: {
               version: extractCompilerVersion(this.env.config, sourcePath)
             },
             sources: {
               [sourcePath]: {
-                content: resolvedFile.content.rawContent
+                content: resolvedFile.content.rawContent,
+                versionPragma: resolvedFile.content.versionPragmas[0]
               }
             }
           };
@@ -300,7 +301,6 @@ export class Tenderly {
         );
         return null;
       }
-      console.log(contract.libraries);
       requestData.contracts[index].networks = {
         [chainID]: {
           address: contract.address,
@@ -325,7 +325,6 @@ export class Tenderly {
 
     if (config === undefined) {
       console.log(NO_COMPILER_FOUND_FOR_CONTRACT);
-      console.log(flatContracts);
     }
 
     return {
