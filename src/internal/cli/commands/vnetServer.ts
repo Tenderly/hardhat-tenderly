@@ -26,8 +26,8 @@ app.use(async (req, res) => {
   try {
     //TODO change to vnet route
     const response: any = await got.post(
-      `http://localhost:8500/vnet/${vnet.vnetId}`,
-      // `https://rpc.tenderly.co/fork/${vnet.vnetId}`,
+      // `http://localhost:8500/vnet/${vnet.vnetId}`,
+      `https://rpc.tenderly.co/fork/${vnet.vnetId}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -132,7 +132,7 @@ function printRPCCall(req: any, rawRes: any): void {
 
     console.log(`${TAB}Hash:\t\t`, res.result);
     console.log(
-      `${TAB}Open in Tenderly:`,
+      `${TAB}Open in Tenderly:\t`,
       `https://dashboard.tenderly.co/${template.username}/${template.projectSlug}/fork/${vnet.vnetId}/simulation/${simulationID}`
     );
   }

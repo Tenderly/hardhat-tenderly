@@ -1,5 +1,4 @@
 import "@nomiclabs/hardhat-ethers";
-import { validate } from "uuid";
 import { ethers } from "ethers";
 import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/src/types";
 import { extendConfig, extendEnvironment, task } from "hardhat/config";
@@ -13,7 +12,6 @@ import {
 } from "hardhat/types";
 import { NetworkMap, PluginName, ReverseNetworkMap } from "./constants";
 
-import { VNet } from "./VNet";
 import { Tenderly } from "./Tenderly";
 import { CONTRACTS_NOT_DETECTED } from "./tenderly/errors";
 import { wrapEthers } from "./tenderly/ethers";

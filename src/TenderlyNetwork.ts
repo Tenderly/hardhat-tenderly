@@ -4,7 +4,6 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import * as yaml from "js-yaml";
 import os from "os";
 import path from "path";
-import { validate } from "uuid";
 
 import { PluginName } from "./constants";
 import { NO_COMPILER_FOUND_FOR_CONTRACT } from "./tenderly/errors";
