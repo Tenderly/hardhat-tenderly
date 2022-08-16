@@ -70,7 +70,7 @@ Run:
 Forwarding: http://127.0.0.1:1337 --> https://rpc.tenderly.co/vnet/{{vnet_id}}
 ```
 
-**_Note: Virtual networks are short-lived nodes made for development purposes so their lifetime is 24 hours after that it will be shut down, or if a virtual network living console is shut down it will shut down that virtual network._**
+**_Note: Virtual networks are short-lived nodes made for development purposes. They have an expiration time of 24 hours; after which they will be unavailable. Similarly, if a virtual network living console is shut down it will shut down that virtual network._**
 
 Then, just connect your wallet or application to http://127.0.0.1:1337.
 
