@@ -23,7 +23,6 @@ export class VNetTemplate {
 
 export function initTemplate(filepath: string) {
   const templateData: VNetTemplate = new VNetTemplate();
-
   fs.writeFileSync(filepath, JSON.stringify(templateData, null, 2), "utf8");
 }
 
@@ -40,15 +39,11 @@ export function writeTemplate(
     network,
     blockNumber
   );
-
   fs.writeFileSync(filepath, JSON.stringify(templateData, null, 2), "utf8");
 }
 
 export function getTemplate(filepath: string): VNetTemplate {
-  const template = fs.readFileSync(filepath);
-
-  const t: VNetTemplate = JSON.parse(template.toString());
-  return t;
+  return JSON.parse(fs.readFileSync(filepath).toString());
 }
 
 export function templateExists(filepath: string): boolean {
