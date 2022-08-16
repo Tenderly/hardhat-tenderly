@@ -39,8 +39,7 @@ const config: HardhatUserConfig = {
     },
 
     tenderly: {
-      chainId: 1,
-      url: `https://rpc.tenderly.co/fork/${TENDERLY_FORK_ID}`,
+      url: `http://localhost:1337`,
     },
   },
   tenderly: {
