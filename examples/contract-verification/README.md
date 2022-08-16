@@ -28,7 +28,7 @@ yarn add --dev @tenderly/hardhat-tenderly@1.2.0-beta.1
 
 To use your local installation of Tenderly, you need to use `npx` to run it (i.e. `npx tenderly`).
 
-Now first we need to login to tenderly. To login run:
+First, we need to log in. To do so, run:
 
 ```
 npx tenderly login
