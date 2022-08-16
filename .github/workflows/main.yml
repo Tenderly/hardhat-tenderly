@@ -1,0 +1,21 @@
+name: Unublish package
+on:
+  workflow_dispatch:
+    inputs:
+      package_version:
+        description: 'Package version to unpublish'
+        required: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+    # Setup .npmrc file to unpublish to npm
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm unpublish $PACKAGE_VERSION
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          PACKAGE_VERSION: ${{ inputs.package_version }}
