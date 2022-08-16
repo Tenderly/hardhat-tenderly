@@ -59,7 +59,7 @@ Run:
   // Network that you want to run as virtual network. In this example we use "1" that refers to "mainnet"
 - Network name (see `npx tenderly networks` for list of supported networks): 1
 
-  // Block number form which block you want to fork provided network
+  // Block number form which you want to fork provided network
 - Network block number: latest
 
 // And at the end, it will spin up a new virtual network and create a "vnet.template.json" config file
