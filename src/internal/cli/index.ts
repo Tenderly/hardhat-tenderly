@@ -2,6 +2,7 @@
 import { Command } from "commander";
 import { NetworksCommand } from "./commands";
 import { LoginCommand } from "./commands";
+import { VNetCommand } from "./commands";
 
 process.openStdin().on("keypress", function (chunk, key) {
   if (key && key.name === "c" && key.ctrl) {
@@ -14,6 +15,7 @@ process.openStdin().on("keypress", function (chunk, key) {
     const program = new Command();
     program.addCommand(LoginCommand);
     program.addCommand(NetworksCommand);
+    program.addCommand(VNetCommand);
 
     await program.parseAsync(process.argv);
 

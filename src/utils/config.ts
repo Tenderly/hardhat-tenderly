@@ -1,7 +1,7 @@
 import fs from "fs";
+import * as yaml from "js-yaml";
 import os from "os";
 import path from "path";
-import * as yaml from "js-yaml";
 
 const filepath = os.homedir() + path.sep + ".tenderly" + path.sep + "config.yaml";
 

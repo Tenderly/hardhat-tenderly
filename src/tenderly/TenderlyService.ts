@@ -5,23 +5,23 @@ import {
   API_VERIFICATION_REQUEST_ERROR,
   BYTECODE_MISMATCH_ERROR,
   NO_NEW_CONTRACTS_VERIFIED_ERROR,
-  NO_VERIFIABLE_CONTRACTS_ERROR
+  NO_VERIFIABLE_CONTRACTS_ERROR,
 } from "./errors";
 import { TenderlyApiService } from "./TenderlyApiService";
 import {
   ApiContract,
   ContractResponse,
   TenderlyContractUploadRequest,
-  TenderlyForkContractUploadRequest
+  TenderlyForkContractUploadRequest,
 } from "./types";
 import { TenderlyPublicNetwork } from "./types/Network";
+import { VNet, VNetTransaction } from "./types/VNet";
 
 export const TENDERLY_API_BASE_URL = "https://api.tenderly.co";
 export const TENDERLY_DASHBOARD_BASE_URL = "https://dashboard.tenderly.co";
 export const TENDERLY_RPC_BASE = "https://rpc.tenderly.co";
 
 export class TenderlyService {
-
   public static async getPublicNetworks(): Promise<TenderlyPublicNetwork[]> {
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
     const apiPath = "/api/v1/public-networks";
@@ -49,7 +49,7 @@ export class TenderlyService {
       tenderlyApi = TenderlyApiService.configureInstance();
     }
 
-    let response: string = '';
+    let response: string = "";
     try {
       response = (await tenderlyApi.get(apiPath)).data.block_number;
     } catch (e) {
@@ -193,5 +193,56 @@ export class TenderlyService {
       logError(error);
       console.log(API_VERIFICATION_REQUEST_ERROR);
     }
+  }
+
+  public static async createVNet(
+    accountId: string,
+    projectSlug: string,
+    networkId: string,
+    blockNumber: string
+  ): Promise<VNet> {
+    const tenderlyApi = TenderlyApiService.configureInstance();
+
+    const apiPath = `/api/v1/account/${accountId}/project/${projectSlug}/fork`;
+
+    let response;
+    try {
+      response = (
+        await tenderlyApi.post(apiPath, {
+          network_id: networkId,
+          blockNumber: blockNumber,
+          vnet: true,
+        })
+      ).data;
+    } catch (e) {
+      console.log(
+        `Error in ${PluginName}: There was an error during the request. VNet creation failed`
+      );
+    }
+    return {
+      vnetId: response.simulation_fork.id,
+      rootTxId: response.root_transaction.id,
+    };
+  }
+
+  public static async getTransaction(
+    accountId: string,
+    projectSlug: string,
+    forkId: string,
+    transactionId: string
+  ): Promise<VNetTransaction> {
+    const tenderlyApi = TenderlyApiService.configureInstance();
+
+    const apiPath = `/api/v1/account/${accountId}/project/${projectSlug}/fork/${forkId}/transaction/${transactionId}`;
+
+    let response: VNetTransaction;
+    try {
+      response = (await tenderlyApi.get(apiPath)).data.fork_transaction;
+    } catch (e) {
+      console.log(
+        `Error in ${PluginName}: There was an error during the request. Transaction fetch failed`
+      );
+    }
+    return response!;
   }
 }

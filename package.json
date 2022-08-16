@@ -22,8 +22,8 @@
     "lint:fix": "prettier --write 'src/**/*.{js,ts}' 'test/**/*.{js,ts}' && tslint --fix --config tslint.json --project tsconfig.json",
     "lint": "tslint --config tslint.json --project tsconfig.json",
     "test": "mocha --exit",
-    "build": "tsc",
-    "buidl": "tsc",
+    "build": "tsc -b",
+    "buidl": "tsc -b",
     "watch": "tsc -w"
   },
   "files": [
@@ -34,11 +34,14 @@
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/cli-table": "^0.3.0",
+    "@types/express": "^4.17.13",
     "@types/find-up": "^4.0.0",
     "@types/fs-extra": "^5.0.4",
     "@types/js-yaml": "^3.12.5",
     "@types/mocha": "^5.2.5",
     "@types/node": "^8.10.38",
+    "@types/promptly": "^3.0.2",
+    "@types/uuid": "^8.3.4",
     "chai": "^4.2.0",
     "dotenv": "^6.2.0",
     "hardhat": "^2.10.1",
@@ -58,13 +61,18 @@
     "@ethersproject/bignumber": "^5.6.2",
     "@nomiclabs/hardhat-ethers": "^2.0.6",
     "axios": "^0.21.1",
-    "cli-table": "^0.3.11",
+    "cli-table3": "^0.6.2",
     "commander": "^9.4.0",
     "ethers": "^5.6.8",
+    "express": "^4.18.1",
     "fs-extra": "^9.0.1",
+    "got": "11.8.3",
     "hardhat-deploy": "^0.11.10",
+    "hyperlinker": "^1.0.0",
     "js-yaml": "^3.14.0",
     "open": "^8.4.0",
-    "promptly": "^3.2.0"
+    "promptly": "^3.2.0",
+    "supports-hyperlinks": "^2.2.0",
+    "uuid": "^8.3.2"
   }
 }

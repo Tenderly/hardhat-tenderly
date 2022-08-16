@@ -1,6 +1,6 @@
 import "@nomiclabs/hardhat-ethers";
-import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/src/types";
 import { ethers } from "ethers";
+import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/src/types";
 import { extendConfig, extendEnvironment, task } from "hardhat/config";
 import { HardhatPluginError, lazyObject } from "hardhat/plugins";
 import { RunTaskFunction } from "hardhat/src/types";
@@ -8,7 +8,7 @@ import {
   ActionType,
   HardhatConfig,
   HardhatRuntimeEnvironment,
-  HttpNetworkConfig
+  HttpNetworkConfig,
 } from "hardhat/types";
 import { NetworkMap, PluginName, ReverseNetworkMap } from "./constants";
 
@@ -24,10 +24,10 @@ import "./type-extensions";
 import {
   extractCompilerVersion,
   newCompilerConfig,
-  resolveDependencies
+  resolveDependencies,
 } from "./utils/util";
 
-extendEnvironment(env => {
+extendEnvironment((env) => {
   env.tenderly = lazyObject(() => new Tenderly(env));
   extendProvider(env);
   populateNetworks(env);
@@ -35,7 +35,7 @@ extendEnvironment(env => {
 
 extendConfig((resolvedConfig, userConfig) => {
   resolvedConfig.networks.tenderly = {
-    ...resolvedConfig.networks.tenderly
+    ...resolvedConfig.networks.tenderly,
   };
 });
 
@@ -45,7 +45,7 @@ export const setup = (cfg?: { automaticVerifications: boolean }): void => {
     automatic = cfg.automaticVerifications;
   }
 
-  extendEnvironment(env => {
+  extendEnvironment((env) => {
     env.tenderly = lazyObject(() => new Tenderly(env));
     extendProvider(env);
     populateNetworks(env);
@@ -93,8 +93,9 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
   if (hre.network.name !== "tenderly") {
     return;
   }
+
   if ("url" in hre.network.config && hre.network.config.url !== undefined) {
-    const forkID = hre.network.config.url.split("/").pop();
+    let forkID = hre.network.config.url.split("/").pop();
     hre.tenderly.network().setFork(forkID);
     return;
   }
@@ -102,15 +103,15 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
   const fork = new TenderlyNetwork(hre);
   fork
     .initializeFork()
-    .then(_ => {
+    .then(async (_) => {
       hre.tenderly.setNetwork(fork);
       (hre.network.config as HttpNetworkConfig).url =
-        TENDERLY_RPC_BASE + `/fork/${hre.tenderly.network().getFork()}`;
+        TENDERLY_RPC_BASE + `/fork/${await hre.tenderly.network().getFork()}`;
       hre.ethers.provider = new hre.ethers.providers.Web3Provider(
         hre.tenderly.network()
       );
     })
-    .catch(_ => {
+    .catch((_) => {
       console.log(
         `Error in ${PluginName}: Initializing fork, check your tenderly configuration`
       );
@@ -123,7 +124,7 @@ interface VerifyArguments {
 
 const populateNetworks = (env: HardhatRuntimeEnvironment): void => {
   TenderlyService.getPublicNetworks()
-    .then(networks => {
+    .then((networks) => {
       let network: TenderlyPublicNetwork;
       let slug: string;
       for (network of networks) {
@@ -140,7 +141,7 @@ const populateNetworks = (env: HardhatRuntimeEnvironment): void => {
         }
       }
     })
-    .catch(e => {
+    .catch((e) => {
       console.log("Error encountered while fetching public networks");
     });
 };
@@ -160,10 +161,10 @@ const extractContractData = async (
 
   const sourcePaths = await run("compile:solidity:get-source-paths");
   const sourceNames = await run("compile:solidity:get-source-names", {
-    sourcePaths
+    sourcePaths,
   });
   const data = await run("compile:solidity:get-dependency-graph", {
-    sourceNames
+    sourceNames,
   });
   if (data.length === 0) {
     throw new HardhatPluginError(PluginName, CONTRACTS_NOT_DETECTED);
@@ -171,9 +172,9 @@ const extractContractData = async (
 
   const metadata: Metadata = {
     defaultCompiler: {
-      version: extractCompilerVersion(config)
+      version: extractCompilerVersion(config),
     },
-    sources: {}
+    sources: {},
   };
 
   data._resolvedFiles.forEach((resolvedFile: any, _: any) => {
@@ -197,7 +198,7 @@ const extractContractData = async (
       }
       metadata.sources[sourcePath] = {
         content: resolvedFile.content.rawContent,
-        versionPragma: resolvedFile.content.versionPragmas[0]
+        versionPragma: resolvedFile.content.versionPragmas[0],
       };
       const visited: Record<string, boolean> = {};
       resolveDependencies(data, sourcePath, metadata, visited);
@@ -217,8 +218,8 @@ const extractContractData = async (
       networks: {},
       compiler: {
         name: "solc",
-        version: extractCompilerVersion(config, key, value.versionPragma)
-      }
+        version: extractCompilerVersion(config, key, value.versionPragma),
+      },
     };
 
     for (contract of contracts) {
@@ -236,8 +237,8 @@ const extractContractData = async (
         }
         contractToPush.networks = {
           [chainID]: {
-            address: contractData[1]
-          }
+            address: contractData[1],
+          },
         };
       }
     }
@@ -266,7 +267,7 @@ const verifyContract: ActionType<VerifyArguments> = async (
 
   await TenderlyService.verifyContracts({
     config: newCompilerConfig(config),
-    contracts: requestContracts
+    contracts: requestContracts,
   });
 };
 
@@ -306,7 +307,7 @@ const pushContracts: ActionType<VerifyArguments> = async (
   await TenderlyService.pushContracts(
     {
       config: solcConfig,
-      contracts: requestContracts
+      contracts: requestContracts,
     },
     config.tenderly.project,
     config.tenderly.username

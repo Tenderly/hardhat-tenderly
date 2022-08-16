@@ -11,10 +11,11 @@ import { TenderlyApiService } from "./tenderly/TenderlyApiService";
 import { TenderlyService } from "./tenderly/TenderlyService";
 import {
   ContractByName,
-  TenderlyForkContractUploadRequest
+  TenderlyForkContractUploadRequest,
 } from "./tenderly/types";
 import { logError } from "./utils/error_logger";
 import { getCompilerDataFromContracts, getContracts } from "./utils/util";
+import { VNet } from "./VNet";
 
 export class TenderlyNetwork {
   public host: string;
@@ -103,6 +104,13 @@ export class TenderlyNetwork {
     if (!this.checkNetwork()) {
       return;
     }
+
+    // Try to override forkID with VNet fork ID
+    const vnetForkID = await VNet.getForkID();
+    if (vnetForkID) {
+      this.fork = vnetForkID;
+    }
+
     if (this.head === undefined && this.fork === undefined) {
       await this.initializeFork();
     }
@@ -140,6 +148,12 @@ export class TenderlyNetwork {
     username: string,
     forkID: string
   ) {
+    // Try to override forkID with VNet fork ID
+    const vnetForkID = await VNet.getForkID();
+    if (vnetForkID) {
+      forkID = vnetForkID;
+    }
+
     try {
       await TenderlyService.verifyForkContracts(
         request,
@@ -165,10 +179,17 @@ export class TenderlyNetwork {
     this.head = head;
   }
 
-  public getFork(): string | undefined {
+  public async getFork(): Promise<string | undefined> {
     if (!this.checkNetwork()) {
       return;
     }
+
+    // Try to override forkID with VNet fork ID
+    const vnetForkID = await VNet.getForkID();
+    if (vnetForkID) {
+      this.fork = vnetForkID;
+    }
+
     return this.fork;
   }
 
@@ -224,7 +245,7 @@ export class TenderlyNetwork {
 
     for (contract of flatContracts) {
       const index = requestData.contracts.findIndex(
-        requestContract => requestContract.contractName === contract.name
+        (requestContract) => requestContract.contractName === contract.name
       );
       if (index === -1) {
         continue;
@@ -232,8 +253,8 @@ export class TenderlyNetwork {
       requestData.contracts[index].networks = {
         [this.fork!]: {
           address: contract.address,
-          links: contract.libraries
-        }
+          links: contract.libraries,
+        },
       };
     }
 
@@ -261,7 +282,7 @@ export class TenderlyNetwork {
     return {
       contracts,
       config: solcConfig!,
-      root: this.head!
+      root: this.head!,
     };
   }
 

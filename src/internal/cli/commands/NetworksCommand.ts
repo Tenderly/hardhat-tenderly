@@ -1,4 +1,4 @@
-import Table from "cli-table";
+import Table from "cli-table3";
 import commander from "commander";
 import { TenderlyPublicNetwork } from "../../../tenderly/types/Network";
 import { TenderlyService } from "../../../tenderly/TenderlyService";

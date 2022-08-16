@@ -1,4 +1,5 @@
 import { NetworksCommand } from "./NetworksCommand";
 import { LoginCommand } from "./LoginCommand";
+import { VNetCommand } from "./VNetCommand";
 
-export { NetworksCommand, LoginCommand };
+export { NetworksCommand, LoginCommand, VNetCommand };

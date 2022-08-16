@@ -6,7 +6,7 @@ import { sep } from "path";
 import { DefaultChainId, NetworkMap, PluginName } from "./constants";
 import {
   CONTRACTS_NOT_DETECTED,
-  NO_COMPILER_FOUND_FOR_CONTRACT
+  NO_COMPILER_FOUND_FOR_CONTRACT,
 } from "./tenderly/errors";
 import { TenderlyService } from "./tenderly/TenderlyService";
 import {
@@ -14,7 +14,7 @@ import {
   Metadata,
   TenderlyArtifact,
   TenderlyContractUploadRequest,
-  TenderlyForkContractUploadRequest
+  TenderlyForkContractUploadRequest,
 } from "./tenderly/types";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 import { logError } from "./utils/error_logger";
@@ -22,8 +22,9 @@ import {
   extractCompilerVersion,
   getCompilerDataFromContracts,
   getContracts,
-  resolveDependencies
+  resolveDependencies,
 } from "./utils/util";
+import { VNet } from "./VNet";
 
 export class Tenderly {
   public env: HardhatRuntimeEnvironment;
@@ -89,6 +90,12 @@ export class Tenderly {
         `Error in ${PluginName}: .verifyForkAPI() is only available for tenderly fork deployments, please use --network tenderly.`
       );
       return;
+    }
+
+    // Try to override forkID with VNet fork ID
+    const vnetForkID = await VNet.getForkID();
+    if (vnetForkID) {
+      forkID = vnetForkID;
     }
 
     try {
@@ -185,7 +192,7 @@ export class Tenderly {
       { sourcePaths }
     );
     const data = await this.env.run("compile:solidity:get-dependency-graph", {
-      sourceNames
+      sourceNames,
     });
     if (data.length === 0) {
       throw new HardhatPluginError(PluginName, CONTRACTS_NOT_DETECTED);
@@ -230,14 +237,14 @@ export class Tenderly {
 
           const metadata: Metadata = {
             defaultCompiler: {
-              version: extractCompilerVersion(this.env.config, sourcePath)
+              version: extractCompilerVersion(this.env.config, sourcePath),
             },
             sources: {
               [sourcePath]: {
                 content: resolvedFile.content.rawContent,
-                versionPragma: resolvedFile.content.versionPragmas[0]
-              }
-            }
+                versionPragma: resolvedFile.content.versionPragmas[0],
+              },
+            },
           };
 
           const visited: Record<string, boolean> = {};
@@ -249,7 +256,7 @@ export class Tenderly {
             address: contract.address,
             bytecode: contractData.bytecode,
             deployedBytecode: contractData.deployedBytecode,
-            abi: contractData.abi
+            abi: contractData.abi,
           };
 
           fs.outputFileSync(
@@ -285,7 +292,7 @@ export class Tenderly {
       }
 
       const index = requestData.contracts.findIndex(
-        requestContract => requestContract.contractName === contract.name
+        (requestContract) => requestContract.contractName === contract.name
       );
       if (index === -1) {
         continue;
@@ -304,8 +311,8 @@ export class Tenderly {
       requestData.contracts[index].networks = {
         [chainID]: {
           address: contract.address,
-          links: contract.libraries
-        }
+          links: contract.libraries,
+        },
       };
     }
 
@@ -329,7 +336,7 @@ export class Tenderly {
 
     return {
       contracts,
-      config: config!
+      config: config!,
     };
   }
 }
