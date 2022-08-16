@@ -40,7 +40,7 @@ It will redirect you to the Tenderly dashboard, where you should create an acces
 
 `@tenderly/hardhat-tenderly@1.2.0-beta.1` comes built-in with **Virtual Network**, a local Ethereum EVM based network node designed for development. It allows you to deploy your contracts, run your tests and debug your code on Tenderly dashboard.
 
-To list all supported networks that can be used to spinnup virtual network run:
+To list all supported networks that can be used to spin up a virtual network run:
 
 ```bash
 npx tenderly networks
