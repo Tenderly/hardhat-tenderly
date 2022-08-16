@@ -34,7 +34,7 @@ First, we need to log in. To do so, run:
 npx tenderly login
 ```
 
-It will redirect you to Tenderly dashboard, create access-token and paste it in console.
+It will redirect you to the Tenderly dashboard, where you should create an access token and paste it into the console prompt.
 
 # Virtual Network
 
