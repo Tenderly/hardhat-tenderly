@@ -18,6 +18,75 @@ From these examples, you can learn:
 - How to verify a Smart Contract referencing a non-deployed library: Greeter uses **non-deployed** `hardhat/console.log`.
 - How to verify a Smart Contract referencing an library deployed on-chain: Calculator uses **deployed** `Maths.sol` library.
 
+# Login
+
+Run:
+
+```bash
+yarn add --dev @tenderly/hardhat-tenderly@1.2.0-beta.1
+```
+
+To use your local installation of Tenderly, you need to use `npx` to run it (i.e. `npx tenderly`).
+
+First, we need to log in. To do so, run:
+
+```
+npx tenderly login
+```
+
+It will redirect you to the Tenderly dashboard, where you should create an access token and paste it into the console prompt.
+
+# Virtual Network
+
+`@tenderly/hardhat-tenderly@1.2.0-beta.1` comes built-in with **Virtual Network**, a local Ethereum EVM based network node designed for development. It allows you to deploy your contracts, run your tests and debug your code on Tenderly dashboard.
+
+To list all supported networks that can be used to spin up a virtual network run:
+
+```bash
+npx tenderly networks
+```
+
+## Running Virtual Network
+
+Run:
+
+```
+> npx tenderly vnet
+  // Project and username/organization slug on which you want to create a virtual network
+- Tenderly project slug: <your project slug>
+- Tenderly username/organization slug: <your username/organization slug>
+
+  // Network that you want to run as virtual network. In this example we use "1" that refers to "mainnet"
+- Network name (see `npx tenderly networks` for list of supported networks): 1
+
+  // Block number form which you want to fork provided network
+- Network block number: latest
+
+// And at the end, it will spin up a new virtual network and create a "vnet.template.json" config file
+// at the root of your project. That file will be used next time when you run "npx tenderly vnet"
+// to load information from above if you want to have more templates stored with different settings
+// you can use them when you want to start a new virtual network using the "--template" flag.
+// Example: ("npx tenderly vnet --template <path to file>")
+Forwarding: http://127.0.0.1:1337 --> https://rpc.tenderly.co/vnet/{{vnet_id}}
+```
+
+**_Note: Virtual networks are short-lived nodes made for development purposes. They have an expiration time of 24 hours; after which they will be unavailable. Similarly, if a virtual network living console is shut down it will shut down that virtual network._**
+
+Then, just connect your wallet or application to http://127.0.0.1:1337.
+
+To do that in hardhat you need to extend `hardhat.config` adding tenderly virtual network url(`http://127.0.0.1:1337`):
+
+```js
+{
+  networks: {
+    tenderly: {
+      url: "http://127.0.0.1:1337"
+    }
+  }
+  ...
+}
+```
+
 # Environment setup
 
 This example requires some environment variables:

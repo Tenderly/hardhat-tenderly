@@ -65,3 +65,6 @@ dist
 
 # hardhat-tenderly plugin
 deployments
+
+# Ignore VNet template file
+vnet.template.json

@@ -26,7 +26,7 @@ export const VNetCommand = new commander.Command("vnet")
         "Tenderly username/organization slug:"
       );
       const network = await promptly.prompt(
-        "Network name (see tenderly networks for list of supported networks):"
+        "Network name (see `npx tenderly networks` for list of supported networks):"
       );
       const blockNumber = await promptly.prompt("Network block number:", {
         validator,
