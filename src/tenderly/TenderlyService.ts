@@ -5,14 +5,14 @@ import {
   API_VERIFICATION_REQUEST_ERROR,
   BYTECODE_MISMATCH_ERROR,
   NO_NEW_CONTRACTS_VERIFIED_ERROR,
-  NO_VERIFIABLE_CONTRACTS_ERROR,
+  NO_VERIFIABLE_CONTRACTS_ERROR
 } from "./errors";
 import { TenderlyApiService } from "./TenderlyApiService";
 import {
   ApiContract,
   ContractResponse,
   TenderlyContractUploadRequest,
-  TenderlyForkContractUploadRequest,
+  TenderlyForkContractUploadRequest
 } from "./types";
 import { TenderlyPublicNetwork } from "./types/Network";
 import { VNet, VNetTransaction } from "./types/VNet";
@@ -34,9 +34,7 @@ export class TenderlyService {
     try {
       response = (await tenderlyApi.get(apiPath)).data;
     } catch (e) {
-      console.log(
-        `Error in ${PluginName}: There was an error during the request. Network fetch failed`
-      );
+      console.log(`Error in ${PluginName}: There was an error during the request. Network fetch failed`);
     }
     return response;
   }
@@ -53,9 +51,7 @@ export class TenderlyService {
     try {
       response = (await tenderlyApi.get(apiPath)).data.block_number;
     } catch (e) {
-      console.log(
-        `Error in ${PluginName}: There was an error during the request. Latest block number fetch failed`
-      );
+      console.log(`Error in ${PluginName}: There was an error during the request. Latest block number fetch failed`);
     }
     return response;
   }
@@ -98,12 +94,10 @@ export class TenderlyService {
       console.log("Smart Contracts successfully verified");
       console.group();
       for (contract of responseData.contracts) {
-        const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/contract/${
-          ReverseNetworkMap[contract.network_id]
-        }/${contract.address}`;
-        console.log(
-          `Contract ${contract.address} verified. You can view the contract at ${contractLink}`
-        );
+        const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/contract/${ReverseNetworkMap[contract.network_id]}/${
+          contract.address
+        }`;
+        console.log(`Contract ${contract.address} verified. You can view the contract at ${contractLink}`);
       }
       console.groupEnd();
     } catch (error) {
@@ -112,18 +106,13 @@ export class TenderlyService {
     }
   }
 
-  public static async pushContracts(
-    request: TenderlyContractUploadRequest,
-    tenderlyProject: string,
-    username: string
-  ) {
+  public static async pushContracts(request: TenderlyContractUploadRequest, tenderlyProject: string, username: string) {
     const tenderlyApi = TenderlyApiService.configureInstance();
 
     try {
-      const response = await tenderlyApi.post(
-        `/api/v1/account/${username}/project/${tenderlyProject}/contracts`,
-        { ...request }
-      );
+      const response = await tenderlyApi.post(`/api/v1/account/${username}/project/${tenderlyProject}/contracts`, {
+        ...request
+      });
 
       const responseData: ContractResponse = response.data;
 
@@ -162,10 +151,9 @@ export class TenderlyService {
     const tenderlyApi = TenderlyApiService.configureTenderlyRPCInstance();
 
     try {
-      const response = await tenderlyApi.post(
-        `/account/${username}/project/${tenderlyProject}/fork/${fork}/verify`,
-        { ...request }
-      );
+      const response = await tenderlyApi.post(`/account/${username}/project/${tenderlyProject}/fork/${fork}/verify`, {
+        ...request
+      });
 
       const responseData: ContractResponse = response.data;
 
@@ -211,17 +199,15 @@ export class TenderlyService {
         await tenderlyApi.post(apiPath, {
           network_id: networkId,
           blockNumber: blockNumber,
-          vnet: true,
+          vnet: true
         })
       ).data;
     } catch (e) {
-      console.log(
-        `Error in ${PluginName}: There was an error during the request. VNet creation failed`
-      );
+      console.log(`Error in ${PluginName}: There was an error during the request. VNet creation failed`);
     }
     return {
       vnetId: response.simulation_fork.id,
-      rootTxId: response.root_transaction.id,
+      rootTxId: response.root_transaction.id
     };
   }
 
@@ -239,9 +225,7 @@ export class TenderlyService {
     try {
       response = (await tenderlyApi.get(apiPath)).data.fork_transaction;
     } catch (e) {
-      console.log(
-        `Error in ${PluginName}: There was an error during the request. Transaction fetch failed`
-      );
+      console.log(`Error in ${PluginName}: There was an error during the request. Transaction fetch failed`);
     }
     return response!;
   }
