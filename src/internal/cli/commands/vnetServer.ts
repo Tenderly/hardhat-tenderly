@@ -4,11 +4,7 @@ import hyperlinker from "hyperlinker";
 import { TenderlyService } from "../../../tenderly/TenderlyService";
 import { VNet } from "../../../tenderly/types/VNet";
 import { getAccessToken } from "../../../utils/config";
-import {
-  updateChainConfig,
-  getTemplate,
-  VNetTemplate,
-} from "../../../utils/template";
+import { updateChainConfig, getTemplate, VNetTemplate } from "../../../utils/template";
 
 const app = express();
 app.use(express.json());
@@ -29,16 +25,13 @@ app.get("/vnet-id", (_, res) => {
 
 app.use(async (req, res) => {
   try {
-    const response: any = await got.post(
-      `https://rpc.tenderly.co/vnet/${vnet.vnet_id}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "X-ACCESS-KEY": getAccessToken(),
-        },
-        body: JSON.stringify(req.body),
-      }
-    );
+    const response: any = await got.post(`https://rpc.tenderly.co/vnet/${vnet.vnet_id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        "X-ACCESS-KEY": getAccessToken()
+      },
+      body: JSON.stringify(req.body)
+    });
 
     printRPCCall(req, response);
 
@@ -62,9 +55,7 @@ app.listen(1337, async () => {
     updateChainConfig(filepath, vnet.chain_config);
   }
 
-  console.log(
-    `Forwarding: http://127.0.0.1:1337 --> https://rpc.tenderly.co/vnet/${vnet.vnet_id}\n`
-  );
+  console.log(`\nForwarding: http://127.0.0.1:1337 --> https://rpc.tenderly.co/vnet/${vnet.vnet_id}\n`);
 
   await listAccounts(vnet);
 });
