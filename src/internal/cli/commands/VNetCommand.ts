@@ -2,9 +2,10 @@ import * as childProcess from "child_process";
 import * as path from "path";
 import supportsHyperlinks from "supports-hyperlinks";
 import commander from "commander";
-import promptly from "promptly";
+import prompts from "prompts";
 
-import { initTemplate, templateExists, writeTemplate } from "../../../utils/template";
+import { templateExists, writeTemplate } from "../../../utils/template";
+import { TenderlyService } from "../../../tenderly/TenderlyService";
 
 export const VNetCommand = new commander.Command("vnet")
   .description("configure and start Tenderly VNet")
@@ -17,16 +18,9 @@ export const VNetCommand = new commander.Command("vnet")
     const saveChainConfig: boolean = options.saveChainConfig;
 
     if (!templateExists(filepath)) {
-      initTemplate(filepath);
-
-      const projectSlug = await promptly.prompt("Tenderly project slug:");
-      const username = await promptly.prompt("Tenderly username/organization slug:");
-      const network = await promptly.prompt(
-        "Network name (see `npx tenderly networks` for list of supported networks):"
-      );
-      const blockNumber = await promptly.prompt("Network block number:", {
-        validator
-      });
+      const [projectSlug, username] = await promptProject();
+      const network = await promptNetwork();
+      const blockNumber = await promptBlockNumber();
 
       writeTemplate(filepath, projectSlug, username, network, blockNumber);
     }
@@ -42,6 +36,81 @@ export const VNetCommand = new commander.Command("vnet")
 
     await startServer(filepath, verbose, saveChainConfig);
   });
+
+async function promptProject(): Promise<[string, string]> {
+  const principalId = (await TenderlyService.getPrincipal()).id;
+  const projects = await TenderlyService.getProjectSlugs(principalId);
+  projects.sort((a, b) => a.name.localeCompare(b.name));
+
+  const projectChoices = projects.map(function(project) {
+    return {
+      title: project.name,
+      value: { slug: project.slug, username: project.owner.username }
+    };
+  });
+
+  const question: prompts.PromptObject = {
+    type: "autocomplete",
+    name: "project",
+    message: "Tenderly project",
+    initial: projects[0].slug,
+    choices: projectChoices
+  };
+
+  const response = await prompts(question);
+
+  return [response.project.slug, response.project.username];
+}
+
+async function promptNetwork(): Promise<string> {
+  const networks = await TenderlyService.getPublicNetworks();
+  const filteredNetworks = networks.filter(function(element) {
+    return element.metadata.exclude_from_listing === undefined || element.metadata.exclude_from_listing === false;
+  });
+  filteredNetworks.sort((a, b) => a.sort_order - b.sort_order);
+  const networkChoices = filteredNetworks.map(function(network) {
+    return {
+      title: network.name,
+      value: network.ethereum_network_id
+    };
+  });
+
+  const question: prompts.PromptObject = {
+    type: "autocomplete",
+    name: "network",
+    message: "Network",
+    initial: "Mainnet",
+    choices: networkChoices
+  };
+  const response = await prompts(question);
+
+  return response.network;
+}
+
+async function promptBlockNumber(): Promise<string> {
+  const question: prompts.PromptObject = {
+    type: "text",
+    name: "blockNumber",
+    message: "Block number",
+    initial: "latest",
+    validate: validator
+  };
+  const response = await prompts(question);
+
+  return response.blockNumber;
+}
+
+const validator = function(value) {
+  if ((value as string) == "latest") {
+    return true;
+  }
+
+  if (!Number.isNaN(Number(value))) {
+    return true;
+  }
+
+  return "Invalid block number: must be a number or latest\n";
+};
 
 async function startServer(filepath: string, verbose: boolean, saveChainConfig: boolean) {
   const child = childProcess.exec(
@@ -65,15 +134,3 @@ async function startServer(filepath: string, verbose: boolean, saveChainConfig: 
     child.on("close", resolve);
   });
 }
-
-const validator = function(value: string | number) {
-  if ((value as string) == "latest") {
-    return value;
-  }
-
-  if (!Number.isNaN(Number(value))) {
-    return value;
-  }
-
-  throw new Error("Invalid block number: must be a number or latest\n");
-};

@@ -15,6 +15,8 @@ import {
   TenderlyForkContractUploadRequest
 } from "./types";
 import { TenderlyPublicNetwork } from "./types/Network";
+import { Principal } from "./types/Principal";
+import { Project } from "./types/Project";
 import { VNet, VNetTransaction } from "./types/VNet";
 
 export const TENDERLY_API_BASE_URL = "https://api.tenderly.co";
@@ -231,5 +233,36 @@ export class TenderlyService {
       console.log(`Error in ${PluginName}: There was an error during the request. Transaction fetch failed`);
     }
     return response!;
+  }
+
+  public static async getPrincipal(): Promise<Principal> {
+    const tenderlyApi = TenderlyApiService.configureInstance();
+
+    const apiPath = "/api/v1/user";
+
+    let response;
+    try {
+      response = (await tenderlyApi.get(apiPath)).data;
+    } catch (e) {
+      console.log(`Error in ${PluginName}: There was an error during the request. Principal id fetch failed`);
+    }
+    return {
+      id: response.user.id,
+      username: response.user.username
+    };
+  }
+
+  public static async getProjectSlugs(principalId: string): Promise<Project[]> {
+    const tenderlyApi = TenderlyApiService.configureInstance();
+
+    const apiPath = `/api/v1/account/${principalId}/projects`;
+
+    let response: Project[] = [];
+    try {
+      response = (await tenderlyApi.get(apiPath)).data.projects;
+    } catch (e) {
+      console.log(`Error in ${PluginName}: There was an error during the request. Project slugs fetch failed`);
+    }
+    return response;
   }
 }
