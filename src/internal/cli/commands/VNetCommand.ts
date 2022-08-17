@@ -4,18 +4,14 @@ import supportsHyperlinks from "supports-hyperlinks";
 import commander from "commander";
 import promptly from "promptly";
 
-import {
-  initTemplate,
-  templateExists,
-  writeTemplate,
-} from "../../../utils/template";
+import { initTemplate, templateExists, writeTemplate } from "../../../utils/template";
 
 export const VNetCommand = new commander.Command("vnet")
   .description("configure and start Tenderly VNet")
   .option("-t, --template <path>", "vnet template path", "vnet.template.json")
   .option("-s, --save-chain-config", "save chain config to template")
   .option("-v, --verbose", "print all json rpc calls")
-  .action(async (options) => {
+  .action(async options => {
     const filepath: string = options.template;
     const verbose: boolean = options.verbose;
     const saveChainConfig: boolean = options.saveChainConfig;
@@ -24,14 +20,12 @@ export const VNetCommand = new commander.Command("vnet")
       initTemplate(filepath);
 
       const projectSlug = await promptly.prompt("Tenderly project slug:");
-      const username = await promptly.prompt(
-        "Tenderly username/organization slug:"
-      );
+      const username = await promptly.prompt("Tenderly username/organization slug:");
       const network = await promptly.prompt(
         "Network name (see `npx tenderly networks` for list of supported networks):"
       );
       const blockNumber = await promptly.prompt("Network block number:", {
-        validator,
+        validator
       });
 
       writeTemplate(filepath, projectSlug, username, network, blockNumber);
@@ -65,10 +59,10 @@ async function startServer(
       "vnetServer.js"
     )} ${filepath} ${verbose} ${saveChainConfig}`
   );
-  child.stdout.pipe(process.stdout);
-  child.stderr.pipe(process.stderr);
+  child.stdout?.pipe(process.stdout);
+  child.stderr?.pipe(process.stderr);
 
-  await new Promise((resolve) => {
+  await new Promise(resolve => {
     child.on("close", resolve);
   });
 }
