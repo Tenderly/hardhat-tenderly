@@ -37,9 +37,8 @@ const config: HardhatUserConfig = {
         ? [process.env.ROPSTEN_PRIVATE_KEY]
         : [],
     },
-
     tenderly: {
-      url: `http://localhost:1337`,
+      url: `http://127.0.0.1:1337`,
     },
   },
   tenderly: {
