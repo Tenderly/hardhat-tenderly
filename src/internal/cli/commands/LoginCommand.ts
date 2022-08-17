@@ -1,56 +1,64 @@
 import axios from "axios";
 import commander from "commander";
 import open from "open";
-import promptly from "promptly";
+import prompts from "prompts";
 
 import { TENDERLY_API_BASE_URL } from "../../../tenderly/TenderlyService";
 import { isAccessTokenSet, setAccessToken } from "../../../utils/config";
 
 export const LoginCommand = new commander.Command("login").description("login to Tenderly").action(async () => {
   if (isAccessTokenSet()) {
-    const overwrite = await promptly.confirm("Access token already set. Would you like to overwrite it? (y/n)", {
-      default: "y"
+    const response = await prompts({
+      type: "confirm",
+      name: "overwrite",
+      message: "Access token already set. Would you like to overwrite it?"
     });
-    if (!overwrite) {
+    if (!response.overwrite) {
       return;
     }
   }
 
   const accessToken = await promptAccessToken();
-  const valid = await isAccessTokenValid(accessToken);
-  if (!valid) {
-    return;
-  }
-
+  
   setAccessToken(accessToken);
   console.log("Successfully logged in.");
 });
-
-const validator = function(value: string) {
-  if (value.length != 32) {
-    throw new Error("Invalid access token: length must be exactly 32 characters\n");
-  }
-
-  return value;
-};
 
 async function promptAccessToken(): Promise<string> {
   console.log("Redirecting to https://dashboard.tenderly.co/account/authorization");
   await open("https://dashboard.tenderly.co/account/authorization");
 
-  return await promptly.prompt("Enter access token: ", { validator });
+  const response = await prompts({
+    type: 'text',
+    name: 'accessToken',
+    message: 'Enter access token',
+    validate: validator,
+  })
+
+  return response.accessToken;
 }
 
-async function isAccessTokenValid(accessToken: string): Promise<boolean> {
+const validator = async function(value: string) {
+  if (value.length != 32) {
+    return "Invalid access token: length must be exactly 32 characters";
+  }
+
+  const canAuth = await canAuthenticate(value)
+  if (!canAuth) {
+    return "Invalid access token: unable to authenticate";
+  }
+
+  return true;
+};
+
+async function canAuthenticate(accessToken: string): Promise<boolean> {
   try {
-    await axios.get(`${TENDERLY_API_BASE_URL}/api/v1/user`, { headers: { "x-access-key": accessToken } });
-    return true;
-  } catch (err) {
-    if (err?.response?.status == 401) {
-      console.log("Error: Invalid access token");
-      return false;
+    const response = await axios.get(`${TENDERLY_API_BASE_URL}/api/v1/user`, { headers: { "x-access-key": accessToken } });
+    if (response.data.user != undefined) {
+      return true;
     }
-    console.log("Error:", err?.response?.data?.error?.message);
+    return false;
+  } catch (err) {
     return false;
   }
 }

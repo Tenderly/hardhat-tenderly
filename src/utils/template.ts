@@ -22,11 +22,6 @@ export class VNetTemplate {
   }
 }
 
-export function initTemplate(filepath: string) {
-  const templateData: VNetTemplate = new VNetTemplate();
-  fs.writeFileSync(filepath, JSON.stringify(templateData, null, 2), "utf8");
-}
-
 export function writeTemplate(
   filepath: string,
   projectSlug: string,

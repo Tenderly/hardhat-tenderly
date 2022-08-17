@@ -9,7 +9,7 @@ export const NetworksCommand = new commander.Command("networks")
   .action(async (options) => {
     const verbose = options.verbose != undefined && options.verbose == true;
 
-    const headers = ["Network ID", "Network slug"];
+    const headers = ["Network ID", "Network name"];
     if (verbose) {
       headers.push("Latest block number");
     }
@@ -33,9 +33,9 @@ export const NetworksCommand = new commander.Command("networks")
               network.ethereum_network_id
             );
 
-            return [network.ethereum_network_id, network.slug, blockNumber];
+            return [network.ethereum_network_id, network.name, blockNumber];
           } else {
-            return [network.ethereum_network_id, network.slug];
+            return [network.ethereum_network_id, network.name];
           }
         })
       ))
