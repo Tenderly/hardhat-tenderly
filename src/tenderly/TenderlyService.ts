@@ -199,7 +199,7 @@ export class TenderlyService {
       response = (
         await tenderlyApi.post(apiPath, {
           network_id: networkId,
-          blockNumber: blockNumber,
+          block_number: blockNumber,
           chain_config: chainConfig,
           vnet: true
         })
