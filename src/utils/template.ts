@@ -1,22 +1,23 @@
 import fs from "fs";
 
 export class VNetTemplate {
-  public projectSlug: string;
+  public project_slug: string;
   public username: string;
   public network: string;
-  public blockNumber: string;
+  public block_number: string;
+  public chain_config?: Record<string, string>;
 
   public constructor(...args: any[]) {
     if (args.length == 0) {
-      this.projectSlug = "";
+      this.project_slug = "";
       this.username = "";
       this.network = "";
-      this.blockNumber = "";
+      this.block_number = "";
     } else {
-      this.projectSlug = args[0];
+      this.project_slug = args[0];
       this.username = args[1];
       this.network = args[2];
-      this.blockNumber = args[3];
+      this.block_number = args[3];
     }
   }
 }
@@ -39,6 +40,19 @@ export function writeTemplate(
     network,
     blockNumber
   );
+  fs.writeFileSync(filepath, JSON.stringify(templateData, null, 2), "utf8");
+}
+
+export function updateChainConfig(
+  filepath: string,
+  chainConfig?: Record<string, string>
+) {
+  if (chainConfig == undefined) {
+    return;
+  }
+
+  let templateData = getTemplate(filepath);
+  templateData.chain_config = chainConfig;
   fs.writeFileSync(filepath, JSON.stringify(templateData, null, 2), "utf8");
 }
 
