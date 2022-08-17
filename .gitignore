@@ -62,4 +62,4 @@ typings/
 .editorconfig
 .env
 .idea
-# .vscode
+.vscode
