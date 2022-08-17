@@ -55,7 +55,7 @@ app.listen(1337, async () => {
     updateChainConfig(filepath, vnet.chain_config);
   }
 
-  console.log(`\nForwarding: http://127.0.0.1:1337 --> https://rpc.tenderly.co/vnet/${vnet.vnet_id}\n`);
+  console.log(`Forwarding: http://127.0.0.1:1337 --> https://rpc.tenderly.co/vnet/${vnet.vnet_id}\n`);
 
   await listAccounts(vnet);
 });
@@ -69,14 +69,13 @@ async function listAccounts(vnet: VNet) {
   );
 
   const warningMessage =
-    "WARNING: These accounts, and their private keys, are publicly known.\nAny funds sent to them on Mainnet or any other live network WILL BE LOST.\n";
+    "WARNING --- DO NOT SEND any funds to the above addresses on Mainnet or any other live network, it will result in the loss of the sent funds --- WARNING\n";
 
-  console.log("Accounts\n========\n");
   console.log(warningMessage);
   forkTx.state_objects.forEach(function(stateObject, index) {
-    console.log(`Account #${index}: ${stateObject.address} (100 ETH)\n`);
+    console.log(`Account #${index}: ${stateObject.address} (100 ETH)`);
   });
-  console.log(warningMessage);
+  console.log(`\n${warningMessage}`);
 }
 
 function isWriteMethod(method: string): boolean {

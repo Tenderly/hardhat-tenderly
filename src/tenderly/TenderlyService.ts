@@ -184,7 +184,7 @@ export class TenderlyService {
   }
 
   public static async createVNet(
-    accountId: string,
+    accountSlug: string,
     projectSlug: string,
     networkId: string,
     blockNumber: string,
@@ -192,7 +192,7 @@ export class TenderlyService {
   ): Promise<VNet> {
     const tenderlyApi = TenderlyApiService.configureInstance();
 
-    const apiPath = `/api/v1/account/${accountId}/project/${projectSlug}/fork`;
+    const apiPath = `/api/v1/account/${accountSlug}/project/${projectSlug}/fork`;
 
     let response;
     try {
@@ -215,14 +215,14 @@ export class TenderlyService {
   }
 
   public static async getTransaction(
-    accountId: string,
+    accountSlug: string,
     projectSlug: string,
     forkId: string,
     transactionId: string
   ): Promise<VNetTransaction> {
     const tenderlyApi = TenderlyApiService.configureInstance();
 
-    const apiPath = `/api/v1/account/${accountId}/project/${projectSlug}/fork/${forkId}/transaction/${transactionId}`;
+    const apiPath = `/api/v1/account/${accountSlug}/project/${projectSlug}/fork/${forkId}/transaction/${transactionId}`;
 
     let response: VNetTransaction;
     try {

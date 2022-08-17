@@ -33,18 +33,17 @@ export const VNetCommand = new commander.Command("vnet")
 
     if (saveChainConfig) {
       console.log(
-        "\nNote: This will use a default chain config. If you need to modify it, edit the generated template and restart the vnet.\n"
-      );  
+        "\nNote: This will use a default chain config. If you need to modify it, edit the generated template and restart the vnet."
+      );
     }
+
+    // New line
+    console.log();
 
     await startServer(filepath, verbose, saveChainConfig);
   });
 
-async function startServer(
-  filepath: string,
-  verbose: boolean,
-  saveChainConfig: boolean
-) {
+async function startServer(filepath: string, verbose: boolean, saveChainConfig: boolean) {
   const child = childProcess.exec(
     `SUPPORTS_HYPERLINKS=${supportsHyperlinks.stdout} node ${path.resolve(
       __dirname,
