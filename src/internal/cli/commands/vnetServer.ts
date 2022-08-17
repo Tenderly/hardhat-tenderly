@@ -4,7 +4,11 @@ import hyperlinker from "hyperlinker";
 import { TenderlyService } from "../../../tenderly/TenderlyService";
 import { VNet } from "../../../tenderly/types/VNet";
 import { getAccessToken } from "../../../utils/config";
-import { getTemplate, VNetTemplate } from "../../../utils/template";
+import {
+  updateChainConfig,
+  getTemplate,
+  VNetTemplate,
+} from "../../../utils/template";
 
 const app = express();
 app.use(express.json());
@@ -17,15 +21,16 @@ const TAB: string = "    ";
 const filepath: string = process.argv[2];
 const template: VNetTemplate = getTemplate(filepath);
 const verbose: boolean = process.argv[3] == "true";
+const saveChainConfig: boolean = process.argv[4] == "true";
 
 app.get("/vnet-id", (_, res) => {
-  res.json({ vnetId: vnet.vnetId });
+  res.json({ vnetId: vnet.vnet_id });
 });
 
 app.use(async (req, res) => {
   try {
     const response: any = await got.post(
-      `https://rpc.tenderly.co/vnet/${vnet.vnetId}`,
+      `https://rpc.tenderly.co/vnet/${vnet.vnet_id}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -47,13 +52,18 @@ app.use(async (req, res) => {
 app.listen(1337, async () => {
   vnet = await TenderlyService.createVNet(
     template.username,
-    template.projectSlug,
+    template.project_slug,
     template.network,
-    template.blockNumber
+    template.block_number,
+    template.chain_config
   );
 
+  if (saveChainConfig) {
+    updateChainConfig(filepath, vnet.chain_config);
+  }
+
   console.log(
-    `Forwarding: http://localhost:1337 --> https://rpc.tenderly.co/vnet/${vnet.vnetId}\n`
+    `Forwarding: http://127.0.0.1:1337 --> https://rpc.tenderly.co/vnet/${vnet.vnet_id}\n`
   );
 
   await listAccounts(vnet);
@@ -62,9 +72,9 @@ app.listen(1337, async () => {
 async function listAccounts(vnet: VNet) {
   const forkTx = await TenderlyService.getTransaction(
     template.username,
-    template.projectSlug,
-    vnet.vnetId,
-    vnet.rootTxId
+    template.project_slug,
+    vnet.vnet_id,
+    vnet.root_tx_id
   );
 
   const warningMessage =
@@ -122,7 +132,7 @@ function printRPCCall(req: any, rawRes: any): void {
     if (SUPPORTS_HYPERLINKS) {
       const hyperlink = hyperlinker(
         "View in Tenderly",
-        `https://dashboard.tenderly.co/${template.username}/${template.projectSlug}/fork/${vnet.vnetId}/simulation/${simulationID}`
+        `https://dashboard.tenderly.co/${template.username}/${template.project_slug}/fork/${vnet.vnet_id}/simulation/${simulationID}`
       );
       console.log(`${TAB}Hash:\t\t`, `${txHash}(${hyperlink})`, "\n");
       return;
@@ -131,7 +141,7 @@ function printRPCCall(req: any, rawRes: any): void {
     console.log(`${TAB}Hash:\t\t`, txHash);
     console.log(
       `${TAB}View in Tenderly:\t`,
-      `https://dashboard.tenderly.co/${template.username}/${template.projectSlug}/fork/${vnet.vnetId}/simulation/${simulationID}`
+      `https://dashboard.tenderly.co/${template.username}/${template.project_slug}/fork/${vnet.vnet_id}/simulation/${simulationID}`
     );
   }
 }

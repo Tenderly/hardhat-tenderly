@@ -1,6 +1,7 @@
 export interface VNet {
-  vnetId: string;
-  rootTxId: string;
+  vnet_id: string;
+  root_tx_id: string;
+  chain_config?: Record<string, string>;
 }
 
 export interface VNetTransaction {

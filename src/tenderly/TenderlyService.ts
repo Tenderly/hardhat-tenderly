@@ -199,7 +199,8 @@ export class TenderlyService {
     accountId: string,
     projectSlug: string,
     networkId: string,
-    blockNumber: string
+    blockNumber: string,
+    chainConfig?: Record<string, string>
   ): Promise<VNet> {
     const tenderlyApi = TenderlyApiService.configureInstance();
 
@@ -211,6 +212,7 @@ export class TenderlyService {
         await tenderlyApi.post(apiPath, {
           network_id: networkId,
           blockNumber: blockNumber,
+          chain_config: chainConfig,
           vnet: true,
         })
       ).data;
@@ -220,8 +222,9 @@ export class TenderlyService {
       );
     }
     return {
-      vnetId: response.simulation_fork.id,
-      rootTxId: response.root_transaction.id,
+      vnet_id: response.simulation_fork.id,
+      root_tx_id: response.root_transaction.id,
+      chain_config: response.simulation_fork.chain_config,
     };
   }
 

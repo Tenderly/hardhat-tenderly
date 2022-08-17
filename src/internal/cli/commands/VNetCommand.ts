@@ -13,10 +13,12 @@ import {
 export const VNetCommand = new commander.Command("vnet")
   .description("configure and start Tenderly VNet")
   .option("-t, --template <path>", "vnet template path", "vnet.template.json")
+  .option("-s, --save-chain-config", "save chain config to template")
   .option("-v, --verbose", "print all json rpc calls")
   .action(async (options) => {
     const filepath: string = options.template;
     const verbose: boolean = options.verbose;
+    const saveChainConfig: boolean = options.saveChainConfig;
 
     if (!templateExists(filepath)) {
       initTemplate(filepath);
@@ -35,10 +37,20 @@ export const VNetCommand = new commander.Command("vnet")
       writeTemplate(filepath, projectSlug, username, network, blockNumber);
     }
 
-    await startServer(filepath, verbose);
+    if (saveChainConfig) {
+      console.log(
+        "\nNote: This will use a default chain config. If you need to modify it, edit the generated template and restart the vnet.\n"
+      );  
+    }
+
+    await startServer(filepath, verbose, saveChainConfig);
   });
 
-async function startServer(filepath: string, verbose: boolean) {
+async function startServer(
+  filepath: string,
+  verbose: boolean,
+  saveChainConfig: boolean
+) {
   const child = childProcess.exec(
     `SUPPORTS_HYPERLINKS=${supportsHyperlinks.stdout} node ${path.resolve(
       __dirname,
@@ -51,7 +63,7 @@ async function startServer(filepath: string, verbose: boolean) {
       "cli",
       "commands",
       "vnetServer.js"
-    )} ${filepath} ${verbose}`
+    )} ${filepath} ${verbose} ${saveChainConfig}`
   );
   child.stdout.pipe(process.stdout);
   child.stderr.pipe(process.stderr);

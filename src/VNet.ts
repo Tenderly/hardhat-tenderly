@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const VNetHostURL = "http://localhost:1337";
+const VNetHostURL = "http://127.0.0.1:1337";
 
 export class VNet {
   public static async getForkID(): Promise<string | undefined> {
