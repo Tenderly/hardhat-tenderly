@@ -23,7 +23,7 @@ From these examples, you can learn:
 Run:
 
 ```bash
-yarn add --dev @tenderly/hardhat-tenderly@1.2.0-beta.1
+yarn add --dev @tenderly/hardhat-tenderly@1.2.0-beta.2
 ```
 
 To use your local installation of Tenderly, you need to use `npx` to run it (i.e. `npx tenderly`).
@@ -38,7 +38,7 @@ It will redirect you to the Tenderly dashboard, where you should create an acces
 
 # Virtual Network
 
-`@tenderly/hardhat-tenderly@1.2.0-beta.1` comes built-in with **Virtual Network**, a local Ethereum EVM based network node designed for development. It allows you to deploy your contracts, run your tests and debug your code on Tenderly dashboard.
+`@tenderly/hardhat-tenderly@1.2.0-beta.2` comes built-in with **Virtual Network**, a local Ethereum EVM based network node designed for development. It allows you to deploy your contracts, run your tests and debug your code on Tenderly dashboard.
 
 To list all supported networks that can be used to spin up a virtual network run:
 
