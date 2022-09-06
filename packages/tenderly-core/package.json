@@ -1,0 +1,70 @@
+{
+  "name": "tenderly",
+  "version": "0.0.0",
+  "author": "Tenderly",
+  "license": "MIT",
+  "homepage": "https://tenderly.co",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "description": "",
+  "keywords": [
+    "tooling",
+    "tenderly",
+    "ethereum",
+    "solidity",
+    "blockchain",
+    "smart-contracts"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tenderly/hardhat-tenderly.git"
+  },
+  "bin": {
+    "tenderly": "dist/internal/cli/index.js"
+  },
+  "scripts": {
+    "lint": "yarn prettier --check && yarn eslint",
+    "lint:fix": "yarn prettier --write && yarn eslint --fix",
+    "eslint": "eslint 'src/**/*.ts' 'test/**/*.ts'",
+    "prettier": "prettier \"**/*.{js,md,json}\"",
+    "build": "tsc --build .",
+    "prepublishOnly": "yarn build"
+  },
+  "files": [
+    "dist/",
+    "LICENSE",
+    "README.md"
+  ],
+  "devDependencies": {
+    "@types/node": "^18.7.15",
+    "@typescript-eslint/eslint-plugin": "^5.36.1",
+    "@typescript-eslint/parser": "^5.36.1",
+    "eslint": "^8.23.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.7.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.2"
+  },
+  "dependencies": {
+    "cli-table3": "^0.6.2",
+    "commander": "^9.4.0",
+    "express": "^4.18.1",
+    "hyperlinker": "^1.0.0",
+    "prompts": "^2.4.2",
+    "supports-hyperlinks": "^2.2.0"
+  },
+  "peerDependencies": {
+    "ts-node": "*",
+    "typescript": "*"
+  },
+  "peerDependenciesMeta": {
+    "ts-node": {
+      "optional": true
+    },
+    "typescript": {
+      "optional": true
+    }
+  }
+}

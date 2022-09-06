@@ -1,0 +1,11 @@
+{
+    "extends": "../../config/typescript/tsconfig.json",
+    "exclude": [
+        "./node_modules",
+    ],
+    "references": [
+        {
+            "path": "./src"
+        }
+    ]
+}
