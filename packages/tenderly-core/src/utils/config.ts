@@ -3,12 +3,14 @@ import os from "os";
 import path from "path";
 import * as yaml from "js-yaml";
 
-const configDir = os.homedir() + path.sep + ".tenderly";
-export const configFilepath = configDir + path.sep + "config.yaml";
+import { TenderlyConfig } from "../types";
 
-export function getConfig(): any {
+const configDir = os.homedir() + path.sep + ".tenderly";
+export const configFilePath = configDir + path.sep + "config.yaml";
+
+export function getConfig(): TenderlyConfig {
   if (configExists()) {
-    const fileData = fs.readFileSync(configFilepath);
+    const fileData = fs.readFileSync(configFilePath);
     return yaml.load(fileData.toString());
   }
   return {
@@ -22,7 +24,7 @@ export function getConfig(): any {
 }
 
 export function configExists(): boolean {
-  return fs.existsSync(configFilepath);
+  return fs.existsSync(configFilePath);
 }
 
 export function isAccessTokenSet(): boolean {
@@ -42,5 +44,5 @@ export function setAccessToken(accessToken: string): void {
   config.access_key = accessToken;
 
   fs.mkdirSync(configDir, { recursive: true });
-  fs.writeFileSync(configFilepath, yaml.safeDump(config), "utf8");
+  fs.writeFileSync(configFilePath, yaml.safeDump(config), "utf8");
 }

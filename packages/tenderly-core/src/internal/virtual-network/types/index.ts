@@ -1,4 +1,2 @@
-import { VirtualNetworkConfig } from "./VirtualNetworkConfig";
-import { VirtualNetwork, Transaction, StateObject } from "./VirtualNetwork";
-
-export { VirtualNetworkConfig, VirtualNetwork, Transaction, StateObject };
+export * from "./VirtualNetworkConfig";
+export * from "./VirtualNetwork";

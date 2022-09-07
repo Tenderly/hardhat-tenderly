@@ -5,10 +5,10 @@ import * as yaml from "js-yaml";
 
 import { PluginName } from "./constants";
 import { NO_COMPILER_FOUND_FOR_CONTRACT } from "./tenderly/errors";
-import { TenderlyApiService } from "./tenderly/TenderlyApiService";
-import { TenderlyService } from "./tenderly/TenderlyService";
+import { TenderlyApiService } from "../../tenderly-core/src/internal/core/services/TenderlyApiService";
+import { TenderlyService } from "../../tenderly-core/src/internal/core/services/TenderlyService";
 import { ContractByName, TenderlyForkContractUploadRequest } from "./tenderly/types";
-import { configFilepath } from "../../tenderly-core/src/utils/config";
+import { configFilePath } from "../../tenderly-core/src/utils/config";
 import { logError } from "./utils/error_logger";
 import { getCompilerDataFromContracts, getContracts } from "./utils/util";
 import { VNet } from "./VNet";
@@ -27,7 +27,7 @@ export class TenderlyNetwork {
     this.env = hre;
     this.connected = true;
 
-    const fileData = fs.readFileSync(configFilepath);
+    const fileData = fs.readFileSync(configFilePath);
     const yamlData = yaml.load(fileData.toString());
 
     this.accessKey = yamlData.access_key;
@@ -76,7 +76,7 @@ export class TenderlyNetwork {
   }
 
   public resetFork(): string | undefined {
-    const fileData = fs.readFileSync(configFilepath);
+    const fileData = fs.readFileSync(configFilePath);
     const yamlData = yaml.load(fileData.toString());
 
     const oldHead = yamlData.head;
@@ -84,7 +84,7 @@ export class TenderlyNetwork {
     delete yamlData.head;
     delete yamlData.fork;
 
-    fs.writeFileSync(configFilepath, yaml.safeDump(yamlData), "utf8");
+    fs.writeFileSync(configFilePath, yaml.safeDump(yamlData), "utf8");
 
     return oldHead;
   }
@@ -193,7 +193,7 @@ export class TenderlyNetwork {
     const projectID: string = this.env.config.tenderly.project;
     try {
       const resp = await this.tenderlyAPI.post(`/account/${username}/project/${projectID}/fork`, {
-        network_id: this.env.config.tenderly.forkNetwork
+        network_id: this.env.config.tenderly.forkNetwork,
       });
       this.head = resp.data.root_transaction.id;
       this.accounts = resp.data.simulation_fork.accounts;
@@ -204,12 +204,12 @@ export class TenderlyNetwork {
   }
 
   private writeHead() {
-    const fileData = fs.readFileSync(configFilepath);
+    const fileData = fs.readFileSync(configFilePath);
     const yamlData = yaml.load(fileData.toString());
 
     yamlData.head = this.head;
 
-    fs.writeFileSync(configFilepath, yaml.safeDump(yamlData), "utf8");
+    fs.writeFileSync(configFilePath, yaml.safeDump(yamlData), "utf8");
   }
 
   private async filterContracts(flatContracts: ContractByName[]): Promise<TenderlyForkContractUploadRequest | null> {
@@ -222,15 +222,17 @@ export class TenderlyNetwork {
     }
 
     for (contract of flatContracts) {
-      const index = requestData.contracts.findIndex(requestContract => requestContract.contractName === contract.name);
+      const index = requestData.contracts.findIndex(
+        (requestContract) => requestContract.contractName === contract.name
+      );
       if (index === -1) {
         continue;
       }
       requestData.contracts[index].networks = {
         [this.fork!]: {
           address: contract.address,
-          links: contract.libraries
-        }
+          links: contract.libraries,
+        },
       };
     }
 
@@ -252,7 +254,7 @@ export class TenderlyNetwork {
     return {
       contracts,
       config: solcConfig!,
-      root: this.head!
+      root: this.head!,
     };
   }
 

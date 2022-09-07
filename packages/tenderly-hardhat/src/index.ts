@@ -16,9 +16,9 @@ import { Tenderly } from "./Tenderly";
 import { CONTRACTS_NOT_DETECTED } from "./tenderly/errors";
 import { wrapEthers } from "./tenderly/ethers";
 import { wrapHHDeployments } from "./tenderly/hardhat-deploy";
-import { TenderlyService, TENDERLY_RPC_BASE } from "./tenderly/TenderlyService";
+import { TenderlyService, TENDERLY_RPC_BASE } from "../../tenderly-core/src/internal/core/services/TenderlyService";
 import { Metadata, TenderlyContract } from "./tenderly/types";
-import { TenderlyPublicNetwork } from "./tenderly/types/Network";
+import { TenderlyPublicNetwork } from "../../tenderly-core/src/internal/core/types/TenderlyNetwork";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 import "./type-extensions";
 import {
@@ -123,7 +123,7 @@ interface VerifyArguments {
 }
 
 const populateNetworks = (env: HardhatRuntimeEnvironment): void => {
-  TenderlyService.getPublicNetworks()
+  TenderlyService.getNetworks()
     .then((networks) => {
       let network: TenderlyPublicNetwork;
       let slug: string;

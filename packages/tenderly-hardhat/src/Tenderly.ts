@@ -8,7 +8,7 @@ import {
   CONTRACTS_NOT_DETECTED,
   NO_COMPILER_FOUND_FOR_CONTRACT,
 } from "./tenderly/errors";
-import { TenderlyService } from "./tenderly/TenderlyService";
+import { TenderlyService } from "../../tenderly-core/src/internal/core/services/TenderlyService";
 import {
   ContractByName,
   Metadata,

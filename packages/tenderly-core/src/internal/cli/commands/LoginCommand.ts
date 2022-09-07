@@ -1,17 +1,17 @@
-import axios from "axios";
-import commander from "commander";
 import open from "open";
+import axios from "axios";
 import prompts from "prompts";
+import commander from "commander";
 
-import { value TENDERLY_API_BASE_URL } from "../../../../../tenderly-hardhat/src/tenderly/TenderlyService";
-import { value isAccessTokenSet, value setAccessToken } from "../../../utils/config";
+import { isAccessTokenSet, setAccessToken } from "../../../utils/config";
+import { TENDERLY_API_BASE_URL, TENDERLY_DASHBOARD_BASE_URL } from "../../../common/constants";
 
 export const LoginCommand = new commander.Command("login").description("login to Tenderly").action(async () => {
   if (isAccessTokenSet()) {
     const response = await prompts({
       type: "confirm",
       name: "overwrite",
-      message: "Access token already set. Would you like to overwrite it?"
+      message: "Access token already set. Would you like to overwrite it?",
     });
     if (!response.overwrite) {
       return;
@@ -25,20 +25,20 @@ export const LoginCommand = new commander.Command("login").description("login to
 });
 
 async function promptAccessToken(): Promise<string> {
-  console.log("Redirecting to https://dashboard.tenderly.co/account/authorization");
-  await open("https://dashboard.tenderly.co/account/authorization");
+  console.log(`Redirecting to ${TENDERLY_DASHBOARD_BASE_URL}/account/authorization`);
+  await open(`${TENDERLY_DASHBOARD_BASE_URL}/account/authorization`);
 
   const response = await prompts({
     type: "text",
     name: "accessToken",
     message: "Enter access token",
-    validate: validator
+    validate: validator,
   });
 
   return response.accessToken;
 }
 
-const validator = async function(value: string) {
+const validator = async function (value: string) {
   if (value.length != 32) {
     return "Invalid access token: length must be exactly 32 characters";
   }
@@ -54,7 +54,7 @@ const validator = async function(value: string) {
 async function canAuthenticate(accessToken: string): Promise<boolean> {
   try {
     const response = await axios.get(`${TENDERLY_API_BASE_URL}/api/v1/user`, {
-      headers: { "x-access-key": accessToken }
+      headers: { "x-access-key": accessToken },
     });
     if (response.data.user != undefined) {
       return true;

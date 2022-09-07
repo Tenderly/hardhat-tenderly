@@ -1,17 +1,19 @@
+const hyperlinker = require("hyperlinker");
 import express from "express";
 import got from "got";
-import hyperlinker from "hyperlinker";
 
 import { getAccessToken } from "../../../utils/config";
-import { TENDERLY_JSON_RPC_HOST, TENDERLY_DASHBOARD_HOST } from "../../../common/constants"
+import { TENDERLY_JSON_RPC_BASE_URL, TENDERLY_DASHBOARD_BASE_URL, PLUGIN_NAME } from "../../../common/constants";
 
-import { TenderlyService } from "../../../../../tenderly-hardhat/src/tenderly/TenderlyService";
+import { TenderlyService } from "../../core/services/TenderlyService";
 import { VirtualNetwork, VirtualNetworkConfig } from "../types";
 import { updateChainConfig, getConfig } from "../utils/config";
 import { VIRTUAL_NETWORK_LOCAL_HOST, TAB, WARNING_MESSAGE } from "./constants";
 
 const app = express();
 app.use(express.json());
+
+const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
 let vnet: VirtualNetwork;
 
@@ -28,12 +30,12 @@ app.get("/vnet-id", (_, res) => {
 
 app.use(async (req, res) => {
   try {
-    const response: any = await got.post(`${TENDERLY_JSON_RPC_HOST}/vnet/${vnet.vnet_id}`, {
+    const response: any = await got.post(`${TENDERLY_JSON_RPC_BASE_URL}/vnet/${vnet.vnet_id}`, {
       headers: {
         "Content-Type": "application/json",
-        "X-ACCESS-KEY": getAccessToken()
+        "X-ACCESS-KEY": getAccessToken(),
       },
-      body: JSON.stringify(req.body)
+      body: JSON.stringify(req.body),
     });
 
     printRPCCall(req, response);
@@ -46,33 +48,40 @@ app.use(async (req, res) => {
 });
 
 app.listen(1337, async () => {
-  vnet = await TenderlyService.createVNet(
+  const vnetTmp = await tenderlyService.createVNet(
     config.username,
     config.project_slug,
     config.network,
     config.block_number,
     config.chain_config
   );
+  if (!vnetTmp) {
+    process.exit(1);
+  }
+  vnet = vnetTmp;
 
   if (saveChainConfig) {
     updateChainConfig(filepath, vnet.chain_config);
   }
 
-  console.log(`Forwarding: ${VIRTUAL_NETWORK_LOCAL_HOST} --> ${TENDERLY_JSON_RPC_HOST}/vnet/${vnet.vnet_id}\n`);
+  console.log(`Forwarding: ${VIRTUAL_NETWORK_LOCAL_HOST} --> ${TENDERLY_JSON_RPC_BASE_URL}/vnet/${vnet.vnet_id}\n`);
 
   await listAccounts(vnet);
 });
 
 async function listAccounts(vnet: VirtualNetwork) {
-  const forkTx = await TenderlyService.getTransaction(
+  const forkTx = await tenderlyService.getTransaction(
     config.username,
     config.project_slug,
     vnet.vnet_id,
     vnet.root_tx_id
   );
+  if (!forkTx) {
+    process.exit(1);
+  }
 
   console.log(WARNING_MESSAGE);
-  forkTx.state_objects.forEach(function(stateObject, index) {
+  forkTx.state_objects.forEach((stateObject, index) => {
     console.log(`Account #${index}: ${stateObject.address} (100 ETH)`);
   });
   console.log(`\n${WARNING_MESSAGE}`);
@@ -122,7 +131,7 @@ function printRPCCall(req: any, rawRes: any): void {
     if (SUPPORTS_HYPERLINKS) {
       const hyperlink = hyperlinker(
         "View in Tenderly",
-        `${TENDERLY_DASHBOARD_HOST}/${config.username}/${config.project_slug}/fork/${vnet.vnet_id}/simulation/${simulationID}`
+        `${TENDERLY_DASHBOARD_BASE_URL}/${config.username}/${config.project_slug}/fork/${vnet.vnet_id}/simulation/${simulationID}`
       );
       console.log(`${TAB}Hash:\t\t`, `${txHash}(${hyperlink})`, "\n");
       return;
@@ -131,7 +140,7 @@ function printRPCCall(req: any, rawRes: any): void {
     console.log(`${TAB}Hash:\t\t`, txHash);
     console.log(
       `${TAB}View in Tenderly:\t`,
-      `${TENDERLY_DASHBOARD_HOST}/${config.username}/${config.project_slug}/fork/${vnet.vnet_id}/simulation/${simulationID}`
+      `${TENDERLY_DASHBOARD_BASE_URL}/${config.username}/${config.project_slug}/fork/${vnet.vnet_id}/simulation/${simulationID}`
     );
   }
 }

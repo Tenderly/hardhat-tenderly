@@ -1,4 +1,4 @@
-export interface TenderlyPublicNetwork {
+export interface TenderlyNetwork {
   ethereum_network_id: string;
   name: string;
   slug: string;
