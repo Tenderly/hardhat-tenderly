@@ -28,8 +28,8 @@ export function configExists(): boolean {
 }
 
 export function isAccessTokenSet(): boolean {
-  const accessToken = getConfig().access_key;
-  return accessToken != undefined && accessToken != "";
+  const config = getConfig();
+  return config.access_key !== undefined || config.access_key !== "";
 }
 
 export function getAccessToken(): string {

@@ -11,7 +11,7 @@ export const NetworksCommand = new commander.Command("networks")
   .description("list all Tenderly supported networks")
   .option("-v, --verbose", "display detailed network information")
   .action(async (options) => {
-    const verbose = options.verbose != undefined && options.verbose == true;
+    const verbose = options.verbose !== undefined && options.verbose === true;
 
     const headers = ["Network ID", "Network name"];
     if (verbose) {

@@ -39,7 +39,7 @@ async function promptAccessToken(): Promise<string> {
 }
 
 const validator = async function (value: string) {
-  if (value.length != 32) {
+  if (value.length !== 32) {
     return "Invalid access token: length must be exactly 32 characters";
   }
 
@@ -56,7 +56,7 @@ async function canAuthenticate(accessToken: string): Promise<boolean> {
     const response = await axios.get(`${TENDERLY_API_BASE_URL}/api/v1/user`, {
       headers: { "x-access-key": accessToken },
     });
-    if (response.data.user != undefined) {
+    if (response.data.user !== undefined) {
       return true;
     }
     return false;

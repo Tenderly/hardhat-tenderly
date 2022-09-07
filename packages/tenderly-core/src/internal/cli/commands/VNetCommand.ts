@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import * as childProcess from "child_process";
 import * as path from "path";
 import commander from "commander";
@@ -48,7 +49,7 @@ export const VNetCommand = new commander.Command("vnet")
 
 async function promptProject(): Promise<[string, string]> {
   const principal = await tenderlyService.getPrincipal();
-  if (!principal?.id) {
+  if (principal === null) {
     process.exit(1);
   }
   const projects = await tenderlyService.getProjectSlugs(principal.id);
@@ -110,7 +111,7 @@ async function promptBlockNumber(): Promise<string> {
 }
 
 function validator(value: any): boolean | string {
-  if ((value as string) == "latest") {
+  if ((value as string) === "latest") {
     return true;
   }
 

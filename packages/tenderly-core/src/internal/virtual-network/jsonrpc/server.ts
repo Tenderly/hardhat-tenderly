@@ -16,22 +16,22 @@ app.use(express.json());
 
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
-let vnet: VirtualNetwork;
+let virtualNetwork: VirtualNetwork;
 
-const SUPPORTS_HYPERLINKS: boolean = process.env.SUPPORTS_HYPERLINKS == "true";
+const SUPPORTS_HYPERLINKS: boolean = process.env.SUPPORTS_HYPERLINKS === "true";
 
 const filepath: string = process.argv[2];
 const config: VirtualNetworkConfig = getConfig(filepath);
-const verbose: boolean = process.argv[3] == "true";
-const saveChainConfig: boolean = process.argv[4] == "true";
+const verbose: boolean = process.argv[3] === "true";
+const saveChainConfig: boolean = process.argv[4] === "true";
 
 app.get("/vnet-id", (_, res) => {
-  res.json({ vnetId: vnet.vnet_id });
+  res.json({ id: virtualNetwork.vnet_id });
 });
 
 app.use(async (req, res) => {
   try {
-    const response: any = await got.post(`${TENDERLY_JSON_RPC_BASE_URL}/vnet/${vnet.vnet_id}`, {
+    const response: any = await got.post(`${TENDERLY_JSON_RPC_BASE_URL}/vnet/${virtualNetwork.vnet_id}`, {
       headers: {
         "Content-Type": "application/json",
         "X-ACCESS-KEY": getAccessToken(),
@@ -49,17 +49,19 @@ app.use(async (req, res) => {
 });
 
 app.listen(1337, async () => {
-  const vnetTmp = await tenderlyService.createVNet(
+  const vnet = await tenderlyService.createVNet(
     config.username,
     config.project_slug,
     config.network,
     config.block_number,
     config.chain_config
   );
-  if (vnetTmp == null) {
+  if (vnet === null) {
     process.exit(1);
   }
-  vnet = vnetTmp;
+
+  // Set created vnet as global
+  virtualNetwork = vnet;
 
   if (saveChainConfig) {
     updateChainConfig(filepath, vnet.chain_config);
@@ -77,7 +79,7 @@ async function listAccounts(vnet: VirtualNetwork) {
     vnet.vnet_id,
     vnet.root_tx_id
   );
-  if (forkTx == null) {
+  if (forkTx === null) {
     process.exit(1);
   }
 
@@ -132,7 +134,7 @@ function printRPCCall(req: any, rawRes: any): void {
     if (SUPPORTS_HYPERLINKS) {
       const hyperlink = hyperlinker(
         "View in Tenderly",
-        `${TENDERLY_DASHBOARD_BASE_URL}/${config.username}/${config.project_slug}/fork/${vnet.vnet_id}/simulation/${simulationID}`
+        `${TENDERLY_DASHBOARD_BASE_URL}/${config.username}/${config.project_slug}/fork/${virtualNetwork.vnet_id}/simulation/${simulationID}`
       );
       console.log(`${TAB}Hash:\t\t`, `${txHash}(${hyperlink})`, "\n");
       return;
@@ -141,7 +143,7 @@ function printRPCCall(req: any, rawRes: any): void {
     console.log(`${TAB}Hash:\t\t`, txHash);
     console.log(
       `${TAB}View in Tenderly:\t`,
-      `${TENDERLY_DASHBOARD_BASE_URL}/${config.username}/${config.project_slug}/fork/${vnet.vnet_id}/simulation/${simulationID}`
+      `${TENDERLY_DASHBOARD_BASE_URL}/${config.username}/${config.project_slug}/fork/${virtualNetwork.vnet_id}/simulation/${simulationID}`
     );
   }
 }

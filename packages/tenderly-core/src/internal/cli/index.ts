@@ -1,15 +1,14 @@
 #! /usr/bin/env node
 import { Command } from "commander";
-import { NetworksCommand } from "./commands";
-import { LoginCommand } from "./commands";
-import { VNetCommand } from "./commands";
+import { NetworksCommand, LoginCommand, VNetCommand } from "./commands";
 
-process.openStdin().on("keypress", function (chunk, key) {
+process.openStdin().on("keypress", (chunk, key) => {
   if (key && key.name === "c" && key.ctrl) {
     process.exit();
   }
 });
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
   try {
     const program = new Command();

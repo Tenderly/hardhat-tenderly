@@ -7,7 +7,7 @@ export function writeConfig(filepath: string, config: VirtualNetworkConfig) {
 }
 
 export function updateChainConfig(filepath: string, chainConfig?: Record<string, string>) {
-  if (chainConfig == undefined) {
+  if (chainConfig === null) {
     return;
   }
 

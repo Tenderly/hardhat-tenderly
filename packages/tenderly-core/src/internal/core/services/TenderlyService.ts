@@ -25,7 +25,7 @@ import { VirtualNetwork, Transaction } from "../../virtual-network/types";
 import { TenderlyApiService } from "./TenderlyApiService";
 
 export class TenderlyService {
-  pluginName: string;
+  private pluginName: string;
 
   constructor(pluginName: string) {
     this.pluginName = pluginName;
@@ -78,12 +78,12 @@ export class TenderlyService {
       const res = await tenderlyApi.post("/api/v1/public/verify-contracts", { ...request });
 
       const responseData: ContractResponse = res.data;
-      if (responseData.bytecode_mismatch_errors != null) {
+      if (responseData.bytecode_mismatch_errors !== null) {
         console.log(`Error in ${this.pluginName}: ${BYTECODE_MISMATCH_ERR_MSG}`);
         return;
       }
 
-      if (!responseData.contracts?.length) {
+      if (responseData.contracts.length === 0) {
         let addresses = "";
         for (const cont of request.contracts) {
           addresses += `${cont.contractName}, `;
@@ -126,12 +126,12 @@ export class TenderlyService {
       });
 
       const responseData: ContractResponse = res.data;
-      if (responseData.bytecode_mismatch_errors != null) {
+      if (responseData.bytecode_mismatch_errors !== null) {
         console.log(`Error in ${this.pluginName}: ${BYTECODE_MISMATCH_ERR_MSG}`);
         return;
       }
 
-      if (!responseData.contracts?.length) {
+      if (responseData.contracts.length === 0) {
         let addresses = "";
         for (const cont of request.contracts) {
           addresses += `${cont.contractName}, `;
@@ -169,12 +169,12 @@ export class TenderlyService {
       });
 
       const responseData: ContractResponse = res.data;
-      if (responseData.bytecode_mismatch_errors != null) {
+      if (responseData.bytecode_mismatch_errors !== null) {
         console.log(BYTECODE_MISMATCH_ERR_MSG);
         return;
       }
 
-      if (!responseData.contracts?.length) {
+      if (responseData.contracts.length === 0) {
         let addresses = "";
         for (const cont of request.contracts) {
           addresses += `${cont.contractName}, `;
@@ -211,7 +211,7 @@ export class TenderlyService {
     try {
       const res = await tenderlyApi.post(`/api/v1/account/${accountSlug}/project/${projectSlug}/fork`, {
         network_id: networkId,
-        block_number: blockNumber == "latest" ? null : Number(blockNumber),
+        block_number: blockNumber === "latest" ? null : Number(blockNumber),
         chain_config: chainConfig,
         vnet: true,
       });

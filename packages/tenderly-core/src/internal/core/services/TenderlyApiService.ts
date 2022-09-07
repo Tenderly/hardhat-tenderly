@@ -1,6 +1,6 @@
 import * as axios from "axios";
 
-import { getConfig } from "../../../utils/config";
+import { getConfig, isAccessTokenSet } from "../../../utils/config";
 import { TENDERLY_API_BASE_URL, TENDERLY_JSON_RPC_BASE_URL } from "../../../common/constants";
 
 export class TenderlyApiService {
@@ -30,6 +30,6 @@ export class TenderlyApiService {
   }
 
   public static isAuthenticated(): boolean {
-    return !!getConfig().access_key;
+    return isAccessTokenSet();
   }
 }
