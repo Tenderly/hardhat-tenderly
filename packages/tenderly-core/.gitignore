@@ -70,6 +70,9 @@ typings/
 /types
 /utils
 
+# Tests compilation output
+/build-test/
+
 !.eslintrc.js
 .env
 .idea
