@@ -1,4 +1,3 @@
-const hyperlinker = require("hyperlinker");
 import express from "express";
 import got from "got";
 
@@ -9,6 +8,8 @@ import { TenderlyService } from "../../core/services/TenderlyService";
 import { VirtualNetwork, VirtualNetworkConfig } from "../types";
 import { updateChainConfig, getConfig } from "../utils/config";
 import { VIRTUAL_NETWORK_LOCAL_HOST, TAB, WARNING_MESSAGE } from "./constants";
+
+const hyperlinker = require("hyperlinker");
 
 const app = express();
 app.use(express.json());
@@ -55,7 +56,7 @@ app.listen(1337, async () => {
     config.block_number,
     config.chain_config
   );
-  if (!vnetTmp) {
+  if (vnetTmp == null) {
     process.exit(1);
   }
   vnet = vnetTmp;
@@ -76,7 +77,7 @@ async function listAccounts(vnet: VirtualNetwork) {
     vnet.vnet_id,
     vnet.root_tx_id
   );
-  if (!forkTx) {
+  if (forkTx == null) {
     process.exit(1);
   }
 

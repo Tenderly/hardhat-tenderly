@@ -13,7 +13,6 @@ import {
   PRINCIPAL_FETCH_FAILED_ERR_MSG,
   PROJECTS_FETCH_FAILED_ERR_MSG,
 } from "../common/errors";
-import { TenderlyApiService } from "./TenderlyApiService";
 import {
   Principal,
   Project,
@@ -23,6 +22,7 @@ import {
   TenderlyForkContractUploadRequest,
 } from "../types";
 import { VirtualNetwork, Transaction } from "../../virtual-network/types";
+import { TenderlyApiService } from "./TenderlyApiService";
 
 export class TenderlyService {
   pluginName: string;
@@ -70,7 +70,7 @@ export class TenderlyService {
     }
 
     try {
-      if (!request.contracts.length) {
+      if (request.contracts.length === 0) {
         console.log(NO_VERIFIABLE_CONTRACTS_ERR_MSG);
         return;
       }
@@ -86,7 +86,7 @@ export class TenderlyService {
       if (!responseData.contracts?.length) {
         let addresses = "";
         for (const cont of request.contracts) {
-          addresses += cont.contractName + ", ";
+          addresses += `${cont.contractName}, `;
         }
 
         console.log(`Error in ${this.pluginName}: ${NO_NEW_CONTRACTS_VERIFIED_ERR_MSG}`, addresses);
@@ -96,7 +96,7 @@ export class TenderlyService {
       console.log("Smart Contracts successfully verified");
       console.group();
 
-      for (let contract of responseData.contracts) {
+      for (const contract of responseData.contracts) {
         const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/contract/${
           CHAIN_ID_NETWORK_NAME_MAP[contract.network_id]
         }/${contract.address}`;
@@ -134,7 +134,7 @@ export class TenderlyService {
       if (!responseData.contracts?.length) {
         let addresses = "";
         for (const cont of request.contracts) {
-          addresses += cont.contractName + ", ";
+          addresses += `${cont.contractName}, `;
         }
 
         console.log(`Error in ${this.pluginName}: ${NO_NEW_CONTRACTS_VERIFIED_ERR_MSG}`, addresses);
@@ -177,7 +177,7 @@ export class TenderlyService {
       if (!responseData.contracts?.length) {
         let addresses = "";
         for (const cont of request.contracts) {
-          addresses += cont.contractName + ", ";
+          addresses += `${cont.contractName}, `;
         }
 
         console.log(`Error in ${this.pluginName}: ${NO_NEW_CONTRACTS_VERIFIED_ERR_MSG}`, addresses);

@@ -1,4 +1,3 @@
-const supportsHyperlinks = require("supports-hyperlinks");
 import * as childProcess from "child_process";
 import * as path from "path";
 import commander from "commander";
@@ -7,6 +6,8 @@ import prompts from "prompts";
 import { configExists, writeConfig } from "../../virtual-network/utils/config";
 import { TenderlyService } from "../../core/services/TenderlyService";
 import { PLUGIN_NAME } from "../../../common/constants";
+
+const supportsHyperlinks = require("supports-hyperlinks");
 
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
@@ -27,8 +28,8 @@ export const VNetCommand = new commander.Command("vnet")
 
       writeConfig(filepath, {
         project_slug: projectSlug,
-        username: username,
-        network: network,
+        username,
+        network,
         block_number: blockNumber,
       });
     }

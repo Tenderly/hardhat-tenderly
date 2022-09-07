@@ -11,7 +11,7 @@ export function updateChainConfig(filepath: string, chainConfig?: Record<string,
     return;
   }
 
-  let configData = getConfig(filepath);
+  const configData = getConfig(filepath);
   configData.chain_config = chainConfig;
 
   writeConfig(filepath, configData);

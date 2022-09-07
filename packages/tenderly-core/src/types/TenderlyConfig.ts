@@ -1,4 +1,4 @@
-export type TenderlyConfig = {
+export interface TenderlyConfig {
   access_key: string;
   access_key_id: string;
   account_id: string;
@@ -6,4 +6,4 @@ export type TenderlyConfig = {
   token: string;
   username: string;
   head?: string;
-};
+}

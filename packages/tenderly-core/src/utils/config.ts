@@ -5,8 +5,8 @@ import * as yaml from "js-yaml";
 
 import { TenderlyConfig } from "../types";
 
-const configDir = os.homedir() + path.sep + ".tenderly";
-export const configFilePath = configDir + path.sep + "config.yaml";
+const configDir = `${os.homedir() + path.sep}.tenderly`;
+export const configFilePath = `${configDir + path.sep}config.yaml`;
 
 export function getConfig(): TenderlyConfig {
   if (configExists()) {
