@@ -25,8 +25,8 @@ const config: VirtualNetworkConfig = getConfig(filepath);
 const verbose: boolean = process.argv[3] === "true";
 const saveChainConfig: boolean = process.argv[4] === "true";
 
-app.get("/vnet-id", (_, res) => {
-  res.json({ id: virtualNetwork.vnet_id });
+app.get("/vnet", (_, res) => {
+  res.json({ vnet: virtualNetwork });
 });
 
 app.use(async (req, res) => {
