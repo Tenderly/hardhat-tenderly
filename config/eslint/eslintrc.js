@@ -98,7 +98,7 @@ module.exports = {
         },
         {
           selector: "typeProperty",
-          format: ["camelCase", "PascalCase"],
+          format: ["camelCase", "PascalCase", "snake_case"],
           leadingUnderscore: "allow",
         },
         {
