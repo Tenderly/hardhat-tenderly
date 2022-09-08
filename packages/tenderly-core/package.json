@@ -31,7 +31,15 @@
     "prepublishOnly": "yarn run build"
   },
   "files": [
-    "dist/",
+    "common/",
+    "internal/",
+    "src/",
+    "types/",
+    "utils/",
+    "*.d.ts",
+    "*.d.ts.map",
+    "*.js",
+    "*.js.map",
     "LICENSE",
     "README.md"
   ],
