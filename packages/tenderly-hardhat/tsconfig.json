@@ -1,11 +1,12 @@
 {
-    "extends": "../../config/typescript/tsconfig.json",
-    "exclude": [
-        "./node_modules",
-    ],
-    "references": [
-        {
-            "path": "./src"
-        }
-    ]
+  "extends": "../../config/typescript/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist"
+  },
+  "exclude": ["./dist", "./node_modules"],
+  "references": [
+    {
+      "path": "../tenderly-core/src"
+    }
+  ]
 }
