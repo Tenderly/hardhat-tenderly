@@ -23,6 +23,11 @@ export function getConfig(): TenderlyConfig {
   };
 }
 
+export function writeConfig(config: TenderlyConfig): void {
+  fs.mkdirSync(configDir, { recursive: true });
+  fs.writeFileSync(configFilePath, yaml.dump(config), "utf8");
+}
+
 export function configExists(): boolean {
   return fs.existsSync(configFilePath);
 }
@@ -42,7 +47,5 @@ export function getAccessToken(): string {
 export function setAccessToken(accessToken: string): void {
   const config = getConfig();
   config.access_key = accessToken;
-
-  fs.mkdirSync(configDir, { recursive: true });
-  fs.writeFileSync(configFilePath, yaml.dump(config), "utf8");
+  writeConfig(config);
 }

@@ -6,4 +6,5 @@ export interface TenderlyConfig {
   token: string;
   username: string;
   head?: string;
+  fork?: string;
 }

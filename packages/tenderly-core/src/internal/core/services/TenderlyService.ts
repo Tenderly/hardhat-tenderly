@@ -1,5 +1,5 @@
 import { TENDERLY_DASHBOARD_BASE_URL, CHAIN_ID_NETWORK_NAME_MAP } from "../../../common/constants";
-import { logApiError } from "../../../common/logger";
+import { logApiError } from "../common/logger";
 import {
   API_VERIFICATION_REQUEST_ERR_MSG,
   BYTECODE_MISMATCH_ERR_MSG,
