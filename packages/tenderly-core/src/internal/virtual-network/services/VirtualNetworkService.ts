@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { logError } from "../../core/common/logger";
+import { logApiError } from "../../../common/logger";
 import { VIRTUAL_NETWORK_LOCAL_HOST } from "../jsonrpc/constants";
 import { VNET_FETCH_FAILED_ERR_MSG } from "../common/errors";
 import { VirtualNetwork } from "../types";
@@ -17,7 +17,7 @@ export class VirtualNetworkService {
       const res = await axios.get(`${VIRTUAL_NETWORK_LOCAL_HOST}/vnet`);
       return res.data.vnet;
     } catch (err) {
-      logError(err);
+      logApiError(err);
       console.log(`Error in ${this.pluginName}: ${VNET_FETCH_FAILED_ERR_MSG}`);
       return null;
     }

@@ -1,5 +1,5 @@
 import { TENDERLY_DASHBOARD_BASE_URL, CHAIN_ID_NETWORK_NAME_MAP } from "../../../common/constants";
-import { logError } from "../common/logger";
+import { logApiError } from "../../../common/logger";
 import {
   API_VERIFICATION_REQUEST_ERR_MSG,
   BYTECODE_MISMATCH_ERR_MSG,
@@ -41,7 +41,7 @@ export class TenderlyService {
       const res = await tenderlyApi.get("/api/v1/public-networks");
       return res.data;
     } catch (err) {
-      logError(err);
+      logApiError(err);
       console.log(`Error in ${this.pluginName}: ${NETWORK_FETCH_FAILED_ERR_MSG}`);
     }
     return [];
@@ -57,7 +57,7 @@ export class TenderlyService {
       const res = await tenderlyApi.get(`/api/v1/network/${networkId}/block-number`);
       return res.data.block_number;
     } catch (err) {
-      logError(err);
+      logApiError(err);
       console.log(`Error in ${this.pluginName}: ${LATEST_BLOCK_NUMBER_FETCH_FAILED_ERR_MSG}`);
     }
     return null;
@@ -104,7 +104,7 @@ export class TenderlyService {
       }
       console.groupEnd();
     } catch (err) {
-      logError(err);
+      logApiError(err);
       console.log(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
     }
   }
@@ -146,7 +146,7 @@ export class TenderlyService {
         `Successfully privately verified Smart Contracts for project ${tenderlyProject}. You can view your contracts at ${dashLink}`
       );
     } catch (err) {
-      logError(err);
+      logApiError(err);
       console.log(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
     }
   }
@@ -190,7 +190,7 @@ export class TenderlyService {
       }
       console.groupEnd();
     } catch (err) {
-      logError(err);
+      logApiError(err);
       console.log(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
     }
   }
@@ -222,7 +222,7 @@ export class TenderlyService {
         chain_config: res.data.simulation_fork.chain_config,
       };
     } catch (err) {
-      logError(err);
+      logApiError(err);
       console.log(`Error in ${this.pluginName}: ${VNET_CREATION_FAILED_ERR_MSG}`);
     }
     return null;
@@ -246,7 +246,7 @@ export class TenderlyService {
       );
       return res.data.fork_transaction;
     } catch (err) {
-      logError(err);
+      logApiError(err);
       console.log(`Error in ${this.pluginName}: ${TRANSACTION_FETCH_FAILED_ERR_MSG}`);
     }
     return null;
@@ -266,7 +266,7 @@ export class TenderlyService {
         username: res.data.user.username,
       };
     } catch (err) {
-      logError(err);
+      logApiError(err);
       console.log(`Error in ${this.pluginName}: ${PRINCIPAL_FETCH_FAILED_ERR_MSG}`);
     }
     return null;
@@ -283,7 +283,7 @@ export class TenderlyService {
       const res = await tenderlyApi.get(`/api/v1/account/${principalId}/projects`);
       return res.data.projects;
     } catch (err) {
-      logError(err);
+      logApiError(err);
       console.log(`Error in ${this.pluginName}: ${PROJECTS_FETCH_FAILED_ERR_MSG}`);
     }
     return [];

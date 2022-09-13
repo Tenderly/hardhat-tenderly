@@ -1,8 +1,6 @@
 import { TENDERLY_DASHBOARD_BASE_URL } from "../../../common/constants";
 import { configFilePath } from "../../../utils/config";
 
-export const API_ERR_MSG = "Unexpected error occurred. \n  Error reason %s %s. \n  Error context: %s";
-
 export const NETWORK_FETCH_FAILED_ERR_MSG = `There was an error during the request. Network fetch failed.`;
 export const LATEST_BLOCK_NUMBER_FETCH_FAILED_ERR_MSG = `There was an error during the request. Latest block number fetch failed.`;
 export const VNET_CREATION_FAILED_ERR_MSG = `There was an error during the request. Virtual Network creation failed.`;

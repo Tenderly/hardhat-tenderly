@@ -11,7 +11,7 @@ export const configFilePath = `${configDir + path.sep}config.yaml`;
 export function getConfig(): TenderlyConfig {
   if (configExists()) {
     const fileData = fs.readFileSync(configFilePath);
-    return yaml.load(fileData.toString());
+    return yaml.load(fileData.toString()) as TenderlyConfig;
   }
   return {
     access_key: "",
@@ -44,5 +44,5 @@ export function setAccessToken(accessToken: string): void {
   config.access_key = accessToken;
 
   fs.mkdirSync(configDir, { recursive: true });
-  fs.writeFileSync(configFilePath, yaml.safeDump(config), "utf8");
+  fs.writeFileSync(configFilePath, yaml.dump(config), "utf8");
 }

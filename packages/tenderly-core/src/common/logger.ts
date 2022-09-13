@@ -1,6 +1,6 @@
-import { API_ERR_MSG } from "./errors";
+const API_ERR_MSG = "Unexpected error occurred. \n  Error reason %s %s. \n  Error context: %s";
 
-export function logError(err: any) {
+export function logApiError(err: any) {
   // api error
   if ("response" in err) {
     const code = err?.response?.status;
