@@ -2,12 +2,11 @@
 
 # hardhat-tenderly
 
-[Hardhat](http://hardhat.org) plugin for integration with [Tenderly](https://tenderly.co). 
+[Hardhat](http://hardhat.org) plugin for integration with [Tenderly](https://tenderly.co).
 
 ## What
 
-This plugin will help you verify your Solidity contracts, as well as allow you to 
-privately push contracts to [Tenderly](https://tenderly.co).
+This plugin will help you verify your Solidity contracts, as well as allow you to privately push contracts to [Tenderly](https://tenderly.co).
 
 ## Installation
 
@@ -36,69 +35,74 @@ tdly.setup();
 Contract verification works out-of-the box if contracts is deployed via ethers provided in HRE object.
 
 Turning off the automatic verification:
+
 ```typescript
 tdly.setup({
-    automaticVerifications: false
+  automaticVerifications: false,
 });
 ```
 
 ## Manual contract verification - Environment extensions
 
-This plugin extends the Hardhat Runtime Environment by adding a `tenderly` field
-whose type is `Tenderly`.
+This plugin extends the Hardhat Runtime Environment by adding a `tenderly` field whose type is `Tenderly`.
 
 This field has the `verify` and `push` methods, and you can use to trigger manual contract verification.
 
 This is an example on how you can call it from your scripts (using ethers to deploy a contract):
+
 ```ts
 const Greeter = await ethers.getContractFactory("Greeter");
 const greeter = await Greeter.deploy("Hello, Hardhat!");
 
-await greeter.deployed()
+await greeter.deployed();
 
 // public contract verification
 await hre.tenderly.verify({
-    name: "Greeter",
-    address: greeter.address,
-})
+  name: "Greeter",
+  address: greeter.address,
+});
 ```
 
 Both functions accept variadic parameters:
+
 ```ts
 const contracts = [
-{
+  {
     name: "Greeter",
-    address: "123"
-},
-{
+    address: "123",
+  },
+  {
     name: "Greeter2",
-    address: "456"
-}]
+    address: "456",
+  },
+];
 
 // private contract verification
-await hre.tenderly.push(...contracts)
+await hre.tenderly.push(...contracts);
 ```
 
 ## Manual contract verification - HRE Tasks
 
 This plugin adds the _`tenderly:verify`_ task to Hardhat:
+
 ```
 Usage: hardhat [GLOBAL OPTIONS] tenderly:verify ...contracts
 
 POSITIONAL ARGUMENTS:
 
-  contracts     Addresses and names of contracts that will be verified formatted ContractName=Address 
+  contracts     Addresses and names of contracts that will be verified formatted ContractName=Address
 
 tenderly-verify: Verifies contracts on Tenderly
 ```
 
 And the `tenderly:push` task:
+
 ```
 Usage: hardhat [GLOBAL OPTIONS] tenderly:push ...contracts
 
 POSITIONAL ARGUMENTS:
 
-  contracts     Addresses and names of contracts that will be verified formatted ContractName=Address 
+  contracts     Addresses and names of contracts that will be verified formatted ContractName=Address
 
 tenderly-push: Privately pushes contracts to Tenderly
 ```
@@ -110,6 +114,7 @@ In order to offer the most flexibility we have exposed our internal API interfac
 There are `verifyAPI` and `pushAPI` functions with all necessary data for verification.
 
 Here is the types example that are needed in order for verification to be successful.
+
 ```typescript
 export interface TenderlyContractConfig {
   compiler_version?: string;
@@ -138,36 +143,32 @@ public async verifyAPI(request: TenderlyContractUploadRequest)
 
 ## Configuration
 
-This plugin extends the `HardhatConfig` object with
-`project`, `username`, `forkNetwork` and `privateVerification` fields.
+This plugin extends the `HardhatConfig` object with `project`, `username`, `forkNetwork` and `privateVerification` fields.
 
 This is an example of how to set it:
 
 ```js
 module.exports = {
-    tenderly: {
-        project: "",
-        username: "",
-        forkNetwork: "",
-        // privateVerification: false,
-        // deploymentsDir: "deployments"
-    }
+  tenderly: {
+    project: "",
+    username: "",
+    forkNetwork: "",
+    // privateVerification: false,
+    // deploymentsDir: "deployments"
+  },
 };
 ```
 
 ## Usage
 
-For this plugin to function you need to create a `config.yaml` file at
-`$HOME/.tenderly/config.yaml` or `%HOMEPATH%\.tenderly\config.yaml` and add an `access_key` field to it:
+For this plugin to function you need to create a `config.yaml` file at `$HOME/.tenderly/config.yaml` or `%HOMEPATH%\.tenderly\config.yaml` and add an `access_key` field to it:
+
 ```yaml
 access_key: super_secret_access_key
 ```
 
-In order to connect with Tenderly you will need an access token which you can get by going to
-your [Tenderly dashboard](https://dashboard.tenderly.co) and in the top right corner click on **Settings**, and then go to
-the **Authorization** tab where you will generate a new access token.
+In order to connect with Tenderly you will need an access token which you can get by going to your [Tenderly dashboard](https://dashboard.tenderly.co) and in the top right corner click on **Settings**, and then go to the **Authorization** tab where you will generate a new access token.
 
-*Alternatively*, this step can be skipped by doing `tenderly login` on the `tenderly-cli`
+_Alternatively_, this step can be skipped by doing `tenderly login` on the `tenderly-cli`
 
-After this you can access [Tenderly](https://tenderly.co) through the Hardhat Runtime Environment anywhere 
-you need it (tasks, scripts, tests, etc.).
+After this you can access [Tenderly](https://tenderly.co) through the Hardhat Runtime Environment anywhere you need it (tasks, scripts, tests, etc.).
