@@ -1,6 +1,6 @@
-import { BigNumber } from "@ethersproject/bignumber";
 import { Contract, ethers } from "ethers";
-import { Libraries } from "hardhat-deploy/dist/types";
+import { BigNumber } from "@ethersproject/bignumber";
+import { Libraries } from "hardhat-deploy/types";
 
 import { TenderlyPlugin } from "../../type-extensions";
 import { ContractByName } from "../types";
@@ -13,18 +13,13 @@ export class TdlyContract {
   private tenderly: TenderlyPlugin;
   private libraries: Libraries | undefined;
 
-  constructor(
-    nativeContract: ethers.Contract,
-    tenderly: TenderlyPlugin,
-    contractName: string,
-    libs?: Libraries
-  ) {
+  constructor(nativeContract: ethers.Contract, tenderly: TenderlyPlugin, contractName: string, libs?: Libraries) {
     this.contractName = contractName;
     this.nativeContract = nativeContract;
     this.tenderly = tenderly;
     this.libraries = libs;
 
-    Object.keys(nativeContract).forEach(key => {
+    Object.keys(nativeContract).forEach((key) => {
       if (this[key] !== undefined) {
         return;
       }
@@ -32,11 +27,9 @@ export class TdlyContract {
       if (key === "deployTransaction") {
         const wait = nativeContract[key].wait;
 
-        nativeContract[key].wait = async (
-          confirmations?: number | undefined
-        ): Promise<TransactionReceipt> => {
+        nativeContract[key].wait = async (confirmations?: number | undefined): Promise<TransactionReceipt> => {
           const receipt = await wait(confirmations);
-          await this.tdlyVerify(receipt.contractAddress);
+          await this._tdlyVerify(receipt.contractAddress);
 
           return receipt;
         };
@@ -48,19 +41,19 @@ export class TdlyContract {
 
   public async deployed(): Promise<Contract> {
     const contract = await this.nativeContract.deployed();
-    if (!this.nativeContract.deployTransaction) {
-      await this.tdlyVerify(contract.address);
+    if (this.nativeContract.deployTransaction === undefined || this.nativeContract.deployTransaction === null) {
+      await this._tdlyVerify(contract.address);
     }
 
     return contract;
   }
 
-  private async tdlyVerify(address: string) {
+  private async _tdlyVerify(address: string) {
     const contPair: ContractByName = {
       name: this.contractName,
-      address
+      address,
     };
-    if (this.libraries) {
+    if (this.libraries !== undefined && this.libraries !== null) {
       contPair.libraries = this.libraries;
     }
 

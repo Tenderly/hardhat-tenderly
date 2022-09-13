@@ -1,9 +1,4 @@
-import { ContractCompiler } from "./Contract";
-
-export interface TenderlyKeyConfig {
-  access_key: string;
-  head: string | undefined;
-}
+import { ContractCompiler } from "tenderly/src/types";
 
 export interface BytecodeMismatchError {
   contract_id: string;

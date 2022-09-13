@@ -1,14 +1,11 @@
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatConfig } from "hardhat/src/types/config";
 import { HardhatRuntimeEnvironment, SolcConfig } from "hardhat/types";
+import { TenderlyContract, TenderlyContractConfig } from "tenderly/types";
 
-import { PluginName } from "../constants";
-import {
-  ContractByName,
-  Metadata,
-  TenderlyContract,
-  TenderlyContractConfig
-} from "../tenderly/types";
+import { PLUGIN_NAME } from "../constants";
+import { CONTRACTS_NOT_DETECTED } from "../tenderly/errors";
+import { ContractByName, Metadata } from "../tenderly/types";
 
 export const getCompilerDataFromContracts = (
   contracts: TenderlyContract[],
@@ -23,15 +20,10 @@ export const getCompilerDataFromContracts = (
       if (mainContract.name !== contract.contractName) {
         continue;
       }
-      const contractConfig = newCompilerConfig(
-        hhConfig,
-        contract.sourcePath,
-        contract.compiler?.version
-      );
-      if (config && !compareConfigs(contractConfig, config)) {
-        console.log(
-          `Error in ${PluginName}: Different compiler versions provided in same request`
-        );
+
+      const contractConfig = newCompilerConfig(hhConfig, contract.sourcePath, contract.compiler?.version);
+      if (config !== null && config !== undefined && !compareConfigs(contractConfig, config)) {
+        console.log(`Error in ${PLUGIN_NAME}: Different compiler versions provided in same request`);
         throw new Error("Compiler version mismatch");
       } else {
         config = contractConfig;
@@ -48,33 +40,27 @@ export const getContracts = async (
 ): Promise<TenderlyContract[]> => {
   const sourcePaths = await hre.run("compile:solidity:get-source-paths");
   const sourceNames = await hre.run("compile:solidity:get-source-names", {
-    sourcePaths
+    sourcePaths,
   });
   const data = await hre.run("compile:solidity:get-dependency-graph", {
-    sourceNames
+    sourceNames,
   });
   if (data.length === 0) {
-    throw new HardhatPluginError(
-      PluginName,
-      "Could not detect any contracts inside hardhat project. Make sure you have some contracts under ./contracts directory."
-    );
+    throw new HardhatPluginError(PLUGIN_NAME, CONTRACTS_NOT_DETECTED);
   }
 
   let contract: ContractByName;
   const requestContracts: TenderlyContract[] = [];
   const metadata: Metadata = {
     defaultCompiler: {
-      version: extractCompilerVersion(hre.config)
+      version: extractCompilerVersion(hre.config),
     },
-    sources: {}
+    sources: {},
   };
 
-  data._resolvedFiles.forEach((resolvedFile, _) => {
+  data._resolvedFiles.forEach((resolvedFile: any, _: any) => {
     const sourcePath: string = resolvedFile.sourceName;
-    const name = sourcePath
-      .split("/")
-      .slice(-1)[0]
-      .split(".")[0];
+    const name = sourcePath.split("/").slice(-1)[0].split(".")[0];
 
     for (contract of flatContracts) {
       if (contract.name !== name) {
@@ -83,7 +69,7 @@ export const getContracts = async (
 
       metadata.sources[sourcePath] = {
         content: resolvedFile.content.rawContent,
-        versionPragma: resolvedFile.content.versionPragmas[0]
+        versionPragma: resolvedFile.content.versionPragmas[0],
       };
       const visited: Record<string, boolean> = {};
       resolveDependencies(data, sourcePath, metadata, visited);
@@ -91,10 +77,7 @@ export const getContracts = async (
   });
 
   for (const [key, value] of Object.entries(metadata.sources)) {
-    const name = key
-      .split("/")
-      .slice(-1)[0]
-      .split(".")[0];
+    const name = key.split("/").slice(-1)[0].split(".")[0];
     const contractToPush: TenderlyContract = {
       contractName: name,
       source: value.content,
@@ -102,8 +85,8 @@ export const getContracts = async (
       networks: {},
       compiler: {
         name: "solc",
-        version: extractCompilerVersion(hre.config, key, value.versionPragma)
-      }
+        version: extractCompilerVersion(hre.config, key, value.versionPragma),
+      },
     };
     requestContracts.push(contractToPush);
   }
@@ -122,26 +105,16 @@ export const resolveDependencies = (
 
   visited[sourcePath] = true;
 
-  dependencyData._dependenciesPerFile
-    .get(sourcePath)
-    .forEach((resolvedDependency, __) => {
-      resolveDependencies(
-        dependencyData,
-        resolvedDependency.sourceName,
-        metadata,
-        visited
-      );
-      metadata.sources[resolvedDependency.sourceName] = {
-        content: resolvedDependency.content.rawContent,
-        versionPragma: resolvedDependency.content.versionPragmas[0]
-      };
-    });
+  dependencyData._dependenciesPerFile.get(sourcePath).forEach((resolvedDependency: any, _: any) => {
+    resolveDependencies(dependencyData, resolvedDependency.sourceName, metadata, visited);
+    metadata.sources[resolvedDependency.sourceName] = {
+      content: resolvedDependency.content.rawContent,
+      versionPragma: resolvedDependency.content.versionPragmas[0],
+    };
+  });
 };
 
-export const compareConfigs = (
-  originalConfig: TenderlyContractConfig,
-  newConfig: TenderlyContractConfig
-): boolean => {
+export const compareConfigs = (originalConfig: TenderlyContractConfig, newConfig: TenderlyContractConfig): boolean => {
   if (originalConfig.compiler_version !== newConfig.compiler_version) {
     return false;
   }
@@ -162,18 +135,13 @@ export const newCompilerConfig = (
   sourcePath?: string,
   contractCompiler?: string
 ): TenderlyContractConfig => {
-  if (
-    sourcePath !== undefined &&
-    config.solidity.overrides[sourcePath] !== undefined
-  ) {
+  if (sourcePath !== undefined && config.solidity.overrides[sourcePath] !== undefined) {
     return {
       compiler_version: config.solidity.overrides[sourcePath].version,
-      optimizations_used:
-        config.solidity.overrides[sourcePath].settings.optimizer.enabled,
-      optimizations_count:
-        config.solidity.overrides[sourcePath].settings.optimizer.runs,
+      optimizations_used: config.solidity.overrides[sourcePath].settings.optimizer.enabled,
+      optimizations_count: config.solidity.overrides[sourcePath].settings.optimizer.runs,
       evm_version: config.solidity.overrides[sourcePath].settings.evmVersion,
-      debug: config.solidity.overrides[sourcePath].settings.debug
+      debug: config.solidity.overrides[sourcePath].settings.debug,
     };
   }
   if (contractCompiler !== undefined) {
@@ -185,19 +153,12 @@ export const newCompilerConfig = (
     optimizations_used: config.solidity.compilers[0].settings.optimizer.enabled,
     optimizations_count: config.solidity.compilers[0].settings.optimizer.runs,
     evm_version: config.solidity.compilers[0].settings.evmVersion,
-    debug: config.solidity.compilers[0].settings.debug
+    debug: config.solidity.compilers[0].settings.debug,
   };
 };
 
-export const extractCompilerVersion = (
-  config: HardhatConfig,
-  sourcePath?: string,
-  versionPragma?: string
-): string => {
-  if (
-    sourcePath !== undefined &&
-    config.solidity.overrides[sourcePath] !== undefined
-  ) {
+export const extractCompilerVersion = (config: HardhatConfig, sourcePath?: string, versionPragma?: string): string => {
+  if (sourcePath !== undefined && config.solidity.overrides[sourcePath] !== undefined) {
     return config.solidity.overrides[sourcePath].version;
   }
   if (versionPragma !== undefined) {
@@ -211,10 +172,7 @@ export const extractCompilerVersion = (
   return config.solidity.compilers[0].version;
 };
 
-const determineCompilerConfig = (
-  compilers: SolcConfig[],
-  contractCompiler: string
-): TenderlyContractConfig => {
+const determineCompilerConfig = (compilers: SolcConfig[], contractCompiler: string): TenderlyContractConfig => {
   for (const compiler of compilers) {
     if (compareVersions(compiler.version, contractCompiler)) {
       return {
@@ -222,7 +180,7 @@ const determineCompilerConfig = (
         optimizations_used: compiler.settings.optimizer.enabled,
         optimizations_count: compiler.settings.optimizer.runs,
         evm_version: compiler.settings.evmVersion,
-        debug: compiler.settings.debug
+        debug: compiler.settings.debug,
       };
     }
   }
@@ -232,14 +190,11 @@ const determineCompilerConfig = (
     optimizations_used: compilers[0].settings.optimizer.enabled,
     optimizations_count: compilers[0].settings.optimizer.runs,
     evm_version: compilers[0].settings.evmVersion,
-    debug: compilers[0].settings.debug
+    debug: compilers[0].settings.debug,
   };
 };
 
-const compareVersions = (
-  compilerVersion: string,
-  contractVersionPragma: string
-): boolean => {
+const compareVersions = (compilerVersion: string, contractVersionPragma: string): boolean => {
   switch (contractVersionPragma[0]) {
     case "^":
       return checkGTEVersion(compilerVersion, contractVersionPragma.slice(1));
@@ -281,10 +236,7 @@ const compareVersions = (
   return false;
 };
 
-const checkGTEVersion = (
-  compilerVersion: string,
-  contractVersionPragma: string
-) => {
+const checkGTEVersion = (compilerVersion: string, contractVersionPragma: string) => {
   const compilerVersionSplit = compilerVersion.split(".");
   const contractVersionSplit = contractVersionPragma.split(".");
   for (let i = 0; i < compilerVersionSplit.length; i++) {
@@ -299,10 +251,7 @@ const checkGTEVersion = (
   return true;
 };
 
-const checkGTVersion = (
-  compilerVersion: string,
-  contractVersionPragma: string
-) => {
+const checkGTVersion = (compilerVersion: string, contractVersionPragma: string) => {
   const compilerVersionSplit = compilerVersion.split(".");
   const contractVersionSplit = contractVersionPragma.split(".");
   for (let i = 0; i < compilerVersionSplit.length; i++) {

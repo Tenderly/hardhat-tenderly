@@ -1,39 +1,41 @@
 import "@nomiclabs/hardhat-ethers";
+import "./type-extensions";
+
 import { ethers } from "ethers";
-import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/src/types";
-import { extendConfig, extendEnvironment, task } from "hardhat/config";
 import { HardhatPluginError, lazyObject } from "hardhat/plugins";
-import { RunTaskFunction } from "hardhat/src/types";
+import { extendConfig, extendEnvironment, task } from "hardhat/config";
 import {
+  RunTaskFunction,
   ActionType,
   HardhatConfig,
   HardhatRuntimeEnvironment,
   HttpNetworkConfig,
 } from "hardhat/types";
-import { NetworkMap, PluginName, ReverseNetworkMap } from "./constants";
+import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/types";
+import { TenderlyService } from "tenderly";
+import { TenderlyContract, TenderlyNetwork as TenderlyNetworkInterface } from "tenderly/types";
+import {
+  CHAIN_ID_NETWORK_NAME_MAP,
+  NETWORK_NAME_CHAIN_ID_MAP,
+  TENDERLY_JSON_RPC_BASE_URL,
+} from "tenderly/common/constants";
 
 import { Tenderly } from "./Tenderly";
-import { CONTRACTS_NOT_DETECTED } from "./tenderly/errors";
-import { wrapEthers } from "./tenderly/ethers";
-import { wrapHHDeployments } from "./tenderly/hardhat-deploy";
-import { TenderlyService, TENDERLY_RPC_BASE } from "../../tenderly-core/src/internal/core/services/TenderlyService";
-import { Metadata, TenderlyContract } from "./tenderly/types";
-import { TenderlyPublicNetwork } from "../../tenderly-core/src/internal/core/types/TenderlyNetwork";
+import { PLUGIN_NAME } from "./constants";
 import { TenderlyNetwork } from "./TenderlyNetwork";
-import "./type-extensions";
-import {
-  extractCompilerVersion,
-  newCompilerConfig,
-  resolveDependencies,
-} from "./utils/util";
+import { Metadata } from "./tenderly/types";
+import { wrapEthers } from "./tenderly/ethers";
+import { CONTRACTS_NOT_DETECTED } from "./tenderly/errors";
+import { wrapHHDeployments } from "./tenderly/hardhat-deploy";
+import { extractCompilerVersion, newCompilerConfig, resolveDependencies } from "./utils/util";
 
-extendEnvironment((env) => {
+extendEnvironment((env: HardhatRuntimeEnvironment) => {
   env.tenderly = lazyObject(() => new Tenderly(env));
   extendProvider(env);
-  populateNetworks(env);
+  populateNetworks();
 });
 
-extendConfig((resolvedConfig, userConfig) => {
+extendConfig((resolvedConfig) => {
   resolvedConfig.networks.tenderly = {
     ...resolvedConfig.networks.tenderly,
   };
@@ -45,10 +47,10 @@ export const setup = (cfg?: { automaticVerifications: boolean }): void => {
     automatic = cfg.automaticVerifications;
   }
 
-  extendEnvironment((env) => {
+  extendEnvironment((env: HardhatRuntimeEnvironment) => {
     env.tenderly = lazyObject(() => new Tenderly(env));
     extendProvider(env);
-    populateNetworks(env);
+    populateNetworks();
     if (automatic) {
       extendEthers(env);
       extendHardhatDeploy(env);
@@ -57,19 +59,13 @@ export const setup = (cfg?: { automaticVerifications: boolean }): void => {
 };
 
 const extendEthers = (hre: HardhatRuntimeEnvironment): void => {
-  if (
-    "ethers" in hre &&
-    hre.ethers !== undefined &&
-    "tenderly" in hre &&
-    hre.tenderly !== undefined
-  ) {
+  if ("ethers" in hre && hre.ethers !== undefined && "tenderly" in hre && hre.tenderly !== undefined) {
     Object.assign(
       hre.ethers,
-      (wrapEthers(
-        (hre.ethers as unknown) as typeof ethers & HardhatEthersHelpers,
-        hre.tenderly,
-        hre.config.tenderly
-      ) as unknown) as typeof hre.ethers
+      wrapEthers(
+        hre.ethers as unknown as typeof ethers & HardhatEthersHelpers,
+        hre.tenderly
+      ) as unknown as typeof hre.ethers
     );
   }
 };
@@ -95,26 +91,22 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
   }
 
   if ("url" in hre.network.config && hre.network.config.url !== undefined) {
-    let forkID = hre.network.config.url.split("/").pop();
+    const forkID = hre.network.config.url.split("/").pop();
     hre.tenderly.network().setFork(forkID);
     return;
   }
 
-  const fork = new TenderlyNetwork(hre);
-  fork
+  const tenderlyNetwork = new TenderlyNetwork(hre);
+  tenderlyNetwork
     .initializeFork()
     .then(async (_) => {
-      hre.tenderly.setNetwork(fork);
-      (hre.network.config as HttpNetworkConfig).url =
-        TENDERLY_RPC_BASE + `/fork/${await hre.tenderly.network().getFork()}`;
-      hre.ethers.provider = new hre.ethers.providers.Web3Provider(
-        hre.tenderly.network()
-      );
+      hre.tenderly.setNetwork(tenderlyNetwork);
+      const forkID = await hre.tenderly.network().getForkID();
+      (hre.network.config as HttpNetworkConfig).url = `${TENDERLY_JSON_RPC_BASE_URL}/fork/${forkID ?? ""}`;
+      hre.ethers.provider = new hre.ethers.providers.Web3Provider(hre.tenderly.network());
     })
     .catch((_) => {
-      console.log(
-        `Error in ${PluginName}: Initializing fork, check your tenderly configuration`
-      );
+      console.log(`Error in ${PLUGIN_NAME}: Initializing fork, check your tenderly configuration`);
     });
 };
 
@@ -122,26 +114,28 @@ interface VerifyArguments {
   contracts: string[];
 }
 
-const populateNetworks = (env: HardhatRuntimeEnvironment): void => {
-  TenderlyService.getNetworks()
-    .then((networks) => {
-      let network: TenderlyPublicNetwork;
+const populateNetworks = (): void => {
+  const tenderlyService = new TenderlyService(PLUGIN_NAME);
+  tenderlyService
+    .getNetworks()
+    .then((networks: TenderlyNetworkInterface[]) => {
+      let network: TenderlyNetworkInterface;
       let slug: string;
       for (network of networks) {
-        NetworkMap[network.slug] = network.ethereum_network_id;
+        NETWORK_NAME_CHAIN_ID_MAP[network.slug] = network.ethereum_network_id;
 
-        if (network?.metadata?.slug) {
-          NetworkMap[network.metadata.slug] = network.ethereum_network_id;
+        if (network?.metadata?.slug !== undefined) {
+          NETWORK_NAME_CHAIN_ID_MAP[network.metadata.slug] = network.ethereum_network_id;
         }
 
-        ReverseNetworkMap[network.ethereum_network_id] = network.slug;
+        CHAIN_ID_NETWORK_NAME_MAP[network.ethereum_network_id] = network.slug;
 
         for (slug of network.metadata.secondary_slugs) {
-          NetworkMap[slug] = network.ethereum_network_id;
+          NETWORK_NAME_CHAIN_ID_MAP[slug] = network.ethereum_network_id;
         }
       }
     })
-    .catch((e) => {
+    .catch((_) => {
       console.log("Error encountered while fetching public networks");
     });
 };
@@ -167,7 +161,7 @@ const extractContractData = async (
     sourceNames,
   });
   if (data.length === 0) {
-    throw new HardhatPluginError(PluginName, CONTRACTS_NOT_DETECTED);
+    throw new HardhatPluginError(PLUGIN_NAME, CONTRACTS_NOT_DETECTED);
   }
 
   const metadata: Metadata = {
@@ -181,17 +175,14 @@ const extractContractData = async (
     for (contract of contracts) {
       const contractData = contract.split("=");
       if (contractData.length < 2) {
-        throw new HardhatPluginError(PluginName, `Invalid contract provided`);
+        throw new HardhatPluginError(PLUGIN_NAME, `Invalid contract provided`);
       }
 
       if (network === undefined) {
-        throw new HardhatPluginError(PluginName, `No network provided`);
+        throw new HardhatPluginError(PLUGIN_NAME, `No network provided`);
       }
       const sourcePath: string = resolvedFile.sourceName;
-      const name = sourcePath
-        .split("/")
-        .slice(-1)[0]
-        .split(".")[0];
+      const name = sourcePath.split("/").slice(-1)[0].split(".")[0];
 
       if (name !== contractData[0]) {
         continue;
@@ -206,10 +197,7 @@ const extractContractData = async (
   });
 
   for (const [key, value] of Object.entries(metadata.sources)) {
-    const name = key
-      .split("/")
-      .slice(-1)[0]
-      .split(".")[0];
+    const name = key.split("/").slice(-1)[0].split(".")[0];
 
     const contractToPush: TenderlyContract = {
       contractName: name,
@@ -225,13 +213,13 @@ const extractContractData = async (
     for (contract of contracts) {
       const contractData = contract.split("=");
       if (contractToPush.contractName === contractData[0]) {
-        let chainID: string = NetworkMap[network!.toLowerCase()];
+        let chainID: string = NETWORK_NAME_CHAIN_ID_MAP[network!.toLowerCase()];
         if (config.networks[network!].chainId !== undefined) {
           chainID = config.networks[network!].chainId!.toString();
         }
         if (chainID === undefined) {
           console.log(
-            `Error in ${PluginName}: Couldn't identify network. Please provide a chainID in the network config object`
+            `Error in ${PLUGIN_NAME}: Couldn't identify network. Please provide a chainID in the network config object`
           );
           return [];
         }
@@ -247,64 +235,47 @@ const extractContractData = async (
   return requestContracts;
 };
 
-const verifyContract: ActionType<VerifyArguments> = async (
-  { contracts },
-  { config, hardhatArguments, run }
-) => {
+const verifyContract: ActionType<VerifyArguments> = async ({ contracts }, { config, hardhatArguments, run }) => {
   if (contracts === undefined) {
     throw new HardhatPluginError(
-      PluginName,
+      PLUGIN_NAME,
       `At least one contract must be provided (ContractName=Address). Run --help for information.`
     );
   }
 
-  const requestContracts = await extractContractData(
-    contracts,
-    hardhatArguments.network,
-    config,
-    run
-  );
+  const requestContracts = await extractContractData(contracts, hardhatArguments.network, config, run);
 
-  await TenderlyService.verifyContracts({
+  const tenderlyService = new TenderlyService(PLUGIN_NAME);
+  await tenderlyService.verifyContracts({
     config: newCompilerConfig(config),
     contracts: requestContracts,
   });
 };
 
-const pushContracts: ActionType<VerifyArguments> = async (
-  { contracts },
-  { config, hardhatArguments, run }
-) => {
+const pushContracts: ActionType<VerifyArguments> = async ({ contracts }, { config, hardhatArguments, run }) => {
   if (contracts === undefined) {
-    throw new HardhatPluginError(
-      PluginName,
-      `At least one contract must be provided (ContractName=Address)`
-    );
+    throw new HardhatPluginError(PLUGIN_NAME, `At least one contract must be provided (ContractName=Address)`);
   }
 
   if (config.tenderly.project === undefined) {
     throw new HardhatPluginError(
-      PluginName,
+      PLUGIN_NAME,
       `Please provide the project field in the tenderly object in hardhat.config.js`
     );
   }
 
   if (config.tenderly.username === undefined) {
     throw new HardhatPluginError(
-      PluginName,
+      PLUGIN_NAME,
       `Please provide the username field in the tenderly object in hardhat.config.js`
     );
   }
 
-  const requestContracts = await extractContractData(
-    contracts,
-    hardhatArguments.network,
-    config,
-    run
-  );
+  const requestContracts = await extractContractData(contracts, hardhatArguments.network, config, run);
   const solcConfig = newCompilerConfig(config);
 
-  await TenderlyService.pushContracts(
+  const tenderlyService = new TenderlyService(PLUGIN_NAME);
+  await tenderlyService.pushContracts(
     {
       config: solcConfig,
       contracts: requestContracts,

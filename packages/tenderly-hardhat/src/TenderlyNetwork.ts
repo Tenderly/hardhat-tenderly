@@ -1,131 +1,119 @@
 import * as axios from "axios";
-import fs from "fs";
-import { HardhatRuntimeEnvironment } from "hardhat/types";
-import * as yaml from "js-yaml";
 
-import { PluginName } from "./constants";
-import { NO_COMPILER_FOUND_FOR_CONTRACT } from "./tenderly/errors";
-import { TenderlyApiService } from "../../tenderly-core/src/internal/core/services/TenderlyApiService";
-import { TenderlyService } from "../../tenderly-core/src/internal/core/services/TenderlyService";
-import { ContractByName, TenderlyForkContractUploadRequest } from "./tenderly/types";
-import { configFilePath } from "../../tenderly-core/src/utils/config";
-import { logError } from "./utils/error_logger";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { TenderlyService, VirtualNetworkService } from "tenderly";
+import { TenderlyForkContractUploadRequest } from "tenderly/types";
+import { getConfig, writeConfig } from "tenderly/utils/config";
+import { TENDERLY_JSON_RPC_BASE_URL } from "tenderly/common/constants";
+
+import { PLUGIN_NAME } from "./constants";
+import { ContractByName } from "./tenderly/types";
+import { NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG } from "./tenderly/errors";
 import { getCompilerDataFromContracts, getContracts } from "./utils/util";
-import { VNet } from "./VNet";
 
 export class TenderlyNetwork {
   public host: string;
   public connected: boolean;
   public accessKey: string;
   public head: string | undefined;
-  public fork: string | undefined;
-  public tenderlyAPI: axios.AxiosInstance;
+  public forkID: string | undefined;
+  public tenderlyJsonRpc: axios.AxiosInstance;
   public accounts: Record<string, string> | undefined;
   public env: HardhatRuntimeEnvironment;
+
+  private tenderlyService = new TenderlyService(PLUGIN_NAME);
+  private virtualNetworkService = new VirtualNetworkService(PLUGIN_NAME);
 
   constructor(hre: HardhatRuntimeEnvironment) {
     this.env = hre;
     this.connected = true;
 
-    const fileData = fs.readFileSync(configFilePath);
-    const yamlData = yaml.load(fileData.toString());
+    const tdlyGlobalConfig = getConfig();
+    this.accessKey = tdlyGlobalConfig?.access_key;
 
-    this.accessKey = yamlData.access_key;
-
-    this.tenderlyAPI = TenderlyApiService.configureTenderlyRPCInstance();
-    this.host = this.tenderlyAPI.defaults.baseURL!;
+    this.tenderlyJsonRpc = this._configureTenderlyRPCInstance();
+    this.host = this.tenderlyJsonRpc.defaults.baseURL!;
 
     if (hre.network.name === "tenderly" && "url" in hre.network.config && hre.network.config.url !== undefined) {
-      this.fork = hre.network.config.url.split("/").pop();
+      this.forkID = hre.network.config.url.split("/").pop();
     }
   }
 
   public supportsSubscriptions() {
-    if (!this.checkNetwork()) {
+    if (!this._checkNetwork()) {
       return;
     }
     return false;
   }
 
   public disconnect() {
-    if (!this.checkNetwork()) {
+    if (!this._checkNetwork()) {
       return;
     }
     return true;
   }
 
-  public async send(payload, cb) {
-    if (!this.checkNetwork()) {
+  public async send(payload: any, cb: any) {
+    if (!this._checkNetwork()) {
       return;
     }
     if (this.head === undefined) {
       await this.initializeFork();
     }
     try {
-      this.tenderlyAPI.defaults.headers.Head = this.head;
-      const resp = await this.tenderlyAPI.post("", payload);
-
+      if (this.head !== undefined) {
+        this.tenderlyJsonRpc.defaults.headers.common.Head = this.head;
+      }
+      const resp = await this.tenderlyJsonRpc.post("", payload);
       this.head = resp.headers.head;
 
-      this.writeHead();
+      this._writeHead();
       cb(null, resp.data);
-    } catch (err) {
-      logError(err);
+    } catch (err: any) {
       cb(err.response.data);
     }
   }
 
   public resetFork(): string | undefined {
-    const fileData = fs.readFileSync(configFilePath);
-    const yamlData = yaml.load(fileData.toString());
+    const tdlyGlobalConfig = getConfig();
+    const oldHead = tdlyGlobalConfig.head;
 
-    const oldHead = yamlData.head;
+    delete tdlyGlobalConfig.head;
+    delete tdlyGlobalConfig.fork;
 
-    delete yamlData.head;
-    delete yamlData.fork;
-
-    fs.writeFileSync(configFilePath, yaml.safeDump(yamlData), "utf8");
-
+    writeConfig(tdlyGlobalConfig);
     return oldHead;
   }
 
-  public async verify(...contracts) {
-    if (!this.checkNetwork()) {
+  public async verify(...contracts: any[]) {
+    if (!this._checkNetwork()) {
       return;
     }
 
     // Try to override forkID with VNet fork ID
-    const vnetForkID = await VNet.getForkID();
-    if (vnetForkID) {
-      this.fork = vnetForkID;
+    const vnet = await this.virtualNetworkService.getVirtualNetwork();
+    if (vnet?.vnet_id !== undefined && vnet?.vnet_id !== null) {
+      this.forkID = vnet.vnet_id;
     }
-
-    if (this.head === undefined && this.fork === undefined) {
+    if (this.head === undefined && this.forkID === undefined) {
       await this.initializeFork();
     }
 
     const flatContracts: ContractByName[] = contracts.reduce((accumulator, value) => accumulator.concat(value), []);
-
-    const requestData = await this.filterContracts(flatContracts);
-
-    if (requestData == null) {
+    const requestData = await this._filterContracts(flatContracts);
+    if (requestData === null) {
       return;
     }
-
     if (requestData?.contracts.length === 0) {
       return;
     }
 
-    try {
-      await TenderlyService.verifyForkContracts(
-        requestData,
-        this.env.config.tenderly.project,
-        this.env.config.tenderly.username,
-        this.fork!
-      );
-    } catch (err) {
-      logError(err);
-    }
+    await this.tenderlyService.verifyForkContracts(
+      requestData,
+      this.env.config.tenderly.project,
+      this.env.config.tenderly.username,
+      this.forkID!
+    );
   }
 
   public async verifyAPI(
@@ -135,88 +123,81 @@ export class TenderlyNetwork {
     forkID: string
   ) {
     // Try to override forkID with VNet fork ID
-    const vnetForkID = await VNet.getForkID();
-    if (vnetForkID) {
-      forkID = vnetForkID;
+    const vnet = await this.virtualNetworkService.getVirtualNetwork();
+    if (vnet?.vnet_id !== undefined && vnet?.vnet_id !== null) {
+      this.forkID = vnet.vnet_id;
     }
 
-    try {
-      await TenderlyService.verifyForkContracts(request, tenderlyProject, username, forkID);
-    } catch (err) {
-      logError(err);
-    }
+    await this.tenderlyService.verifyForkContracts(request, tenderlyProject, username, forkID);
   }
   public getHead(): string | undefined {
-    if (!this.checkNetwork()) {
+    if (!this._checkNetwork()) {
       return;
     }
     return this.head;
   }
 
   public setHead(head: string | undefined): void {
-    if (!this.checkNetwork()) {
+    if (!this._checkNetwork()) {
       return;
     }
     this.head = head;
   }
 
-  public async getFork(): Promise<string | undefined> {
-    if (!this.checkNetwork()) {
+  public async getForkID(): Promise<string | undefined> {
+    if (!this._checkNetwork()) {
       return;
     }
 
     // Try to override forkID with VNet fork ID
-    const vnetForkID = await VNet.getForkID();
-    if (vnetForkID) {
-      this.fork = vnetForkID;
+    const vnet = await this.virtualNetworkService.getVirtualNetwork();
+    if (vnet?.vnet_id !== undefined && vnet?.vnet_id !== null) {
+      this.forkID = vnet.vnet_id;
     }
 
-    return this.fork;
+    return this.forkID;
   }
 
   public setFork(fork: string | undefined): void {
-    if (!this.checkNetwork()) {
+    if (!this._checkNetwork()) {
       return;
     }
-    this.fork = fork;
+    this.forkID = fork;
   }
 
   public async initializeFork() {
-    if (!this.checkNetwork()) {
+    if (!this._checkNetwork()) {
       return;
     }
-    if (!this.env.config.tenderly?.forkNetwork) {
+    if (this.env.config.tenderly?.forkNetwork === undefined) {
       return;
     }
 
     const username: string = this.env.config.tenderly.username;
     const projectID: string = this.env.config.tenderly.project;
     try {
-      const resp = await this.tenderlyAPI.post(`/account/${username}/project/${projectID}/fork`, {
+      const resp = await this.tenderlyJsonRpc.post(`/account/${username}/project/${projectID}/fork`, {
         network_id: this.env.config.tenderly.forkNetwork,
       });
       this.head = resp.data.root_transaction.id;
       this.accounts = resp.data.simulation_fork.accounts;
-      this.fork = resp.data.simulation_fork.id;
+      this.forkID = resp.data.simulation_fork.id;
     } catch (err) {
       throw err;
     }
   }
 
-  private writeHead() {
-    const fileData = fs.readFileSync(configFilePath);
-    const yamlData = yaml.load(fileData.toString());
-
-    yamlData.head = this.head;
-
-    fs.writeFileSync(configFilePath, yaml.safeDump(yamlData), "utf8");
+  private _writeHead() {
+    const tdlyGlobalConfig = getConfig();
+    tdlyGlobalConfig.head = this.head;
+    writeConfig(tdlyGlobalConfig);
   }
 
-  private async filterContracts(flatContracts: ContractByName[]): Promise<TenderlyForkContractUploadRequest | null> {
+  private async _filterContracts(flatContracts: ContractByName[]): Promise<TenderlyForkContractUploadRequest | null> {
     let contract: ContractByName;
     let requestData: TenderlyForkContractUploadRequest;
     try {
-      requestData = await this.getForkContractData(flatContracts);
+      requestData = await this._getForkContractData(flatContracts);
     } catch (e) {
       return null;
     }
@@ -229,7 +210,7 @@ export class TenderlyNetwork {
         continue;
       }
       requestData.contracts[index].networks = {
-        [this.fork!]: {
+        [this.forkID!]: {
           address: contract.address,
           links: contract.libraries,
         },
@@ -239,7 +220,7 @@ export class TenderlyNetwork {
     return requestData;
   }
 
-  private async getForkContractData(flatContracts: ContractByName[]): Promise<TenderlyForkContractUploadRequest> {
+  private async _getForkContractData(flatContracts: ContractByName[]): Promise<TenderlyForkContractUploadRequest> {
     const contracts = await getContracts(this.env, flatContracts);
     if (contracts.length === 0) {
       throw new Error("Failed to get contracts");
@@ -248,7 +229,7 @@ export class TenderlyNetwork {
     const solcConfig = getCompilerDataFromContracts(contracts, flatContracts, this.env.config);
 
     if (solcConfig === undefined) {
-      console.log(NO_COMPILER_FOUND_FOR_CONTRACT);
+      console.log(NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG);
     }
 
     return {
@@ -258,13 +239,28 @@ export class TenderlyNetwork {
     };
   }
 
-  private checkNetwork(): boolean {
+  private _checkNetwork(): boolean {
     if (this.env.network.name !== "tenderly") {
       console.log(
-        `Warning in ${PluginName}: Network is not set to tenderly. Please call the task again with --network tenderly`
+        `Warning in ${PLUGIN_NAME}: Network is not set to tenderly. Please call the task again with --network tenderly`
       );
       return false;
     }
     return true;
+  }
+
+  /**
+   * Note: _configureTenderlyRPCInstance needs to be deleted this is only a temporary solution.
+   * @deprecated
+   */
+  private _configureTenderlyRPCInstance(): axios.AxiosInstance {
+    const tdlyConfig = getConfig();
+    return axios.default.create({
+      baseURL: TENDERLY_JSON_RPC_BASE_URL,
+      headers: {
+        "x-access-key": tdlyConfig.access_key,
+        Head: tdlyConfig.head !== undefined ? tdlyConfig.head : "",
+      },
+    });
   }
 }
