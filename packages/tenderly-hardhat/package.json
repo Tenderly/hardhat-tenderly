@@ -1,6 +1,6 @@
 {
   "name": "@tenderly/hardhat-tenderly",
-  "author": "Tenderly Technologies",
+  "author": "Tenderly",
   "license": "MIT",
   "homepage": "https://tenderly.co",
   "description": "Hardhat plugin for integration with Tenderly",

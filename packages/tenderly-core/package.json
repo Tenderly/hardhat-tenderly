@@ -1,7 +1,7 @@
 {
   "name": "tenderly",
   "version": "0.0.1",
-  "author": "Tenderly Technologies",
+  "author": "Tenderly",
   "license": "MIT",
   "homepage": "https://tenderly.co",
   "main": "internal/lib/tenderly-lib.js",
