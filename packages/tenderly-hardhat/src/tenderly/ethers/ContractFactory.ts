@@ -28,7 +28,7 @@ export class TdlyContractFactory {
         continue;
       }
 
-      this[attribute] = nativeContractFactory[attribute];
+      this[attribute] = (nativeContractFactory as any)[attribute];
     }
   }
 
