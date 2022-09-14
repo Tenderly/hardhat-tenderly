@@ -31,7 +31,7 @@
     "lint:fix": "yarn run prettier --write && yarn run eslint --fix",
     "eslint": "eslint 'src/**/*.ts'",
     "prettier": "prettier \"**/*.{js,md,json}\"",
-    "build": "rm -rf build-test && tsc --build .",
+    "build": "rm -rf dist && tsc --build .",
     "prepublishOnly": "yarn run build"
   },
   "devDependencies": {
