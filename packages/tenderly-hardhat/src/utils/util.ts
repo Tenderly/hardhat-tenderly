@@ -265,3 +265,18 @@ const checkGTVersion = (compilerVersion: string, contractVersionPragma: string) 
 
   return true;
 };
+
+// ------------------------------------------------------------------------------------
+const isGetter = (x: any, name: string): any => ((Object.getOwnPropertyDescriptor(x, name) !== null || {}) as any).get;
+const isFunction = (x: any, name: string): boolean => typeof x[name] === "function";
+const deepFunctions = (x: any): string[] => {
+  if (x && x !== Object.prototype) {
+    return Object.getOwnPropertyNames(x)
+      .filter((name: string) => isGetter(x, name) !== null || isFunction(x, name))
+      .concat(deepFunctions(Object.getPrototypeOf(x)) ?? []);
+  }
+  return [];
+};
+const distinctDeepFunctions = (x: any) => Array.from(new Set(deepFunctions(x)));
+export const classFunctions = (x: any) =>
+  distinctDeepFunctions(x).filter((name: string) => name !== "constructor" && name.indexOf("__") === -1);
