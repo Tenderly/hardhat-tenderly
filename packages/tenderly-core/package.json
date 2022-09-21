@@ -1,0 +1,85 @@
+{
+  "name": "tenderly",
+  "version": "0.0.1",
+  "author": "Tenderly",
+  "license": "MIT",
+  "homepage": "https://tenderly.co",
+  "main": "internal/lib/tenderly-lib.js",
+  "types": "internal/lib/tenderly-lib.d.ts",
+  "description": "",
+  "keywords": [
+    "tooling",
+    "tenderly",
+    "ethereum",
+    "solidity",
+    "blockchain",
+    "smart-contracts"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tenderly/hardhat-tenderly.git"
+  },
+  "bin": {
+    "tenderly": "internal/cli/index.js"
+  },
+  "scripts": {
+    "lint": "yarn run prettier --check && yarn run eslint",
+    "lint:fix": "yarn run prettier --write && yarn run eslint --fix",
+    "eslint": "eslint 'src/**/*.ts'",
+    "prettier": "prettier \"**/*.{js,md,json}\"",
+    "build": "rm -rf build-test && tsc --build .",
+    "prepublishOnly": "yarn run build"
+  },
+  "files": [
+    "common/",
+    "internal/",
+    "src/",
+    "types/",
+    "utils/",
+    "*.d.ts",
+    "*.d.ts.map",
+    "*.js",
+    "*.js.map",
+    "LICENSE",
+    "README.md"
+  ],
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/js-yaml": "^4.0.5",
+    "@types/node": "^18.7.15",
+    "@types/prompts": "^2.0.14",
+    "@typescript-eslint/eslint-plugin": "^5.36.1",
+    "@typescript-eslint/parser": "^5.36.1",
+    "eslint": "^8.23.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.7.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.2"
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "cli-table3": "^0.6.2",
+    "commander": "^9.4.0",
+    "express": "^4.18.1",
+    "got": "11.8.3",
+    "hyperlinker": "^1.0.0",
+    "js-yaml": "^4.1.0",
+    "open": "^8.4.0",
+    "prompts": "^2.4.2",
+    "supports-hyperlinks": "^2.2.0"
+  },
+  "peerDependencies": {
+    "ts-node": "*",
+    "typescript": "*"
+  },
+  "peerDependenciesMeta": {
+    "ts-node": {
+      "optional": true
+    },
+    "typescript": {
+      "optional": true
+    }
+  }
+}
