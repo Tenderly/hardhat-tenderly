@@ -129,8 +129,6 @@ async function startServer(filepath: string, verbose: boolean, saveChainConfig: 
       "..",
       "..",
       "..",
-      "..",
-      "dist",
       "internal",
       "virtual-network",
       "jsonrpc",
