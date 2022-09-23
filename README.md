@@ -1,1 +1,1 @@
-packages/tenderly-hardhat/README.md
+./packages/tenderly-hardhat/README.md
