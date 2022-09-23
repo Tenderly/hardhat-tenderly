@@ -9,7 +9,7 @@ async function main() {
   const address = greeter.address;
   console.log("Manual Advanced: {Greeter} deployed to:", address);
 
-  tenderly.verify({
+  await tenderly.verify({
     address,
     name: "Greeter",
   });

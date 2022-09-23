@@ -174,5 +174,4 @@ yarn run private:greeter:manual-simple --network ropsten
 yarn run fork:calculatr:manual-advanced
 ```
 
-When running against a specific network, you must add `--network <NETWORK_NAME>`.
-The `fork:` scripts have `--network tenderly` already included.
+When running against a specific network, you must add `--network <NETWORK_NAME>`. The `fork:` scripts have `--network tenderly` already included.

@@ -1,4 +1,5 @@
 import { HardhatUserConfig } from "hardhat/config";
+import { HardhatNetworkAccountsUserConfig } from "hardhat/types";
 import * as tdly from "@tenderly/hardhat-tenderly";
 import * as dotenv from "dotenv";
 
@@ -21,7 +22,7 @@ const config: HardhatUserConfig = {
   networks: {
     ropsten: {
       url: process.env.ROPSTEN_URL,
-      accounts: !!process.env.ROPSTEN_PRIVATE_KEY ? [process.env.ROPSTEN_PRIVATE_KEY] : [],
+      accounts: (process.env.ROPSTEN_PRIVATE_KEY as HardhatNetworkAccountsUserConfig) ?? undefined,
     },
     tenderly: {
       url: `https://rpc.tenderly.co/fork/${TENDERLY_FORK_ID}`,
@@ -29,10 +30,11 @@ const config: HardhatUserConfig = {
     },
   },
   tenderly: {
-    project: process.env.TENDERLY_PROJECT || "",
-    username: process.env.TENDERLY_USERNAME || "",
+    project: process.env.TENDERLY_PROJECT ?? "",
+    username: process.env.TENDERLY_USERNAME ?? "",
     privateVerification: process.env.PRIVATE_VERIFICATION === "true",
   },
 };
 
+// eslint-disable-next-line import/no-default-export
 export default config;

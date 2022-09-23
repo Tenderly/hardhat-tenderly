@@ -21,7 +21,6 @@ export async function deployCalculator(mathsAddress: string) {
   console.log("🧮[ethers] Deploying Calculator smart contract");
   const calculator = await Calculator.deploy();
   await calculator.deployed();
-  const calculatorAddress = calculator.address;
 
   console.log("🧮[ethers] {Calculator} deployed to", calculator.address);
   return calculator.address;
