@@ -18,7 +18,7 @@ async function main() {
 
   console.log("🧮[tenderly] Verifying Calculator in Tenderly");
 
-  tenderly.verify({
+  await tenderly.verify({
     name: "Calculator",
     address: calculatorAddress,
     libraries: {

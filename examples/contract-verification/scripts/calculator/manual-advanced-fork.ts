@@ -3,12 +3,12 @@ import { readFileSync } from "fs";
 import { tenderly } from "hardhat";
 import { deployCalculator, deployMaths } from "./maths-deployment-ethers";
 
-const FORK_ID = process.env.TENDERLY_FORK_ID || "";
+const FORK_ID = process.env.TENDERLY_FORK_ID ?? "";
 
 export async function main() {
   // 📐 Maths
   const mathsAddress = await deployMaths();
-  tenderly.verify({
+  await tenderly.verify({
     name: "Maths",
     address: mathsAddress,
   });
@@ -44,10 +44,7 @@ export async function main() {
         },
         {
           contractName: "Maths",
-          source: readFileSync(
-            "contracts/libraries/Maths.sol",
-            "utf-8"
-          ).toString(),
+          source: readFileSync("contracts/libraries/Maths.sol", "utf-8").toString(),
           sourcePath: "libraries/Maths.sol",
           compiler: {
             version: "0.8.9",
@@ -56,8 +53,8 @@ export async function main() {
         },
       ],
     },
-    process.env.TENDERLY_PROJECT || "",
-    process.env.TENDERLY_USERNAME || "",
+    process.env.TENDERLY_PROJECT ?? "",
+    process.env.TENDERLY_USERNAME ?? "",
     FORK_ID
   );
 }

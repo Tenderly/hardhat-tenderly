@@ -12,7 +12,7 @@ async function main() {
 
   console.log("🧮[tenderly] Deploying & autoverifying in Tenderly");
 
-  tenderly.verify({
+  await tenderly.verify({
     name: "Calculator",
     address: calculatorAddress,
     libraries: {
