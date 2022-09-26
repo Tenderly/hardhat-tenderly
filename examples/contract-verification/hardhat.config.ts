@@ -25,7 +25,7 @@ const config: HardhatUserConfig = {
       accounts: (process.env.ROPSTEN_PRIVATE_KEY as HardhatNetworkAccountsUserConfig) ?? undefined,
     },
     tenderly: {
-      url: `https://rpc.tenderly.co/fork/${TENDERLY_FORK_ID}`,
+      url: `https://rpc.tenderly.co/fork/${TENDERLY_FORK_ID ?? ""}`,
       // url: `http://127.0.0.1:1337`,
     },
   },
