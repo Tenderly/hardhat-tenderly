@@ -29,16 +29,36 @@ import { CONTRACTS_NOT_DETECTED } from "./tenderly/errors";
 import { wrapHHDeployments } from "./tenderly/hardhat-deploy";
 import { extractCompilerVersion, newCompilerConfig, resolveDependencies } from "./utils/util";
 
+task("run", "Runs a user-defined script after compiling the project").setAction(
+  async (taskArguments, hre, runSuper) => {
+    process.env.forkURL = "https://rpc.tenderly.co/fork/a51c60d9-b972-4f67-b742-3d94b8c5a555";
+    console.log("cao cao");
+
+    await runSuper();
+  }
+);
+
 extendEnvironment((env: HardhatRuntimeEnvironment) => {
+  console.log("extendEnvironment is called");
   env.tenderly = lazyObject(() => new Tenderly(env));
   extendProvider(env);
   populateNetworks();
 });
 
-extendConfig((resolvedConfig) => {
-  resolvedConfig.networks.tenderly = {
-    ...resolvedConfig.networks.tenderly,
-  };
+extendConfig((resolvedConfig: HardhatConfig) => {
+  console.log("extendConfig is called");
+
+  if (resolvedConfig.networks.tenderly === undefined) {
+    resolvedConfig.networks.tenderly = {
+      accounts: "remote",
+      gas: "auto",
+      gasPrice: "auto",
+      gasMultiplier: 1,
+      httpHeaders: {}, // here we can inject auth header
+      timeout: 20000,
+      url: process.env.forkURL ?? "",
+    };
+  }
 });
 
 export const setup = (cfg?: { automaticVerifications: boolean }): void => {
