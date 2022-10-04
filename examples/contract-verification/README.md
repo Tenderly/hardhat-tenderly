@@ -62,11 +62,11 @@ Run:
   // Block number form which you want to fork provided network
 - Network block number: latest
 
-// And at the end, it will spin up a new virtual network and create a "vnet.template.json" config file
+// And at the end, it will spin up a new virtual network and create a "vnet.config.json" config file
 // at the root of your project. That file will be used next time when you run "npx tenderly vnet"
-// to load information from above if you want to have more templates stored with different settings
-// you can use them when you want to start a new virtual network using the "--template" flag.
-// Example: ("npx tenderly vnet --template <path to file>")
+// to load information from above if you want to have more config files stored with different settings
+// you can use them when you want to start a new virtual network using the "--config" flag.
+// Example: ("npx tenderly vnet --config <path to file>")
 Forwarding: http://127.0.0.1:1337 --> https://rpc.tenderly.co/vnet/{{vnet_id}}
 ```
 

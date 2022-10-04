@@ -8,7 +8,6 @@ import {
   NETWORK_FETCH_FAILED_ERR_MSG,
   LATEST_BLOCK_NUMBER_FETCH_FAILED_ERR_MSG,
   ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG,
-  VNET_CREATION_FAILED_ERR_MSG,
   TRANSACTION_FETCH_FAILED_ERR_MSG,
   PRINCIPAL_FETCH_FAILED_ERR_MSG,
   PROJECTS_FETCH_FAILED_ERR_MSG,
@@ -21,7 +20,7 @@ import {
   TenderlyContractUploadRequest,
   TenderlyForkContractUploadRequest,
 } from "../types";
-import { VirtualNetwork, Transaction } from "../../virtual-network/types";
+import { Transaction } from "../../virtual-network/types";
 import { TenderlyApiService } from "./TenderlyApiService";
 
 export class TenderlyService {
@@ -193,39 +192,6 @@ export class TenderlyService {
       logApiError(err);
       console.log(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
     }
-  }
-
-  public async createVNet(
-    accountSlug: string,
-    projectSlug: string,
-    networkId: string,
-    blockNumber: string,
-    chainConfig?: Record<string, string>
-  ): Promise<VirtualNetwork | null> {
-    if (!TenderlyApiService.isAuthenticated()) {
-      console.log(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
-      return null;
-    }
-
-    const tenderlyApi = TenderlyApiService.configureInstance();
-    try {
-      const res = await tenderlyApi.post(`/api/v1/account/${accountSlug}/project/${projectSlug}/fork`, {
-        network_id: networkId,
-        block_number: blockNumber === "latest" ? null : Number(blockNumber),
-        chain_config: chainConfig,
-        vnet: true,
-      });
-
-      return {
-        vnet_id: res.data.simulation_fork.id,
-        root_tx_id: res.data.root_transaction.id,
-        chain_config: res.data.simulation_fork.chain_config,
-      };
-    } catch (err) {
-      logApiError(err);
-      console.log(`Error in ${this.pluginName}: ${VNET_CREATION_FAILED_ERR_MSG}`);
-    }
-    return null;
   }
 
   public async getTransaction(

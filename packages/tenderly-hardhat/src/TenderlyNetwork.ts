@@ -86,14 +86,15 @@ export class TenderlyNetwork {
   }
 
   public async verify(...contracts: any[]) {
+    console.log("verify: ", contracts);
     if (!this._checkNetwork()) {
       return;
     }
 
     // Try to override forkID with VNet fork ID
-    const vnet = await this.virtualNetworkService.getVirtualNetwork();
-    if (vnet?.vnet_id !== undefined && vnet?.vnet_id !== null) {
-      this.forkID = vnet.vnet_id;
+    const vnet = await this.virtualNetworkService.getLocalVNet();
+    if (vnet?.id !== undefined && vnet?.id !== null) {
+      this.forkID = vnet.id;
     }
     if (this.head === undefined && this.forkID === undefined) {
       await this.initializeFork();
@@ -123,9 +124,9 @@ export class TenderlyNetwork {
     forkID: string
   ) {
     // Try to override forkID with VNet fork ID
-    const vnet = await this.virtualNetworkService.getVirtualNetwork();
-    if (vnet?.vnet_id !== undefined && vnet?.vnet_id !== null) {
-      this.forkID = vnet.vnet_id;
+    const vnet = await this.virtualNetworkService.getLocalVNet();
+    if (vnet?.id !== undefined && vnet?.id !== null) {
+      this.forkID = vnet.id;
     }
 
     await this.tenderlyService.verifyForkContracts(request, tenderlyProject, username, forkID);
@@ -150,9 +151,9 @@ export class TenderlyNetwork {
     }
 
     // Try to override forkID with VNet fork ID
-    const vnet = await this.virtualNetworkService.getVirtualNetwork();
-    if (vnet?.vnet_id !== undefined && vnet?.vnet_id !== null) {
-      this.forkID = vnet.vnet_id;
+    const vnet = await this.virtualNetworkService.getLocalVNet();
+    if (vnet?.id !== undefined && vnet?.id !== null) {
+      this.forkID = vnet.id;
     }
 
     return this.forkID;

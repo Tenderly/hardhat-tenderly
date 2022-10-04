@@ -3,7 +3,6 @@ import { configFilePath } from "../../../utils/config";
 
 export const NETWORK_FETCH_FAILED_ERR_MSG = `There was an error during the request. Network fetch failed.`;
 export const LATEST_BLOCK_NUMBER_FETCH_FAILED_ERR_MSG = `There was an error during the request. Latest block number fetch failed.`;
-export const VNET_CREATION_FAILED_ERR_MSG = `There was an error during the request. Virtual Network creation failed.`;
 export const TRANSACTION_FETCH_FAILED_ERR_MSG = `There was an error during the request. Transaction fetch failed.`;
 export const PRINCIPAL_FETCH_FAILED_ERR_MSG = `There was an error during the request. Principal fetch failed.`;
 export const PROJECTS_FETCH_FAILED_ERR_MSG = `There was an error during the request. Projects fetch failed.`;

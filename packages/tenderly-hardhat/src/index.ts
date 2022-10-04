@@ -1,164 +1,47 @@
 import "@nomiclabs/hardhat-ethers";
 import "./type-extensions";
+import "./tasks";
 
-import { ethers } from "ethers";
 import { HardhatPluginError, lazyObject } from "hardhat/plugins";
 import { extendConfig, extendEnvironment, task } from "hardhat/config";
-import {
-  RunTaskFunction,
-  ActionType,
-  HardhatConfig,
-  HardhatRuntimeEnvironment,
-  HttpNetworkConfig,
-} from "hardhat/types";
-import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/types";
+import { RunTaskFunction, ActionType, HardhatConfig, HardhatRuntimeEnvironment } from "hardhat/types";
 import { TenderlyService } from "tenderly";
-import { TenderlyContract, TenderlyNetwork as TenderlyNetworkInterface } from "tenderly/types";
-import {
-  CHAIN_ID_NETWORK_NAME_MAP,
-  NETWORK_NAME_CHAIN_ID_MAP,
-  TENDERLY_JSON_RPC_BASE_URL,
-} from "tenderly/common/constants";
+import { TenderlyContract } from "tenderly/types";
+import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";
+import { getAccessToken } from "tenderly/src/utils/config";
 
 import { Tenderly } from "./Tenderly";
 import { PLUGIN_NAME } from "./constants";
-import { TenderlyNetwork } from "./TenderlyNetwork";
 import { Metadata } from "./tenderly/types";
-import { wrapEthers } from "./tenderly/ethers";
 import { CONTRACTS_NOT_DETECTED } from "./tenderly/errors";
-import { wrapHHDeployments } from "./tenderly/hardhat-deploy";
+import { extendProvider, populateNetworks } from "./tenderly/extender";
 import { extractCompilerVersion, newCompilerConfig, resolveDependencies } from "./utils/util";
 
-task("run", "Runs a user-defined script after compiling the project").setAction(
-  async (taskArguments, hre, runSuper) => {
-    process.env.forkURL = "https://rpc.tenderly.co/fork/a51c60d9-b972-4f67-b742-3d94b8c5a555";
-    console.log("cao cao");
-
-    await runSuper();
-  }
-);
+const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
 extendEnvironment((env: HardhatRuntimeEnvironment) => {
-  console.log("extendEnvironment is called");
+  console.log("extendEnvironment");
   env.tenderly = lazyObject(() => new Tenderly(env));
   extendProvider(env);
   populateNetworks();
 });
 
 extendConfig((resolvedConfig: HardhatConfig) => {
-  console.log("extendConfig is called");
-
+  console.log("extendConfig");
   if (resolvedConfig.networks.tenderly === undefined) {
     resolvedConfig.networks.tenderly = {
       accounts: "remote",
       gas: "auto",
       gasPrice: "auto",
       gasMultiplier: 1,
-      httpHeaders: {}, // here we can inject auth header
+      httpHeaders: {
+        "X-ACCESS-KEY": getAccessToken(),
+      },
       timeout: 20000,
-      url: process.env.forkURL ?? "",
+      url: process.env.VNET_URL ?? "",
     };
   }
 });
-
-export const setup = (cfg?: { automaticVerifications: boolean }): void => {
-  let automatic = true;
-  if (cfg !== undefined && cfg?.automaticVerifications !== undefined) {
-    automatic = cfg.automaticVerifications;
-  }
-
-  extendEnvironment((env: HardhatRuntimeEnvironment) => {
-    env.tenderly = lazyObject(() => new Tenderly(env));
-    extendProvider(env);
-    populateNetworks();
-    if (automatic) {
-      extendEthers(env);
-      extendHardhatDeploy(env);
-    }
-  });
-};
-
-const extendEthers = (hre: HardhatRuntimeEnvironment): void => {
-  if ("ethers" in hre && hre.ethers !== undefined && "tenderly" in hre && hre.tenderly !== undefined) {
-    Object.assign(
-      hre.ethers,
-      wrapEthers(
-        hre.ethers as unknown as typeof ethers & HardhatEthersHelpers,
-        hre.tenderly
-      ) as unknown as typeof hre.ethers
-    );
-  }
-};
-
-const extendHardhatDeploy = (hre: HardhatRuntimeEnvironment): void => {
-  // ts-ignore is needed here because we want to avoid importing hardhat-deploy in order not to cause duplicated initialization of the .deployments field
-  if (
-    "deployments" in hre &&
-    // @ts-ignore
-    hre.deployments !== undefined &&
-    "tenderly" in hre &&
-    // @ts-ignore
-    hre.tenderly !== undefined
-  ) {
-    // @ts-ignore
-    hre.deployments = wrapHHDeployments(hre.deployments, hre.tenderly);
-  }
-};
-
-const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
-  if (hre.network.name !== "tenderly") {
-    return;
-  }
-
-  if ("url" in hre.network.config && hre.network.config.url !== undefined) {
-    const forkID = hre.network.config.url.split("/").pop();
-    hre.tenderly.network().setFork(forkID);
-    return;
-  }
-
-  const tenderlyNetwork = new TenderlyNetwork(hre);
-  tenderlyNetwork
-    .initializeFork()
-    .then(async (_) => {
-      hre.tenderly.setNetwork(tenderlyNetwork);
-      const forkID = await hre.tenderly.network().getForkID();
-      (hre.network.config as HttpNetworkConfig).url = `${TENDERLY_JSON_RPC_BASE_URL}/fork/${forkID ?? ""}`;
-      hre.ethers.provider = new hre.ethers.providers.Web3Provider(hre.tenderly.network());
-    })
-    .catch((_) => {
-      console.log(`Error in ${PLUGIN_NAME}: Initializing fork, check your tenderly configuration`);
-    });
-};
-
-interface VerifyArguments {
-  contracts: string[];
-}
-
-const populateNetworks = (): void => {
-  const tenderlyService = new TenderlyService(PLUGIN_NAME);
-  tenderlyService
-    .getNetworks()
-    .then((networks: TenderlyNetworkInterface[]) => {
-      let network: TenderlyNetworkInterface;
-      let slug: string;
-      for (network of networks) {
-        NETWORK_NAME_CHAIN_ID_MAP[network.slug] = network.ethereum_network_id;
-
-        if (network?.metadata?.slug !== undefined) {
-          NETWORK_NAME_CHAIN_ID_MAP[network.metadata.slug] = network.ethereum_network_id;
-        }
-
-        CHAIN_ID_NETWORK_NAME_MAP[network.ethereum_network_id] = network.slug;
-
-        for (slug of network.metadata.secondary_slugs) {
-          NETWORK_NAME_CHAIN_ID_MAP[slug] = network.ethereum_network_id;
-        }
-      }
-    })
-    .catch((_) => {
-      console.log("Error encountered while fetching public networks");
-    });
-};
 
 interface VerifyArguments {
   contracts: string[];
@@ -265,7 +148,6 @@ const verifyContract: ActionType<VerifyArguments> = async ({ contracts }, { conf
 
   const requestContracts = await extractContractData(contracts, hardhatArguments.network, config, run);
 
-  const tenderlyService = new TenderlyService(PLUGIN_NAME);
   await tenderlyService.verifyContracts({
     config: newCompilerConfig(config),
     contracts: requestContracts,
@@ -294,7 +176,6 @@ const pushContracts: ActionType<VerifyArguments> = async ({ contracts }, { confi
   const requestContracts = await extractContractData(contracts, hardhatArguments.network, config, run);
   const solcConfig = newCompilerConfig(config);
 
-  const tenderlyService = new TenderlyService(PLUGIN_NAME);
   await tenderlyService.pushContracts(
     {
       config: solcConfig,

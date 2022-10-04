@@ -4,9 +4,10 @@ import got from "got";
 import { getAccessToken } from "../../../utils/config";
 import { TENDERLY_JSON_RPC_BASE_URL, TENDERLY_DASHBOARD_BASE_URL, PLUGIN_NAME } from "../../../common/constants";
 
-import { TenderlyService } from "../../core/services/TenderlyService";
+import { TenderlyService } from "../../core/services";
 import { VirtualNetwork, VirtualNetworkConfig } from "../types";
 import { updateChainConfig, getConfig } from "../utils/config";
+import { VirtualNetworkService } from "../services";
 import { VIRTUAL_NETWORK_LOCAL_HOST, TAB, WARNING_MESSAGE } from "./constants";
 
 const hyperlinker = require("hyperlinker");
@@ -15,6 +16,7 @@ const app = express();
 app.use(express.json());
 
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
+const virtualNetworkService = new VirtualNetworkService(PLUGIN_NAME);
 
 let virtualNetwork: VirtualNetwork;
 
@@ -31,7 +33,7 @@ app.get("/vnet", (_, res) => {
 
 app.use(async (req, res) => {
   try {
-    const response: any = await got.post(`${TENDERLY_JSON_RPC_BASE_URL}/vnet/${virtualNetwork.vnet_id}`, {
+    const response: any = await got.post(`${TENDERLY_JSON_RPC_BASE_URL}/vnet/${virtualNetwork.id}`, {
       headers: {
         "Content-Type": "application/json",
         "X-ACCESS-KEY": getAccessToken(),
@@ -49,7 +51,7 @@ app.use(async (req, res) => {
 });
 
 app.listen(1337, async () => {
-  const vnet = await tenderlyService.createVNet(
+  const vnet = await virtualNetworkService.createVNet(
     config.username,
     config.project_slug,
     config.network,
@@ -67,18 +69,13 @@ app.listen(1337, async () => {
     updateChainConfig(filepath, vnet.chain_config);
   }
 
-  console.log(`Forwarding: ${VIRTUAL_NETWORK_LOCAL_HOST} --> ${TENDERLY_JSON_RPC_BASE_URL}/vnet/${vnet.vnet_id}\n`);
+  console.log(`Forwarding: ${VIRTUAL_NETWORK_LOCAL_HOST} --> ${TENDERLY_JSON_RPC_BASE_URL}/vnet/${vnet.id}\n`);
 
   await listAccounts(vnet);
 });
 
 async function listAccounts(vnet: VirtualNetwork) {
-  const forkTx = await tenderlyService.getTransaction(
-    config.username,
-    config.project_slug,
-    vnet.vnet_id,
-    vnet.root_tx_id
-  );
+  const forkTx = await tenderlyService.getTransaction(config.username, config.project_slug, vnet.id, vnet.root_tx_id);
   if (forkTx === null) {
     process.exit(1);
   }
@@ -134,7 +131,7 @@ function printRPCCall(req: any, rawRes: any): void {
     if (SUPPORTS_HYPERLINKS) {
       const hyperlink = hyperlinker(
         "View in Tenderly",
-        `${TENDERLY_DASHBOARD_BASE_URL}/${config.username}/${config.project_slug}/fork/${virtualNetwork.vnet_id}/simulation/${simulationID}`
+        `${TENDERLY_DASHBOARD_BASE_URL}/${config.username}/${config.project_slug}/fork/${virtualNetwork.id}/simulation/${simulationID}`
       );
       console.log(`${TAB}Hash:\t\t`, `${txHash}(${hyperlink})`, "\n");
       return;
@@ -143,7 +140,7 @@ function printRPCCall(req: any, rawRes: any): void {
     console.log(`${TAB}Hash:\t\t`, txHash);
     console.log(
       `${TAB}View in Tenderly:\t`,
-      `${TENDERLY_DASHBOARD_BASE_URL}/${config.username}/${config.project_slug}/fork/${virtualNetwork.vnet_id}/simulation/${simulationID}`
+      `${TENDERLY_DASHBOARD_BASE_URL}/${config.username}/${config.project_slug}/fork/${virtualNetwork.id}/simulation/${simulationID}`
     );
   }
 }

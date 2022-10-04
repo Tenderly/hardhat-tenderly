@@ -71,9 +71,9 @@ export class Tenderly {
     }
 
     // Try to override forkID with VNet fork ID
-    const vnet = await this.virtualNetworkService.getVirtualNetwork();
-    if (vnet?.vnet_id !== undefined && vnet?.vnet_id !== null) {
-      forkID = vnet.vnet_id;
+    const vnet = await this.virtualNetworkService.getLocalVNet();
+    if (vnet?.id !== undefined && vnet?.id !== null) {
+      forkID = vnet.id;
     }
 
     await this.tenderlyNetwork.verifyAPI(request, tenderlyProject, username, forkID);

@@ -1,5 +1,5 @@
 export interface VirtualNetwork {
-  vnet_id: string;
+  id: string;
   root_tx_id: string;
   chain_config?: Record<string, string>;
 }

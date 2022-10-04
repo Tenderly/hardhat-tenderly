@@ -1,7 +1,7 @@
 // File: scripts/greeter/automatic.ts
 import { ethers } from "hardhat";
 
-async function main() {
+export async function main() {
   const Greeter = await ethers.getContractFactory("Greeter");
   const greeter = await Greeter.deploy("Hello, Hardhat!");
 
