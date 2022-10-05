@@ -6,20 +6,16 @@ import { TENDERLY_DASHBOARD_BASE_URL } from "tenderly/src/common/constants";
 import { configExists, writeConfig, getConfig } from "tenderly/src/internal/virtual-network/utils/config";
 
 import { PLUGIN_NAME } from "../constants";
-import { extendHHEnvironment } from "../tenderly/extender";
 
 const virtualNetworkService = new VirtualNetworkService(PLUGIN_NAME);
 
 task("run", "Runs a user-defined script after compiling the project")
   .addOptionalParam("vnetConfig", "Virtual Network path to config file", "vnet.config.json")
   .addOptionalParam("saveChainConfig", "Save default chain config to config file", false, boolean)
-  .addOptionalParam("verifyOnDeploy", "If it true it will verify contract on deploy", false, boolean)
+  .addOptionalParam("verifyOnDeploy", "If it is true it will verify the contract on deploy", false, boolean)
   .setAction(async (taskArguments, hre, runSuper) => {
-    console.log("run task");
-
     const filepath: string = taskArguments.vnetConfig;
     const saveChainConfig: boolean = taskArguments.saveChainConfig;
-    const verifyOnDeploy: boolean = taskArguments.verifyOnDeploy;
 
     if (!configExists(filepath)) {
       const [projectSlug, username] = await virtualNetworkService.promptProject();
@@ -54,10 +50,9 @@ task("run", "Runs a user-defined script after compiling the project")
       process.exit(1);
     }
 
+    process.env.AUTOMATIC_VERIFICATION_ENABLED = taskArguments.verifyOnDeploy;
     process.env.VNET_URL = `https://rpc.tenderly.co/vnet/${vnet.id}`;
     (hre.config.networks.tenderly as HttpNetworkConfig).url = process.env.VNET_URL;
-
-    extendHHEnvironment(hre, verifyOnDeploy);
 
     await runSuper(taskArguments);
 

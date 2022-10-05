@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import { lazyObject } from "hardhat/plugins";
-import { HardhatRuntimeEnvironment, HttpNetworkConfig } from "hardhat/types";
+import { extendConfig, extendEnvironment } from "hardhat/config";
+import { HardhatRuntimeEnvironment, HttpNetworkConfig, HardhatConfig } from "hardhat/types";
 import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/types";
 import { TenderlyService } from "tenderly";
 import { TenderlyNetwork as TenderlyNetworkInterface } from "tenderly/types";
@@ -9,6 +10,7 @@ import {
   NETWORK_NAME_CHAIN_ID_MAP,
   TENDERLY_JSON_RPC_BASE_URL,
 } from "tenderly/common/constants";
+import { getAccessToken } from "tenderly/src/utils/config";
 
 import { Tenderly } from "../Tenderly";
 import { TenderlyNetwork } from "../TenderlyNetwork";
@@ -18,17 +20,33 @@ import { wrapHHDeployments } from "./hardhat-deploy";
 
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
-export const extendHHEnvironment = (hre: HardhatRuntimeEnvironment, automaticVerifications: boolean = false): void => {
+extendEnvironment((hre: HardhatRuntimeEnvironment) => {
   hre.tenderly = lazyObject(() => new Tenderly(hre));
   extendProvider(hre);
   populateNetworks();
-  if (automaticVerifications) {
+  if (process.env.AUTOMATIC_VERIFICATION_ENABLED === "true") {
     extendEthers(hre);
     extendHardhatDeploy(hre);
   }
-};
+});
 
-export const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
+extendConfig((resolvedConfig: HardhatConfig) => {
+  if (resolvedConfig.networks.tenderly === undefined) {
+    resolvedConfig.networks.tenderly = {
+      accounts: "remote",
+      gas: "auto",
+      gasPrice: "auto",
+      gasMultiplier: 1,
+      httpHeaders: {
+        "X-ACCESS-KEY": getAccessToken(),
+      },
+      timeout: 20000,
+      url: process.env.VNET_URL ?? "",
+    };
+  }
+});
+
+const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
   if (hre.network.name !== "tenderly") {
     return;
   }
@@ -53,7 +71,7 @@ export const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
     });
 };
 
-export const populateNetworks = (): void => {
+const populateNetworks = (): void => {
   tenderlyService
     .getNetworks()
     .then((networks: TenderlyNetworkInterface[]) => {

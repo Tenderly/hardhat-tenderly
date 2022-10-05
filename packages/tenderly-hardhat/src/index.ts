@@ -1,47 +1,21 @@
 import "@nomiclabs/hardhat-ethers";
+import "./tenderly/extender";
 import "./type-extensions";
 import "./tasks";
 
-import { HardhatPluginError, lazyObject } from "hardhat/plugins";
-import { extendConfig, extendEnvironment, task } from "hardhat/config";
-import { RunTaskFunction, ActionType, HardhatConfig, HardhatRuntimeEnvironment } from "hardhat/types";
+import { HardhatPluginError } from "hardhat/plugins";
+import { task } from "hardhat/config";
+import { RunTaskFunction, ActionType, HardhatConfig } from "hardhat/types";
 import { TenderlyService } from "tenderly";
 import { TenderlyContract } from "tenderly/types";
 import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";
-import { getAccessToken } from "tenderly/src/utils/config";
 
-import { Tenderly } from "./Tenderly";
 import { PLUGIN_NAME } from "./constants";
 import { Metadata } from "./tenderly/types";
 import { CONTRACTS_NOT_DETECTED } from "./tenderly/errors";
-import { extendProvider, populateNetworks } from "./tenderly/extender";
 import { extractCompilerVersion, newCompilerConfig, resolveDependencies } from "./utils/util";
 
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
-
-extendEnvironment((env: HardhatRuntimeEnvironment) => {
-  console.log("extendEnvironment");
-  env.tenderly = lazyObject(() => new Tenderly(env));
-  extendProvider(env);
-  populateNetworks();
-});
-
-extendConfig((resolvedConfig: HardhatConfig) => {
-  console.log("extendConfig");
-  if (resolvedConfig.networks.tenderly === undefined) {
-    resolvedConfig.networks.tenderly = {
-      accounts: "remote",
-      gas: "auto",
-      gasPrice: "auto",
-      gasMultiplier: 1,
-      httpHeaders: {
-        "X-ACCESS-KEY": getAccessToken(),
-      },
-      timeout: 20000,
-      url: process.env.VNET_URL ?? "",
-    };
-  }
-});
 
 interface VerifyArguments {
   contracts: string[];

@@ -86,7 +86,6 @@ export class TenderlyNetwork {
   }
 
   public async verify(...contracts: any[]) {
-    console.log("verify: ", contracts);
     if (!this._checkNetwork()) {
       return;
     }
