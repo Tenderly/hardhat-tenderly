@@ -783,9 +783,9 @@
     "@sentry/types" "5.30.0"
     tslib "^1.9.3"
 
-"@tenderly/hardhat-tenderly@file:../../packages/tenderly-hardhat/tenderly-hardhat-tenderly-1.2.0-test.34.tgz":
-  version "1.2.0-test.34"
-  resolved "file:../../packages/tenderly-hardhat/tenderly-hardhat-tenderly-1.2.0-test.34.tgz#5c32c86149046d726a11bb1e056d176fc4573da2"
+"@tenderly/hardhat-tenderly@file:../../packages/tenderly-hardhat/tenderly-hardhat-tenderly-1.2.0-test.35.tgz":
+  version "1.2.0-test.35"
+  resolved "file:../../packages/tenderly-hardhat/tenderly-hardhat-tenderly-1.2.0-test.35.tgz#717e272d831427ac99becd5a6aca6ba33afc956c"
   dependencies:
     "@ethersproject/bignumber" "^5.7.0"
     "@nomiclabs/hardhat-ethers" "^2.1.1"

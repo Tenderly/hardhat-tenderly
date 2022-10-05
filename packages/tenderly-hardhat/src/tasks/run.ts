@@ -3,7 +3,12 @@ import { boolean } from "hardhat/internal/core/params/argumentTypes";
 import { HttpNetworkConfig } from "hardhat/types";
 import { VirtualNetworkService } from "tenderly";
 import { TENDERLY_DASHBOARD_BASE_URL } from "tenderly/src/common/constants";
-import { configExists, writeConfig, getConfig } from "tenderly/src/internal/virtual-network/utils/config";
+import {
+  configExists,
+  writeConfig,
+  getConfig,
+  updateChainConfig,
+} from "tenderly/src/internal/virtual-network/utils/config";
 
 import { PLUGIN_NAME } from "../constants";
 
@@ -48,6 +53,10 @@ task("run", "Runs a user-defined script after compiling the project")
     );
     if (vnet === null) {
       process.exit(1);
+    }
+
+    if (saveChainConfig) {
+      updateChainConfig(filepath, vnet.chain_config);
     }
 
     process.env.AUTOMATIC_VERIFICATION_ENABLED = taskArguments.verifyOnDeploy;
