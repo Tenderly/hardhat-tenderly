@@ -16,8 +16,8 @@ const virtualNetworkService = new VirtualNetworkService(PLUGIN_NAME);
 
 task("run", "Runs a user-defined script after compiling the project")
   .addOptionalParam("vnetConfig", "Virtual Network path to config file", "vnet.config.json")
-  .addOptionalParam("saveChainConfig", "Save default chain config to config file", false, boolean)
   .addOptionalParam("verifyOnDeploy", "If it is true it will verify the contract on deploy", false, boolean)
+  .addFlag("saveChainConfig", "Save default chain config to config file")
   .setAction(async (taskArguments, hre, runSuper) => {
     const filepath: string = taskArguments.vnetConfig;
     const saveChainConfig: boolean = taskArguments.saveChainConfig;
