@@ -33,7 +33,6 @@
     "@ethersproject/providers": "^5.6.8",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.2",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.3",
-    "@nomiclabs/hardhat-ethers": "^2.1.0",
     "@nomiclabs/hardhat-etherscan": "^3.1.0",
     "@typechain/ethers-v5": "^10.1.0",
     "@typechain/hardhat": "^6.1.2",
@@ -54,6 +53,7 @@
     "typescript": "^4.8.3"
   },
   "dependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.1.0",
     "@tenderly/hardhat-tenderly": "/Users/riphal/Documents/Tenderly/hardhat-tenderly/packages/tenderly-hardhat/tenderly-hardhat-tenderly-1.2.0-test.36.tgz",
     "dotenv": "^16.0.1",
     "hardhat": "^2.10.2"
