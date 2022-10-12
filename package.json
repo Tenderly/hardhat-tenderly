@@ -9,11 +9,11 @@
     ],
     "scripts": {
         "build": "tsc --build packages/tenderly-core packages/tenderly-hardhat",
-        "watch": "tsc --build --watch packages/tenderly-core packages/tenderly-hardhat",
-        "clean": "wsrun --exclude-missing clean",
-        "lint": "wsrun --exclude-missing --stages lint && yarn prettier --check",
         "lint:fix": "wsrun --exclude-missing --stages lint:fix && yarn prettier --write",
-        "prettier": "prettier *.md \"{docs,.github}/**/*.{md,yml}\""
+        "prettier": "prettier *.md \"{docs,.github}/**/*.{md,yml}\"",
+        "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+        "changeset": "changeset",
+        "version-packages": "changeset version"
     },
     "devDependencies": {
         "@changesets/cli": "^2.25.0",

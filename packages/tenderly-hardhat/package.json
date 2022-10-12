@@ -27,11 +27,12 @@
     "README.md"
   ],
   "scripts": {
+    "build": "rm -rf ./dist && tsc --build .",
+    "clean": "rm -rf node_modules && rm -rf dist",
     "lint": "yarn run prettier --check && yarn run eslint",
     "lint:fix": "yarn run prettier --write && yarn run eslint --fix",
     "eslint": "eslint 'src/**/*.ts'",
     "prettier": "prettier \"**/*.{js,md,json}\"",
-    "build": "rm -rf ./dist && tsc --build .",
     "prepublishOnly": "yarn run build"
   },
   "devDependencies": {
