@@ -16,6 +16,7 @@
         "prettier": "prettier *.md \"{docs,.github}/**/*.{md,yml}\""
     },
     "devDependencies": {
+        "@changesets/cli": "^2.25.0",
         "prettier": "^2.7.1",
         "typescript": "^4.8.2",
         "wsrun": "^5.2.4"
