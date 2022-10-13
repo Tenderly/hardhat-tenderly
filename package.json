@@ -8,7 +8,7 @@
         "packages/*"
     ],
     "scripts": {
-        "build": "tsc --build packages/tenderly-core packages/tenderly-hardhat",
+        "build": "yarn --cwd packages/tenderly-core run build && yarn --cwd packages/tenderly-hardhat run build",
         "lint:fix": "wsrun --exclude-missing --stages lint:fix && yarn prettier --write",
         "prettier": "prettier *.md \"{docs,.github}/**/*.{md,yml}\"",
         "format": "prettier --write \"**/*.{ts,tsx,md}\"",
