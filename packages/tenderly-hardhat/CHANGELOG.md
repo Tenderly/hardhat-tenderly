@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 1.2.1-beta.3
+
+### Patch Changes
+
+- Fix @tenderly/hardhat-tenderly installation
+
 ## 1.2.1-beta.2
 
 ### Patch Changes
