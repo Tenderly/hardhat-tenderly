@@ -3,7 +3,7 @@
 ## Prerelease
 
 > Warning! Prereleases are very complicated! Using them requires a thorough understanding of all parts of npm publishes. Mistakes can lead to repository and publish states that are very hard to fix.\
->  To fix that problem we use changeset and GitHub Actions.
+> To fix that problem we use changeset and GitHub Actions.
 
 A prerelease workflow might look something like this:
 
