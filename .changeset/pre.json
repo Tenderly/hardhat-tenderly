@@ -1,0 +1,9 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "tenderly": "0.0.1",
+    "@tenderly/hardhat-tenderly": "1.2.0"
+  },
+  "changesets": []
+}
