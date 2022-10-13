@@ -10,6 +10,7 @@ A prerelease workflow might look something like this:
 ```bash
 git checkout beta
 git merge <your branch> // recomended to use develep branch
+yarn changeset // adding changesets
 yarn changeset version
 git add .
 git commit -m "Version packages"
@@ -31,9 +32,10 @@ This command will version packages as you would normally expect but append `-bet
 
 ## Release
 
+Open PR with destination to `master` branch and run:
+
 ```bash
-git checkout master
-git merge <your branch> // recomended to use develep branch
+yarn changeset // adding changesets
 yarn changeset version
 git add .
 git commit -m "Version packages"
