@@ -1,9 +1,11 @@
 {
   "extends": "../../config/typescript/tsconfig.json",
   "compilerOptions": {
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "rootDirs": ["./src", "./test"]
   },
   "exclude": ["./dist", "./node_modules"],
+  "include": ["./test", "./src"],
   "references": [
     {
       "path": "../tenderly-core/src"

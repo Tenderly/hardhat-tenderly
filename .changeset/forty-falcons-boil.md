@@ -1,6 +1,5 @@
 ---
-"tenderly": patch
 "@tenderly/hardhat-tenderly": patch
 ---
 
-Beta test release
+Fix @tenderly/hardhat-tenderly installation

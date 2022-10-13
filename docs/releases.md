@@ -3,22 +3,23 @@
 ## Prerelease
 
 > Warning! Prereleases are very complicated! Using them requires a thorough understanding of all parts of npm publishes. Mistakes can lead to repository and publish states that are very hard to fix.\
->  To fix that problem we use changeset and GitHub Actions.
+> To fix that problem we use changeset and GitHub Actions.
 
 A prerelease workflow might look something like this:
 
 ```bash
 git checkout beta
 git merge <your branch> // recomended to use develep branch
+yarn changeset // adding changesets
 yarn changeset version
 git add .
 git commit -m "Version packages"
 git push
 ```
 
-Let's go through what's happening here. For this example, let's say you have a repo that looks like this:
+Let's go through what's happening here:
 
-Inside beta brach Changesets is into prerelease mode, prerelease mode have a `pre.json` file in the `.changeset` directory which stores information about the state the prerelease is in. For the specific data stored in the `pre.json` file, see the type definition of `PreState` in [`@changesets/types`](https://github.com/changesets/changesets/tree/main/packages/types).
+Inside `beta` branch Changesets is into prerelease mode, prerelease mode have a `pre.json` file in the `.changeset` directory which stores information about the state the prerelease is in. For the specific data stored in the `pre.json` file, see the type definition of `PreState` in [`@changesets/types`](https://github.com/changesets/changesets/tree/main/packages/types).
 
 ```
 yarn changeset version
@@ -31,9 +32,10 @@ This command will version packages as you would normally expect but append `-bet
 
 ## Release
 
+Open PR with destination to `master` branch and run:
+
 ```bash
-git checkout master
-git merge <your branch> // recomended to use develep branch
+yarn changeset // adding changesets
 yarn changeset version
 git add .
 git commit -m "Version packages"
