@@ -31,7 +31,7 @@
     "lint:fix": "yarn run prettier --write && yarn run eslint --fix",
     "eslint": "eslint 'src/**/*.ts'",
     "prettier": "prettier \"**/*.{js,md,json}\"",
-    "prerelease": "npm run build"
+    "prepublishOnly": "yarn run build"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",
