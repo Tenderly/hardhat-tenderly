@@ -1,1 +1,3 @@
-./packages/tenderly-hardhat/README.md
+## Documentation
+
+- [Release & Prerelease package](./docs/releases.md)
