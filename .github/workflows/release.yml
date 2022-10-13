@@ -3,7 +3,8 @@ name: Release
 on:
   push:
     branches:
-      - $default-branch
+      - master
+      - beta
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -22,12 +23,17 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14.x
-          cache: "yarn"
 
       - name: Install Dependencies
         run: yarn
-
-      - name: Create Release Pull Request
-        uses: changesets/action@master
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # This enable Actions fatch all private packages if we have them
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+     - name: Create Release Pull Request or Publish to npm
+        uses: changesets/action@master
+        with:
+          publish: yarn run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Ensure to have this set up under GitHub secrets
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }} # Ensure to have this set up under GitHub secrets

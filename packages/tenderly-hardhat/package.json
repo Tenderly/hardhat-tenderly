@@ -4,7 +4,7 @@
   "license": "MIT",
   "homepage": "https://tenderly.co",
   "description": "Hardhat plugin for integration with Tenderly",
-  "version": "1.2.0-test.36",
+  "version": "1.2.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
@@ -33,7 +33,7 @@
     "lint:fix": "yarn run prettier --write && yarn run eslint --fix",
     "eslint": "eslint 'src/**/*.ts'",
     "prettier": "prettier \"**/*.{js,md,json}\"",
-    "prepublishOnly": "yarn run build"
+    "prerelease": "npm run build"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",

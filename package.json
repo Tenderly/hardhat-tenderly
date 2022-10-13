@@ -13,9 +13,11 @@
         "prettier": "prettier *.md \"{docs,.github}/**/*.{md,yml}\"",
         "format": "prettier --write \"**/*.{ts,tsx,md}\"",
         "changeset": "changeset",
+        "release": "changeset publish",
         "version-packages": "changeset version"
     },
     "devDependencies": {
+        "@changesets/changelog-github": "^0.4.7",
         "@changesets/cli": "^2.25.0",
         "prettier": "^2.7.1",
         "typescript": "^4.8.2",

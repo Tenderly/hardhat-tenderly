@@ -29,7 +29,7 @@
     "lint:fix": "yarn run prettier --write && yarn run eslint --fix",
     "eslint": "eslint 'src/**/*.ts'",
     "prettier": "prettier \"**/*.{js,md,json}\"",
-    "prepublishOnly": "yarn run build"
+    "prerelease": "npm run build"
   },
   "files": [
     "common/",

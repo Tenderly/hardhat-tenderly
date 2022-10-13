@@ -1,3 +1,3 @@
 ## Documentation
 
-- [Prereleases](./docs/prereleases.md)
+- [Release & Prerelease package](./docs/releases.md)
