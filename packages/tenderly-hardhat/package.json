@@ -7,9 +7,6 @@
   "version": "1.2.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "bin": {
-    "tenderly": "dist/internal/cli/index.js"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Tenderly/hardhat-tenderly.git"
