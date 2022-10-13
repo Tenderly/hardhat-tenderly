@@ -6,6 +6,6 @@
     "@tenderly/hardhat-tenderly": "1.2.0"
   },
   "changesets": [
-    "forty-falcons-boil"
+    "spicy-gorillas-remain"
   ]
 }
