@@ -24,12 +24,16 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16.x
+          cache: "yarn"
 
       - name: Install Dependencies
         run: yarn
         env:
           # This enable Actions fatch all private packages if we have them
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Build
+        run: yarn run build
 
       - name: Create Release Pull Request or Publish to npm
         uses: changesets/action@v1
