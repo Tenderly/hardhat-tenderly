@@ -10,8 +10,8 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   release:
-    name: Release
     runs-on: ubuntu-latest
+    if: github.repository == 'Tenderly/hardhat-tenderly'
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
