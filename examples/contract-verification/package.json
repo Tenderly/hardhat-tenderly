@@ -54,9 +54,9 @@
   },
   "dependencies": {
     "@nomiclabs/hardhat-ethers": "^2.1.0",
-    "@tenderly/hardhat-tenderly": "1.2.1-beta.1",
+    "@tenderly/hardhat-tenderly": "1.2.1-beta.5",
     "dotenv": "^16.0.1",
     "hardhat": "^2.10.2",
-    "tenderly": "^0.0.2-beta.0"
+    "tenderly": "^0.0.2-beta.2"
   }
 }
