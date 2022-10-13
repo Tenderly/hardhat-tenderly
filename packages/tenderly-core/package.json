@@ -4,7 +4,7 @@
   "license": "MIT",
   "homepage": "https://tenderly.co",
   "description": "",
-  "version": "0.0.2-beta.1",
+  "version": "0.0.2-beta.2",
   "main": "internal/lib/tenderly-lib.js",
   "types": "internal/lib/tenderly-lib.d.ts",
   "keywords": [
