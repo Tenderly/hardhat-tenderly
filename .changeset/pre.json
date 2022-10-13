@@ -6,6 +6,7 @@
     "@tenderly/hardhat-tenderly": "1.2.0"
   },
   "changesets": [
-    "loud-walls-hang"
+    "loud-walls-hang",
+    "red-laws-shake"
   ]
 }
