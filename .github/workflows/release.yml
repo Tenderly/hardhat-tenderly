@@ -10,6 +10,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   release:
+    name: Release
     runs-on: ubuntu-latest
     if: github.repository == 'Tenderly/hardhat-tenderly'
     steps:
@@ -30,9 +31,10 @@ jobs:
           # This enable Actions fatch all private packages if we have them
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-     - name: Create Release Pull Request or Publish to npm
+      - name: Create Release Pull Request or Publish to npm
         uses: changesets/action@master
         with:
+          # This expects you to have a script called release which does a build for your packages and calls changeset publish
           publish: yarn run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Ensure to have this set up under GitHub secrets
