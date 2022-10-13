@@ -800,10 +800,10 @@
   dependencies:
     defer-to-connect "^2.0.0"
 
-"@tenderly/hardhat-tenderly@1.2.1-beta.0":
-  version "1.2.1-beta.0"
-  resolved "https://registry.yarnpkg.com/@tenderly/hardhat-tenderly/-/hardhat-tenderly-1.2.1-beta.0.tgz#18617bc2520d45556fd98ee6e4fdd9cc7f9fe263"
-  integrity sha512-uwkXC+5cpef3RBNHGEwfVb85luFTJVTWCRSjwSX8wqT07TLvhpW9dwgBfKfKqwIyo4X7mhrsfYJAFiaZLSI+fw==
+"@tenderly/hardhat-tenderly@1.2.1-beta.1":
+  version "1.2.1-beta.1"
+  resolved "https://registry.yarnpkg.com/@tenderly/hardhat-tenderly/-/hardhat-tenderly-1.2.1-beta.1.tgz#a6a867e52093b1212acbce398efc07661d21bf67"
+  integrity sha512-V0qaPAWiRIsbqh+9oWmB6F9wlSlI0MJwlTwhXpTNn6nGoh2IbMBHomFSDQ9RUziCDZLsPbsgV8sR8h0NMbrsBQ==
   dependencies:
     "@ethersproject/bignumber" "^5.7.0"
     "@nomiclabs/hardhat-ethers" "^2.1.1"

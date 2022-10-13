@@ -1,12 +1,12 @@
 {
   "name": "tenderly",
-  "version": "0.0.1",
   "author": "Tenderly",
   "license": "MIT",
   "homepage": "https://tenderly.co",
+  "description": "",
+  "version": "0.0.1",
   "main": "internal/lib/tenderly-lib.js",
   "types": "internal/lib/tenderly-lib.d.ts",
-  "description": "",
   "keywords": [
     "tooling",
     "tenderly",
