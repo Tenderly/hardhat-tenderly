@@ -17,9 +17,9 @@ git commit -m "Version packages"
 git push
 ```
 
-Let's go through what's happening here. For this example, let's say you have a repo that looks like this:
+Let's go through what's happening here:
 
-Inside beta brach Changesets is into prerelease mode, prerelease mode have a `pre.json` file in the `.changeset` directory which stores information about the state the prerelease is in. For the specific data stored in the `pre.json` file, see the type definition of `PreState` in [`@changesets/types`](https://github.com/changesets/changesets/tree/main/packages/types).
+Inside `beta` brach Changesets is into prerelease mode, prerelease mode have a `pre.json` file in the `.changeset` directory which stores information about the state the prerelease is in. For the specific data stored in the `pre.json` file, see the type definition of `PreState` in [`@changesets/types`](https://github.com/changesets/changesets/tree/main/packages/types).
 
 ```
 yarn changeset version
