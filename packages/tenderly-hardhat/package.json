@@ -59,6 +59,6 @@
   },
   "peerDependencies": {
     "hardhat": "^2.10.2",
-    "tenderly": "^0.0.2-beta.0"
+    "tenderly": "^0.0.2-beta.3"
   }
 }
