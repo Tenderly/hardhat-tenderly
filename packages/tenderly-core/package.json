@@ -34,7 +34,6 @@
   "files": [
     "common/",
     "internal/",
-    "src/",
     "types/",
     "utils/",
     "*.d.ts",
