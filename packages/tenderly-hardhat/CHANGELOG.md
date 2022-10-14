@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 1.2.1-beta.6
+
+### Patch Changes
+
+- Delete typescript files from published packages
+
 ## 1.2.1-beta.5
 
 ### Patch Changes

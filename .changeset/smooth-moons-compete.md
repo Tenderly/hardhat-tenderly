@@ -3,4 +3,4 @@
 "@tenderly/hardhat-tenderly": patch
 ---
 
-Fix tenderly & @tenderly/hardhat-tenderly installation
+Delete typescript files from published packages
