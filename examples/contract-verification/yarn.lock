@@ -800,10 +800,10 @@
   dependencies:
     defer-to-connect "^2.0.0"
 
-"@tenderly/hardhat-tenderly@1.2.1-beta.5":
-  version "1.2.1-beta.5"
-  resolved "https://registry.yarnpkg.com/@tenderly/hardhat-tenderly/-/hardhat-tenderly-1.2.1-beta.5.tgz#df7adea9ca1651364780261881d0457153657b15"
-  integrity sha512-i35dMee8hVPsI3zM2PVfbA8BLOPXlbyGaZCngq32BtLmnO5fOBJwb6JMC0vZ8aqQUoSau7TznObi4CxcIpFT3g==
+"@tenderly/hardhat-tenderly@1.2.1-beta.6":
+  version "1.2.1-beta.6"
+  resolved "https://registry.yarnpkg.com/@tenderly/hardhat-tenderly/-/hardhat-tenderly-1.2.1-beta.6.tgz#8a99bb9e24d730700e7a0f96e6e1750a21782385"
+  integrity sha512-+7L1xfyS5L/fztBoiu6PgN/GIEuMutVgQenN5bBugzcDYh4JhL9VGRh8NVtcnkoVpdCjQUzBpzJytQLaAenJIw==
   dependencies:
     "@ethersproject/bignumber" "^5.7.0"
     "@nomiclabs/hardhat-ethers" "^2.1.1"
@@ -4230,10 +4230,10 @@ table@^6.8.0:
     string-width "^4.2.3"
     strip-ansi "^6.0.1"
 
-tenderly@^0.0.2-beta.2:
-  version "0.0.2-beta.2"
-  resolved "https://registry.yarnpkg.com/tenderly/-/tenderly-0.0.2-beta.2.tgz#65aec37c675b8fce5d46d452ce86e4f783bef4ba"
-  integrity sha512-YwaNeAAd2v0wClBLumFM5yKrvoHqt5bqkOb3tys+vXitJA6oprI1KEZqHbp9u+csNjkVrqSW3Pf2UkTK4qCGJw==
+tenderly@^0.0.2-beta.3:
+  version "0.0.2-beta.3"
+  resolved "https://registry.yarnpkg.com/tenderly/-/tenderly-0.0.2-beta.3.tgz#24b7b4bd54c6b657810fab881b0f399441204ca8"
+  integrity sha512-miiN3uzSFVipF8n/Pi1q6+iwJWscuy79zD43pECyonoL+tUP3N5d7KZiSNqqW2MWD2e+eb5U0XN2XDEnbf/vEg==
   dependencies:
     axios "^0.27.2"
     cli-table3 "^0.6.2"

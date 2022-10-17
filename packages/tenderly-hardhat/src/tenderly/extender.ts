@@ -32,6 +32,7 @@ extendEnvironment((hre: HardhatRuntimeEnvironment) => {
 
 extendConfig((resolvedConfig: HardhatConfig) => {
   if (resolvedConfig.networks.tenderly === undefined) {
+    process.env.IS_TENDERLY_NETWORK_AUTO_CREATED = "true";
     resolvedConfig.networks.tenderly = {
       accounts: "remote",
       gas: "auto",

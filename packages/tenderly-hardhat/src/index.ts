@@ -3,7 +3,6 @@ import "./tenderly/extender";
 import "./type-extensions";
 import "./tasks";
 
-/**
- * @deprecated The method should not be used.
- */
-export function setup() {}
+export function setup({ automaticVerifications = false }): void {
+  process.env.AUTOMATIC_VERIFICATION_ENABLED = automaticVerifications === true ? "true" : "false";
+}

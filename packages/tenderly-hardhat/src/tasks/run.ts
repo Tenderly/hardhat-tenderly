@@ -18,6 +18,12 @@ task("run", "Runs a user-defined script after compiling the project")
   .addFlag("verifyOnDeploy", "If it is true it will verify the contract on deploy")
   .addFlag("saveChainConfig", "Save default chain config to config file")
   .setAction(async (taskArguments, hre, runSuper) => {
+    // If tenderly network config already exists in hardhat config or hre selected network name is not "tenderly" call regular run without our addition.
+    if (process.env.IS_TENDERLY_NETWORK_AUTO_CREATED !== "true" || hre.network.name !== "tenderly") {
+      await runSuper(taskArguments);
+      return;
+    }
+
     const filepath: string = taskArguments.vnetConfig;
     const saveChainConfig: boolean = taskArguments.saveChainConfig;
 
