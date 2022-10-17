@@ -1,30 +1,25 @@
-import "@tenderly/hardhat-tenderly";
+import * as tdly from "@tenderly/hardhat-tenderly";
 import { HardhatUserConfig } from "hardhat/config";
-// import { HardhatNetworkAccountsUserConfig } from "hardhat/types";
 import * as dotenv from "dotenv";
+
+tdly.setup({ automaticVerifications: true });
 
 dotenv.config();
 
 const { TENDERLY_PRIVATE_VERIFICATION } = process.env;
 
-// const automaticVerification = TENDERLY_AUTOMATIC_VERIFICATION === "true";
 const priaveteVerification = TENDERLY_PRIVATE_VERIFICATION === "true";
 
-// console.log("Using automatic verification? ", automaticVerification, TENDERLY_AUTOMATIC_VERIFICATION);
-// console.log("Using private verification? ", priaveteVerification, TENDERLY_PRIVATE_VERIFICATION);
+console.log("Using private verification? ", priaveteVerification, TENDERLY_PRIVATE_VERIFICATION);
 
 const config: HardhatUserConfig = {
   solidity: "0.8.9",
 
   networks: {
-    // ropsten: {
-    // url: process.env.ROPSTEN_URL,
-    // accounts: (process.env.ROPSTEN_PRIVATE_KEY as HardhatNetworkAccountsUserConfig) ?? undefined,
-    // },
-    // tenderly: {
-    //   url: `https://rpc.tenderly.co/fork/${TENDERLY_FORK_ID ?? ""}`,
-    // url: `http://127.0.0.1:1337`,
-    // },
+    tenderly: {
+      chainId: 1,
+      url: `https://rpc.tenderly.co/fork/${process.env.TENDERLY_FORK_ID ?? ""}`,
+    },
   },
   tenderly: {
     project: process.env.TENDERLY_PROJECT ?? "",
