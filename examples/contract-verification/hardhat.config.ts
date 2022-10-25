@@ -1,9 +1,8 @@
-// import * as tdly from "@tenderly/hardhat-tenderly";
-import "@tenderly/hardhat-tenderly";
+import * as tdly from "@tenderly/hardhat-tenderly";
 import { HardhatUserConfig } from "hardhat/config";
 import * as dotenv from "dotenv";
 
-// tdly.setup({ automaticVerifications: true });
+tdly.setup({ automaticVerifications: true });
 
 dotenv.config();
 
@@ -16,12 +15,12 @@ console.log("Using private verification? ", priaveteVerification, TENDERLY_PRIVA
 const config: HardhatUserConfig = {
   solidity: "0.8.9",
 
-  // networks: {
-  //   tenderly: {
-  //     chainId: 1,
-  //     url: `https://rpc.tenderly.co/fork/${process.env.TENDERLY_FORK_ID ?? ""}`,
-  //   },
-  // },
+  networks: {
+    tenderly: {
+      chainId: 1,
+      url: `https://rpc.tenderly.co/fork/${process.env.TENDERLY_FORK_ID ?? ""}`,
+    },
+  },
   tenderly: {
     project: process.env.TENDERLY_PROJECT ?? "",
     username: process.env.TENDERLY_USERNAME ?? "",
