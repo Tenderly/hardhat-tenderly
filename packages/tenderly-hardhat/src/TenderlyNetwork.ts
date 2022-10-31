@@ -1,7 +1,7 @@
 import * as axios from "axios";
 
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { TenderlyService, VirtualNetworkService } from "tenderly";
+import { TenderlyService } from "tenderly";
 import { TenderlyForkContractUploadRequest } from "tenderly/types";
 import { getConfig, writeConfig } from "tenderly/utils/config";
 import { TENDERLY_JSON_RPC_BASE_URL } from "tenderly/common/constants";
@@ -22,7 +22,6 @@ export class TenderlyNetwork {
   public env: HardhatRuntimeEnvironment;
 
   private tenderlyService = new TenderlyService(PLUGIN_NAME);
-  private virtualNetworkService = new VirtualNetworkService(PLUGIN_NAME);
 
   constructor(hre: HardhatRuntimeEnvironment) {
     this.env = hre;
@@ -90,11 +89,6 @@ export class TenderlyNetwork {
       return;
     }
 
-    // Try to override forkID with VNet fork ID
-    const vnet = await this.virtualNetworkService.getLocalVNet();
-    if (vnet?.id !== undefined && vnet?.id !== null) {
-      this.forkID = vnet.id;
-    }
     if (this.head === undefined && this.forkID === undefined) {
       await this.initializeFork();
     }
@@ -122,14 +116,9 @@ export class TenderlyNetwork {
     username: string,
     forkID: string
   ) {
-    // Try to override forkID with VNet fork ID
-    const vnet = await this.virtualNetworkService.getLocalVNet();
-    if (vnet?.id !== undefined && vnet?.id !== null) {
-      this.forkID = vnet.id;
-    }
-
     await this.tenderlyService.verifyForkContracts(request, tenderlyProject, username, forkID);
   }
+
   public getHead(): string | undefined {
     if (!this._checkNetwork()) {
       return;
@@ -147,12 +136,6 @@ export class TenderlyNetwork {
   public async getForkID(): Promise<string | undefined> {
     if (!this._checkNetwork()) {
       return;
-    }
-
-    // Try to override forkID with VNet fork ID
-    const vnet = await this.virtualNetworkService.getLocalVNet();
-    if (vnet?.id !== undefined && vnet?.id !== null) {
-      this.forkID = vnet.id;
     }
 
     return this.forkID;

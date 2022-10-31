@@ -2,7 +2,7 @@ import { sep } from "path";
 import * as fs from "fs-extra";
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { TenderlyService, VirtualNetworkService } from "tenderly";
+import { TenderlyService } from "tenderly";
 import { TenderlyArtifact, TenderlyContractUploadRequest, TenderlyForkContractUploadRequest } from "tenderly/types";
 import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";
 
@@ -17,7 +17,6 @@ export class Tenderly {
   public tenderlyNetwork: TenderlyNetwork;
 
   private tenderlyService = new TenderlyService(PLUGIN_NAME);
-  private virtualNetworkService = new VirtualNetworkService(PLUGIN_NAME);
 
   constructor(hre: HardhatRuntimeEnvironment) {
     this.env = hre;
@@ -68,12 +67,6 @@ export class Tenderly {
         `Error in ${PLUGIN_NAME}: .verifyForkAPI() is only available for tenderly fork deployments, please use --network tenderly.`
       );
       return;
-    }
-
-    // Try to override forkID with VNet fork ID
-    const vnet = await this.virtualNetworkService.getLocalVNet();
-    if (vnet?.id !== undefined && vnet?.id !== null) {
-      forkID = vnet.id;
     }
 
     await this.tenderlyNetwork.verifyAPI(request, tenderlyProject, username, forkID);

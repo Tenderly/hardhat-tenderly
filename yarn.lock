@@ -4992,20 +4992,12 @@ supports-color@^5.3.0:
   dependencies:
     has-flag "^3.0.0"
 
-supports-color@^7.0.0, supports-color@^7.1.0:
+supports-color@^7.1.0:
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-7.2.0.tgz#1b7dcdcb32b8138801b3e478ba6a51caa89648da"
   integrity sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==
   dependencies:
     has-flag "^4.0.0"
-
-supports-hyperlinks@^2.2.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/supports-hyperlinks/-/supports-hyperlinks-2.3.0.tgz#3943544347c1ff90b15effb03fc14ae45ec10624"
-  integrity sha512-RpsAZlpWcDwOPQA22aCH4J0t7L8JmAvsCxfOSEwm7cQs3LshN36QaTkwd70DnBOXDWGssw2eUoc8CaRWT0XunA==
-  dependencies:
-    has-flag "^4.0.0"
-    supports-color "^7.0.0"
 
 supports-preserve-symlinks-flag@^1.0.0:
   version "1.0.0"
