@@ -4,7 +4,7 @@ import "./tasks";
 
 import * as tenderlyExtender from "./tenderly/extender";
 
-export function setup({ automaticVerifications = false }): void {
-  process.env.AUTOMATIC_VERIFICATION_ENABLED = automaticVerifications === true ? "true" : "false";
+export function setup(cfg = { automaticVerifications: false }): void {
+  process.env.AUTOMATIC_VERIFICATION_ENABLED = cfg.automaticVerifications === true ? "true" : "false";
   tenderlyExtender.setup();
 }

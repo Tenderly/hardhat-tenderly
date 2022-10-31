@@ -31,6 +31,12 @@ export function setup() {
   });
 }
 
+extendEnvironment((hre: HardhatRuntimeEnvironment) => {
+  hre.tenderly = lazyObject(() => new Tenderly(hre));
+  extendProvider(hre);
+  populateNetworks();
+});
+
 extendConfig((resolvedConfig: HardhatConfig) => {
   resolvedConfig.networks.tenderly = {
     ...resolvedConfig.networks.tenderly,
