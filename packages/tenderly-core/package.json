@@ -7,20 +7,9 @@
   "version": "0.0.2-beta.3",
   "main": "internal/lib/tenderly-lib.js",
   "types": "internal/lib/tenderly-lib.d.ts",
-  "keywords": [
-    "tooling",
-    "tenderly",
-    "ethereum",
-    "solidity",
-    "blockchain",
-    "smart-contracts"
-  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/Tenderly/hardhat-tenderly.git"
-  },
-  "bin": {
-    "tenderly": "internal/cli/index.js"
   },
   "scripts": {
     "build": "rm -rf build-test && tsc --build .",
@@ -67,8 +56,7 @@
     "hyperlinker": "^1.0.0",
     "js-yaml": "^4.1.0",
     "open": "^8.4.0",
-    "prompts": "^2.4.2",
-    "supports-hyperlinks": "^2.2.0"
+    "prompts": "^2.4.2"
   },
   "peerDependencies": {
     "ts-node": "*",

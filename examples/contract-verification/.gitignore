@@ -65,6 +65,3 @@ dist
 
 # hardhat-tenderly plugin
 deployments
-
-# Ignore VNet config file
-vnet.config.json

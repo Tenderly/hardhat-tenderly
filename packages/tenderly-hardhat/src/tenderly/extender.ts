@@ -10,7 +10,6 @@ import {
   NETWORK_NAME_CHAIN_ID_MAP,
   TENDERLY_JSON_RPC_BASE_URL,
 } from "tenderly/common/constants";
-import { getAccessToken } from "tenderly/src/utils/config";
 
 import { Tenderly } from "../Tenderly";
 import { TenderlyNetwork } from "../TenderlyNetwork";
@@ -20,31 +19,22 @@ import { wrapHHDeployments } from "./hardhat-deploy";
 
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
-extendEnvironment((hre: HardhatRuntimeEnvironment) => {
-  hre.tenderly = lazyObject(() => new Tenderly(hre));
-  extendProvider(hre);
-  populateNetworks();
-  if (process.env.AUTOMATIC_VERIFICATION_ENABLED === "true") {
-    extendEthers(hre);
-    extendHardhatDeploy(hre);
-  }
-});
+export function setup() {
+  extendEnvironment((hre: HardhatRuntimeEnvironment) => {
+    hre.tenderly = lazyObject(() => new Tenderly(hre));
+    extendProvider(hre);
+    populateNetworks();
+    if (process.env.AUTOMATIC_VERIFICATION_ENABLED === "true") {
+      extendEthers(hre);
+      extendHardhatDeploy(hre);
+    }
+  });
+}
 
 extendConfig((resolvedConfig: HardhatConfig) => {
-  if (resolvedConfig.networks.tenderly === undefined) {
-    process.env.IS_TENDERLY_NETWORK_AUTO_CREATED = "true";
-    resolvedConfig.networks.tenderly = {
-      accounts: "remote",
-      gas: "auto",
-      gasPrice: "auto",
-      gasMultiplier: 1,
-      httpHeaders: {
-        "X-ACCESS-KEY": getAccessToken(),
-      },
-      timeout: 20000,
-      url: process.env.VNET_URL ?? "",
-    };
-  }
+  resolvedConfig.networks.tenderly = {
+    ...resolvedConfig.networks.tenderly,
+  };
 });
 
 const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
