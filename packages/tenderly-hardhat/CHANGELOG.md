@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 1.2.1-beta.8
+
+### Patch Changes
+
+- Pre-release for new restructure
+
 ## 1.2.1-beta.7
 
 ### Patch Changes

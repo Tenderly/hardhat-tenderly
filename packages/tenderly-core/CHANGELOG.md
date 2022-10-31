@@ -1,5 +1,11 @@
 # tenderly
 
+## 0.0.2-beta.4
+
+### Patch Changes
+
+- Pre-release for new restructure
+
 ## 0.0.2-beta.3
 
 ### Patch Changes
