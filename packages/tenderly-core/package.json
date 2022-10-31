@@ -19,9 +19,6 @@
     "type": "git",
     "url": "https://github.com/Tenderly/hardhat-tenderly.git"
   },
-  "bin": {
-    "tenderly": "internal/cli/index.js"
-  },
   "scripts": {
     "build": "rm -rf build-test && tsc --build .",
     "clean": "rm -rf node_modules && rm -rf build-test && rm -rf common && rm -rf internal && rm -rf types && rm -rf utils",
