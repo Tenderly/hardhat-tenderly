@@ -19,15 +19,17 @@ import { wrapHHDeployments } from "./hardhat-deploy";
 
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
-extendEnvironment((hre: HardhatRuntimeEnvironment) => {
-  hre.tenderly = lazyObject(() => new Tenderly(hre));
-  extendProvider(hre);
-  populateNetworks();
-  if (process.env.AUTOMATIC_VERIFICATION_ENABLED === "true") {
-    extendEthers(hre);
-    extendHardhatDeploy(hre);
-  }
-});
+export function setup() {
+  extendEnvironment((hre: HardhatRuntimeEnvironment) => {
+    hre.tenderly = lazyObject(() => new Tenderly(hre));
+    extendProvider(hre);
+    populateNetworks();
+    if (process.env.AUTOMATIC_VERIFICATION_ENABLED === "true") {
+      extendEthers(hre);
+      extendHardhatDeploy(hre);
+    }
+  });
+}
 
 extendConfig((resolvedConfig: HardhatConfig) => {
   resolvedConfig.networks.tenderly = {
