@@ -778,10 +778,10 @@
     "@sentry/types" "5.30.0"
     tslib "^1.9.3"
 
-"@tenderly/hardhat-tenderly@1.2.1-beta.8":
-  version "1.2.1-beta.8"
-  resolved "https://registry.yarnpkg.com/@tenderly/hardhat-tenderly/-/hardhat-tenderly-1.2.1-beta.8.tgz#518ae6bb309084a5c0c3e791933ce7e929c9d6e1"
-  integrity sha512-ExE/EYH04cTQ/tg2XQhXR1wcgwLSlBpqibRFaUBKxN5JmTdnhoX4wVvntgsKoMiHmsMqBvQISw7Ft3/pFgSh0w==
+"@tenderly/hardhat-tenderly@1.2.1-beta.9":
+  version "1.2.1-beta.9"
+  resolved "https://registry.yarnpkg.com/@tenderly/hardhat-tenderly/-/hardhat-tenderly-1.2.1-beta.9.tgz#8654b053b1c40216ca06a8b6b3922a9e6d3ff0c9"
+  integrity sha512-WFoI5O9r4Gset3C3WebM/Za+T2GiTl1bmxjfogKWAjPtjvvG0uGInaNdn+eOrWGWAFsK36ACCVUmwU2VNex5jg==
   dependencies:
     "@ethersproject/bignumber" "^5.7.0"
     "@nomiclabs/hardhat-ethers" "^2.1.1"
