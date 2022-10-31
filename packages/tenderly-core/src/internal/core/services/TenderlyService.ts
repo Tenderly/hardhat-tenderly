@@ -8,7 +8,6 @@ import {
   NETWORK_FETCH_FAILED_ERR_MSG,
   LATEST_BLOCK_NUMBER_FETCH_FAILED_ERR_MSG,
   ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG,
-  TRANSACTION_FETCH_FAILED_ERR_MSG,
   PRINCIPAL_FETCH_FAILED_ERR_MSG,
   PROJECTS_FETCH_FAILED_ERR_MSG,
 } from "../common/errors";
@@ -20,7 +19,6 @@ import {
   TenderlyContractUploadRequest,
   TenderlyForkContractUploadRequest,
 } from "../types";
-import { Transaction } from "../../virtual-network/types";
 import { TenderlyApiService } from "./TenderlyApiService";
 
 export class TenderlyService {
@@ -192,30 +190,6 @@ export class TenderlyService {
       logApiError(err);
       console.log(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
     }
-  }
-
-  public async getTransaction(
-    accountSlug: string,
-    projectSlug: string,
-    forkId: string,
-    transactionId: string
-  ): Promise<Transaction | null> {
-    if (!TenderlyApiService.isAuthenticated()) {
-      console.log(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
-      return null;
-    }
-
-    const tenderlyApi = TenderlyApiService.configureInstance();
-    try {
-      const res = await tenderlyApi.get(
-        `/api/v1/account/${accountSlug}/project/${projectSlug}/fork/${forkId}/transaction/${transactionId}`
-      );
-      return res.data.fork_transaction;
-    } catch (err) {
-      logApiError(err);
-      console.log(`Error in ${this.pluginName}: ${TRANSACTION_FETCH_FAILED_ERR_MSG}`);
-    }
-    return null;
   }
 
   public async getPrincipal(): Promise<Principal | null> {

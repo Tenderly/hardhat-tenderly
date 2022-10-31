@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 import { Command } from "commander";
-import { NetworksCommand, LoginCommand, VNetCommand } from "./commands";
+import { NetworksCommand, LoginCommand } from "./commands";
 
 process.openStdin().on("keypress", (chunk, key) => {
   if (key && key.name === "c" && key.ctrl) {
@@ -14,7 +14,6 @@ process.openStdin().on("keypress", (chunk, key) => {
     const program = new Command();
     program.addCommand(LoginCommand);
     program.addCommand(NetworksCommand);
-    program.addCommand(VNetCommand);
 
     await program.parseAsync(process.argv);
 

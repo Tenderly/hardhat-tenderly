@@ -10,7 +10,6 @@ import {
   NETWORK_NAME_CHAIN_ID_MAP,
   TENDERLY_JSON_RPC_BASE_URL,
 } from "tenderly/common/constants";
-import { getAccessToken } from "tenderly/src/utils/config";
 
 import { Tenderly } from "../Tenderly";
 import { TenderlyNetwork } from "../TenderlyNetwork";
@@ -31,20 +30,9 @@ extendEnvironment((hre: HardhatRuntimeEnvironment) => {
 });
 
 extendConfig((resolvedConfig: HardhatConfig) => {
-  if (resolvedConfig.networks.tenderly === undefined) {
-    process.env.IS_TENDERLY_NETWORK_AUTO_CREATED = "true";
-    resolvedConfig.networks.tenderly = {
-      accounts: "remote",
-      gas: "auto",
-      gasPrice: "auto",
-      gasMultiplier: 1,
-      httpHeaders: {
-        "X-ACCESS-KEY": getAccessToken(),
-      },
-      timeout: 20000,
-      url: process.env.VNET_URL ?? "",
-    };
-  }
+  resolvedConfig.networks.tenderly = {
+    ...resolvedConfig.networks.tenderly,
+  };
 });
 
 const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
