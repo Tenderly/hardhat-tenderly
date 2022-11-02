@@ -52,7 +52,6 @@
     "cli-table3": "^0.6.2",
     "commander": "^9.4.0",
     "express": "^4.18.1",
-    "got": "11.8.3",
     "hyperlinker": "^1.0.0",
     "js-yaml": "^4.1.0",
     "open": "^8.4.0",
