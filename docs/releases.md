@@ -36,8 +36,7 @@ Open PR with destination to `master` branch and run:
 
 ```bash
 yarn changeset // adding changesets
-yarn changeset version
 git add .
-git commit -m "Version packages"
+git commit -m "Add changeset"
 git push
 ```
