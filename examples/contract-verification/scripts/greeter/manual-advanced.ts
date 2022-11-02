@@ -37,10 +37,7 @@ export async function main() {
       },
       {
         contractName: "console",
-        source: readFileSync(
-          "node_modules/hardhat/console.sol",
-          "utf-8"
-        ).toString(),
+        source: readFileSync("node_modules/hardhat/console.sol", "utf-8").toString(),
         sourcePath: "hardhat/console.sol",
         networks: {},
         compiler: {

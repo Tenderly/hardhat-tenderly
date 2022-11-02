@@ -1,6 +1,6 @@
 // File: scripts/maths/manual-advanced.ts
 import { readFileSync } from "fs";
-import hre, { tenderly } from "hardhat";
+import { tenderly } from "hardhat";
 import { deployCalculator, deployMaths } from "./maths-deployment-ethers";
 
 export async function main() {
@@ -44,10 +44,7 @@ export async function main() {
       },
       {
         contractName: "Maths",
-        source: readFileSync(
-          "contracts/libraries/Maths.sol",
-          "utf-8"
-        ).toString(),
+        source: readFileSync("contracts/libraries/Maths.sol", "utf-8").toString(),
         sourcePath: "libraries/Maths.sol",
         compiler: {
           version: "0.8.9",

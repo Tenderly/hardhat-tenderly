@@ -59,6 +59,7 @@ typings/
 # next.js build output
 .next
 
-.editorconfig
 .env
 .idea
+.vscode
+**/.DS_Store
