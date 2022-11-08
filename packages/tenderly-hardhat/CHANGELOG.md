@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 1.3.1-beta.0
+
+### Patch Changes
+
+- Fix for https://github.com/Tenderly/hardhat-tenderly/issues/84
+
 ## 1.3.0
 
 ### Minor Changes
