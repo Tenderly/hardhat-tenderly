@@ -1,5 +1,12 @@
 # @tenderly/hardhat-tenderly
 
+## 1.3.2
+
+### Patch Changes
+
+- Updated dependencies [[`913aad5`](https://github.com/Tenderly/hardhat-tenderly/commit/913aad5b23e3c3c170a600b7153dfe085be34919)]:
+  - tenderly@0.0.3
+
 ## 1.3.1
 
 ### Patch Changes
