@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 1.3.1
+
+### Patch Changes
+
+- [#86](https://github.com/Tenderly/hardhat-tenderly/pull/86) [`aee1c9b`](https://github.com/Tenderly/hardhat-tenderly/commit/aee1c9be6452842a4eb9090ef2d1b2d62626be23) Thanks [@Riphal](https://github.com/Riphal)! - Fix for https://github.com/Tenderly/hardhat-tenderly/issues/84
+
 ## 1.3.0
 
 ### Minor Changes
