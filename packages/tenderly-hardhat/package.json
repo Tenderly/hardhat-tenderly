@@ -55,7 +55,8 @@
     "fs-extra": "^10.1.0",
     "hardhat": "^2.10.2",
     "hardhat-deploy": "^0.11.14",
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "tenderly": "^0.0.2"
   },
   "peerDependencies": {
     "hardhat": "^2.10.2",
