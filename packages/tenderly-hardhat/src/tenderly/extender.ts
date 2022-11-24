@@ -11,7 +11,7 @@ import {
   TENDERLY_JSON_RPC_BASE_URL,
 } from "tenderly/common/constants";
 
-import { Logger } from "tslog";
+import { logger } from "../utils/logger";
 import { Tenderly } from "../Tenderly";
 import { TenderlyNetwork } from "../TenderlyNetwork";
 import { PLUGIN_NAME } from "../constants";
@@ -19,10 +19,6 @@ import { wrapEthers } from "./ethers";
 import { wrapHHDeployments } from "./hardhat-deploy";
 
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
-const logger = new Logger({
-  prettyLogTemplate: "{{dateIsoStr}} {{logLevelName}} {{name}} =>",
-  name: "HardhatLogger",
-});
 
 export function setup() {
   logger.settings.minLevel = Number(process.env.MIN_LOG_LEVEL);
@@ -31,11 +27,12 @@ export function setup() {
   extendEnvironment((hre: HardhatRuntimeEnvironment) => {
     hre.tenderly = lazyObject(() => new Tenderly(hre));
 
-    logger.trace("Tenderly configuration: ", {
+    logger.trace("Tenderly running configuration: ", {
       username: hre.config.tenderly?.username,
       project: hre.config.tenderly?.project,
       automaticVerification: process.env.AUTOMATIC_VERIFICATION_ENABLED,
       privateVerification: hre.config.tenderly?.privateVerification,
+      networkName: hre.network.name,
     });
 
     extendProvider(hre);
