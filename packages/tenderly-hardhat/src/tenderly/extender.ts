@@ -16,10 +16,11 @@ import { TenderlyNetwork } from "../TenderlyNetwork";
 import { PLUGIN_NAME } from "../constants";
 import { wrapEthers } from "./ethers";
 import { wrapHHDeployments } from "./hardhat-deploy";
-
+import { setupVerboseLogging, verboseLogging } from "tenderly";
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
 export function setup() {
+  setupVerboseLogging(process.env.VERBOSE_LOGGING);
   extendEnvironment((hre: HardhatRuntimeEnvironment) => {
     hre.tenderly = lazyObject(() => new Tenderly(hre));
     extendProvider(hre);
