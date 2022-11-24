@@ -38,8 +38,10 @@ export function setup() {
     extendProvider(hre);
     populateNetworks();
     if (process.env.AUTOMATIC_VERIFICATION_ENABLED === "true") {
+      logger.silly("Automatic verification is enabled, proceeding to extend ethers library...");
       extendEthers(hre);
       extendHardhatDeploy(hre);
+      logger.silly("Wrapping ethers library finished.");
     }
 
     logger.trace("Setup finished.");
@@ -60,12 +62,14 @@ extendConfig((resolvedConfig: HardhatConfig) => {
 
 const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
   if (hre.network.name !== "tenderly") {
+    logger.info("Used network is not 'tenderly' so there is no extending of the provider.");
     return;
   }
 
   if ("url" in hre.network.config && hre.network.config.url !== undefined) {
     const forkID = hre.network.config.url.split("/").pop();
     hre.tenderly.network().setFork(forkID);
+    logger.info(`There is a fork url in the 'tenderly' network`, { forkID });
     return;
   }
 
@@ -79,7 +83,7 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
       hre.ethers.provider = new hre.ethers.providers.Web3Provider(hre.tenderly.network());
     })
     .catch((_) => {
-      console.log(`Error in ${PLUGIN_NAME}: Initializing fork, check your tenderly configuration`);
+      logger.error(`Error happened while trying to initialize fork ${PLUGIN_NAME}. Check your tenderly configuration`);
     });
 };
 
@@ -102,9 +106,10 @@ const populateNetworks = (): void => {
           NETWORK_NAME_CHAIN_ID_MAP[slug] = network.ethereum_network_id;
         }
       }
+      logger.trace("Obtained supported public networks: ", NETWORK_NAME_CHAIN_ID_MAP);
     })
     .catch((_) => {
-      console.log("Error encountered while fetching public networks");
+      logger.error("Error encountered while fetching public networks");
     });
 };
 
