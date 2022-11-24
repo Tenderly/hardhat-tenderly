@@ -11,14 +11,18 @@ import {
   TENDERLY_JSON_RPC_BASE_URL,
 } from "tenderly/common/constants";
 
+import { Logger } from "tslog";
 import { Tenderly } from "../Tenderly";
 import { TenderlyNetwork } from "../TenderlyNetwork";
 import { PLUGIN_NAME } from "../constants";
 import { wrapEthers } from "./ethers";
 import { wrapHHDeployments } from "./hardhat-deploy";
+
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
+const logger = new Logger({ type: "pretty", name: "HardhatLogger" });
 
 export function setup() {
+  logger.info("Setup function has been called, extending environment...");
   extendEnvironment((hre: HardhatRuntimeEnvironment) => {
     hre.tenderly = lazyObject(() => new Tenderly(hre));
     extendProvider(hre);
@@ -28,6 +32,7 @@ export function setup() {
       extendHardhatDeploy(hre);
     }
   });
+  logger.info("Finished setup.");
 }
 
 extendEnvironment((hre: HardhatRuntimeEnvironment) => {
