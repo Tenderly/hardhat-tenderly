@@ -4,9 +4,9 @@ import "./tasks";
 
 import * as tenderlyExtender from "./tenderly/extender";
 
-export function setup(cfg = { automaticVerifications: false, verboseLogging: true }): void {
+export function setup(cfg = { automaticVerifications: false, minLogLevel: 7 }): void {
   process.env.AUTOMATIC_VERIFICATION_ENABLED = cfg.automaticVerifications === true ? "true" : "false";
-  process.env.VERBOSE_LOGGING = cfg.verboseLogging === true ? "true" : "false";
+  process.env.MIN_LOG_LEVEL = cfg.minLogLevel !== undefined ? cfg.minLogLevel.toString() : "7";
 
   tenderlyExtender.setup();
 }

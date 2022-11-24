@@ -25,12 +25,13 @@ const logger = new Logger({
 });
 
 export function setup() {
-  logger.debug("Setting up hardhat-tenderly plugin...");
+  logger.settings.minLevel = Number(process.env.MIN_LOG_LEVEL);
+  logger.trace(`Setting up hardhat-tenderly plugin... Log level set to: ${logger.settings.minLevel}`);
 
   extendEnvironment((hre: HardhatRuntimeEnvironment) => {
     hre.tenderly = lazyObject(() => new Tenderly(hre));
 
-    logger.debug("Tenderly configuration: ", {
+    logger.trace("Tenderly configuration: ", {
       username: hre.config.tenderly?.username,
       project: hre.config.tenderly?.project,
       automaticVerification: process.env.AUTOMATIC_VERIFICATION_ENABLED,
@@ -44,7 +45,7 @@ export function setup() {
       extendHardhatDeploy(hre);
     }
 
-    logger.debug("Setup finished.");
+    logger.trace("Setup finished.");
   });
 }
 
