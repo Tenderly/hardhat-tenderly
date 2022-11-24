@@ -6,12 +6,15 @@ import { TenderlyContract, TenderlyContractConfig } from "tenderly/types";
 import { PLUGIN_NAME } from "../constants";
 import { CONTRACTS_NOT_DETECTED } from "../tenderly/errors";
 import { ContractByName, Metadata } from "../tenderly/types";
+import { logger } from "./logger";
 
 export const getCompilerDataFromContracts = (
   contracts: TenderlyContract[],
   flatContracts: ContractByName[],
   hhConfig: HardhatConfig
 ): TenderlyContractConfig | undefined => {
+  logger.trace("Obtaining compiler data from contracts...");
+
   let contract: TenderlyContract;
   let mainContract: ContractByName;
   let config: TenderlyContractConfig | undefined;
@@ -23,13 +26,14 @@ export const getCompilerDataFromContracts = (
 
       const contractConfig = newCompilerConfig(hhConfig, contract.sourcePath, contract.compiler?.version);
       if (config !== null && config !== undefined && !compareConfigs(contractConfig, config)) {
-        console.log(`Error in ${PLUGIN_NAME}: Different compiler versions provided in same request`);
+        logger.error(`Error in ${PLUGIN_NAME}: Different compiler versions provided in same request`);
         throw new Error("Compiler version mismatch");
       } else {
         config = contractConfig;
       }
     }
   }
+  logger.trace("Compiler data has been obtained.");
 
   return config;
 };
@@ -38,6 +42,8 @@ export const getContracts = async (
   hre: HardhatRuntimeEnvironment,
   flatContracts: ContractByName[]
 ): Promise<TenderlyContract[]> => {
+  logger.trace("Processing contracts from the artifacts/ folder.");
+
   const sourcePaths = await hre.run("compile:solidity:get-source-paths");
   const sourceNames = await hre.run("compile:solidity:get-source-names", {
     sourcePaths,
@@ -90,6 +96,8 @@ export const getContracts = async (
     };
     requestContracts.push(contractToPush);
   }
+
+  logger.trace("Finished processing contracts from the artifacts/ folder.");
   return requestContracts;
 };
 

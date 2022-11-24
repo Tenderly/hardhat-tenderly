@@ -5,6 +5,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { TenderlyService } from "tenderly";
 import { TenderlyArtifact, TenderlyContractUploadRequest, TenderlyForkContractUploadRequest } from "tenderly/types";
 import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";
+import { logger } from "./utils/logger";
 
 import { ContractByName, Metadata } from "./tenderly/types";
 import { CONTRACTS_NOT_DETECTED, NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG } from "./tenderly/errors";
@@ -19,17 +20,27 @@ export class Tenderly {
   private tenderlyService = new TenderlyService(PLUGIN_NAME);
 
   constructor(hre: HardhatRuntimeEnvironment) {
+    logger.silly("Making hardhat Tenderly interface...");
+
     this.env = hre;
     this.tenderlyNetwork = new TenderlyNetwork(hre);
+
+    logger.silly("Finished making hardhat Tenderly interface.");
   }
 
   public async verify(...contracts: any[]): Promise<void> {
+    logger.info("Public verification has been called.");
+
     const priv = this.env.config.tenderly?.privateVerification;
     if (priv !== undefined && priv && this.env.network.name !== "tenderly") {
+      logger.info(
+        "Private verification flag is set to TRUE in tenderly configuration. Redirecting to private verification..."
+      );
       return this.push(...contracts);
     }
 
     if (this.env.network.name === "tenderly") {
+      logger.info("Network parameter is set to 'tenderly', redirecting to fork verification...");
       return this.tenderlyNetwork.verify(contracts);
     }
 
@@ -38,7 +49,7 @@ export class Tenderly {
     const requestData = await this._filterContracts(flatContracts);
 
     if (requestData === null) {
-      console.log("Verification failed");
+      logger.error("Verification failed");
       return;
     }
 
@@ -46,9 +57,11 @@ export class Tenderly {
   }
 
   public async verifyAPI(request: TenderlyContractUploadRequest): Promise<void> {
+    logger.info("Public verification API has been called.");
+
     if (this.env.network.name === "tenderly") {
-      console.log(
-        `Error in ${PLUGIN_NAME}: .verifyAPI() is not available for fork deployments, please use verifyForkAPI().`
+      logger.error(
+        `Error in ${PLUGIN_NAME}: Network parameter is set to 'tenderly' and verifyAPI() is not available for fork deployments, please use verifyForkAPI().`
       );
       return;
     }
@@ -62,9 +75,10 @@ export class Tenderly {
     username: string,
     forkID: string
   ): Promise<void> {
+    logger.info("Fork verification has been called.");
     if (this.env.network.name !== "tenderly") {
       console.log(
-        `Error in ${PLUGIN_NAME}: .verifyForkAPI() is only available for tenderly fork deployments, please use --network tenderly.`
+        `Error in ${PLUGIN_NAME}: Network parameter is not set to 'tenderly' and verifyForkAPI() is only available for tenderly fork deployments, please use --network tenderly.`
       );
       return;
     }
@@ -78,12 +92,19 @@ export class Tenderly {
 
   public setNetwork(network: TenderlyNetwork): TenderlyNetwork {
     this.tenderlyNetwork = network;
+    logger.trace("Network is set to 'tenderly'.", network);
+
     return this.tenderlyNetwork;
   }
 
   public async push(...contracts: any[]): Promise<void> {
+    logger.info("Private verification has been called.");
+
     const priv = this.env.config.tenderly?.privateVerification;
     if (priv !== undefined && !priv) {
+      logger.info(
+        "Private verification flag is set to FALSE in tenderly configuration. Redirecting to public verification..."
+      );
       return this.verify(...contracts);
     }
 
@@ -92,14 +113,14 @@ export class Tenderly {
     const requestData = await this._filterContracts(flatContracts);
 
     if (this.env.config.tenderly.project === undefined) {
-      console.log(
+      logger.error(
         `Error in ${PLUGIN_NAME}: Please provide the project field in the tenderly object in hardhat.config.js`
       );
       return;
     }
 
     if (this.env.config.tenderly.username === undefined) {
-      console.log(
+      logger.error(
         `Error in ${PLUGIN_NAME}: Please provide the username field in the tenderly object in hardhat.config.js`
       );
       return;
@@ -122,9 +143,11 @@ export class Tenderly {
     tenderlyProject: string,
     username: string
   ): Promise<void> {
+    logger.info("Private verification API has been called.");
+
     if (this.env.network.name === "tenderly") {
-      console.log(
-        `Error in ${PLUGIN_NAME}: .pushAPI() is not available for fork deployments, please use verifyForkAPI().`
+      logger.error(
+        `Error in ${PLUGIN_NAME}: Network parameter is set to 'tenderly' and pushAPI() is not available for fork deployments, please use verifyForkAPI().`
       );
       return;
     }
@@ -133,7 +156,9 @@ export class Tenderly {
   }
 
   public async persistArtifacts(...contracts: ContractByName[]) {
+    logger.info("Artifact persisting has been called.");
     if (contracts.length === 0) {
+      logger.error("No contracts were provided during artifact persisting.");
       return;
     }
 
@@ -201,6 +226,8 @@ export class Tenderly {
             abi: contractData.abi,
           };
 
+          logger.trace("Processed artifact: ", artifact);
+
           fs.outputFileSync(`${destPath}${name}.json`, JSON.stringify(artifact));
         }
       }
@@ -208,11 +235,15 @@ export class Tenderly {
   }
 
   private async _filterContracts(flatContracts: ContractByName[]): Promise<TenderlyContractUploadRequest | null> {
+    logger.info("Contract filtering has been called.");
+
     let contract: ContractByName;
     let requestData: TenderlyContractUploadRequest;
     try {
       requestData = await this._getContractData(flatContracts);
+      logger.trace("Request data obtained: ", requestData);
     } catch (e) {
+      logger.error("Error caught while trying to process contracts by name: ", e);
       return null;
     }
 
@@ -222,7 +253,7 @@ export class Tenderly {
           ? this.env.hardhatArguments.network ?? contract.network
           : contract.network;
       if (network === undefined) {
-        console.log(
+        logger.error(
           `Error in ${PLUGIN_NAME}: Please provide a network via the hardhat --network argument or directly in the contract`
         );
         return null;
@@ -232,6 +263,7 @@ export class Tenderly {
         (requestContract) => requestContract.contractName === contract.name
       );
       if (index === -1) {
+        logger.error(`Contract '${contract.name}' was not found in processed data.`);
         continue;
       }
       let chainID: string = NETWORK_NAME_CHAIN_ID_MAP[network!.toLowerCase()];
@@ -240,7 +272,7 @@ export class Tenderly {
       }
 
       if (chainID === undefined) {
-        console.log(
+        logger.error(
           `Error in ${PLUGIN_NAME}: Couldn't identify network. Please provide a chainID in the network config object`
         );
         return null;
@@ -253,6 +285,9 @@ export class Tenderly {
       };
     }
 
+    fs.outputFileSync("filterContractsData.json", requestData);
+    logger.trace("Wrote data to a separate file 'filterContractsData.json' to avoid console clutter.");
+
     return requestData;
   }
 
@@ -261,7 +296,7 @@ export class Tenderly {
 
     const config = getCompilerDataFromContracts(contracts, flatContracts, this.env.config);
     if (config === undefined) {
-      console.log(NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG);
+      logger.error(NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG);
     }
 
     return {
