@@ -19,20 +19,33 @@ import { wrapEthers } from "./ethers";
 import { wrapHHDeployments } from "./hardhat-deploy";
 
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
-const logger = new Logger({ type: "pretty", name: "HardhatLogger" });
+const logger = new Logger({
+  prettyLogTemplate: "{{dateIsoStr}} {{logLevelName}} {{name}} =>",
+  name: "HardhatLogger",
+});
 
 export function setup() {
-  logger.info("Setup function has been called, extending environment...");
+  logger.debug("Setting up hardhat-tenderly plugin...");
+
   extendEnvironment((hre: HardhatRuntimeEnvironment) => {
     hre.tenderly = lazyObject(() => new Tenderly(hre));
+
+    logger.debug("Tenderly configuration: ", {
+      username: hre.config.tenderly?.username,
+      project: hre.config.tenderly?.project,
+      automaticVerification: process.env.AUTOMATIC_VERIFICATION_ENABLED,
+      privateVerification: hre.config.tenderly?.privateVerification,
+    });
+
     extendProvider(hre);
     populateNetworks();
     if (process.env.AUTOMATIC_VERIFICATION_ENABLED === "true") {
       extendEthers(hre);
       extendHardhatDeploy(hre);
     }
+
+    logger.debug("Setup finished.");
   });
-  logger.info("Finished setup.");
 }
 
 extendEnvironment((hre: HardhatRuntimeEnvironment) => {
