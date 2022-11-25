@@ -22,12 +22,12 @@ const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
 export function setup() {
   logger.settings.minLevel = Number(process.env.MIN_LOG_LEVEL);
-  logger.trace(`Setting up hardhat-tenderly plugin... Log level set to: ${logger.settings.minLevel}`);
+  logger.debug(`Setting up hardhat-tenderly plugin... Log level set to: ${logger.settings.minLevel}`);
 
   extendEnvironment((hre: HardhatRuntimeEnvironment) => {
     hre.tenderly = lazyObject(() => new Tenderly(hre));
 
-    logger.trace("Tenderly running configuration: ", {
+    logger.info("Tenderly running configuration: ", {
       username: hre.config.tenderly?.username,
       project: hre.config.tenderly?.project,
       automaticVerification: process.env.AUTOMATIC_VERIFICATION_ENABLED,
@@ -38,13 +38,13 @@ export function setup() {
     extendProvider(hre);
     populateNetworks();
     if (process.env.AUTOMATIC_VERIFICATION_ENABLED === "true") {
-      logger.silly("Automatic verification is enabled, proceeding to extend ethers library...");
+      logger.debug("Automatic verification is enabled, proceeding to extend ethers library...");
       extendEthers(hre);
       extendHardhatDeploy(hre);
-      logger.silly("Wrapping ethers library finished.");
+      logger.debug("Wrapping ethers library finished.");
     }
 
-    logger.trace("Setup finished.");
+    logger.debug("Setup finished.");
   });
 }
 
@@ -106,7 +106,7 @@ const populateNetworks = (): void => {
           NETWORK_NAME_CHAIN_ID_MAP[slug] = network.ethereum_network_id;
         }
       }
-      logger.trace("Obtained supported public networks: ", NETWORK_NAME_CHAIN_ID_MAP);
+      logger.info("Obtained supported public networks: ", NETWORK_NAME_CHAIN_ID_MAP);
     })
     .catch((_) => {
       logger.error("Error encountered while fetching public networks");

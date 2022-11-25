@@ -20,12 +20,12 @@ export class Tenderly {
   private tenderlyService = new TenderlyService(PLUGIN_NAME);
 
   constructor(hre: HardhatRuntimeEnvironment) {
-    logger.silly("Making hardhat Tenderly interface...");
+    logger.debug("Making hardhat Tenderly interface...");
 
     this.env = hre;
     this.tenderlyNetwork = new TenderlyNetwork(hre);
 
-    logger.silly("Finished making hardhat Tenderly interface.");
+    logger.debug("Finished making hardhat Tenderly interface.");
   }
 
   public async verify(...contracts: any[]): Promise<void> {
@@ -175,10 +175,15 @@ export class Tenderly {
 
     data._resolvedFiles.forEach((resolvedFile: any, _: any) => {
       const sourcePath: string = resolvedFile.sourceName;
+      logger.trace("Currently processing file:", sourcePath);
+
       const name = sourcePath.split("/").slice(-1)[0].split(".")[0];
+      logger.trace("Obtained name from source file:", name);
 
       for (contract of contracts) {
         if (contract.name === name) {
+          logger.trace("Found contract:", contract.name);
+
           const network =
             this.env.hardhatArguments.network !== "hardhat"
               ? this.env.hardhatArguments.network ?? contract.network
@@ -241,7 +246,7 @@ export class Tenderly {
     let requestData: TenderlyContractUploadRequest;
     try {
       requestData = await this._getContractData(flatContracts);
-      logger.trace("Request data obtained: ", requestData);
+      logger.silly("Request data obtained: ", requestData);
     } catch (e) {
       logger.error("Error caught while trying to process contracts by name: ", e);
       return null;
@@ -258,6 +263,7 @@ export class Tenderly {
         );
         return null;
       }
+      logger.trace("Found network is:", network);
 
       const index = requestData.contracts.findIndex(
         (requestContract) => requestContract.contractName === contract.name
@@ -270,6 +276,7 @@ export class Tenderly {
       if (this.env.config.networks[network!].chainId !== undefined) {
         chainID = this.env.config.networks[network!].chainId!.toString();
       }
+      logger.trace(`ChainID for network '${network}' is ${chainID}`);
 
       if (chainID === undefined) {
         logger.error(
@@ -285,8 +292,15 @@ export class Tenderly {
       };
     }
 
-    fs.outputFileSync("filterContractsData.json", requestData);
-    logger.trace("Wrote data to a separate file 'filterContractsData.json' to avoid console clutter.");
+    if (
+      process.env.MIN_LOG_LEVEL !== undefined &&
+      process.env.MIN_LOG_LEVEL !== null &&
+      process.env.MIN_LOG_LEVEL !== "" &&
+      Number(process.env.MIN_LOG_LEVEL) <= 2
+    ) {
+      fs.outputFileSync("./filterContractsData.json", JSON.stringify(requestData));
+      logger.debug("Wrote data to a separate file 'filterContractsData.json' to avoid console clutter.");
+    }
 
     return requestData;
   }

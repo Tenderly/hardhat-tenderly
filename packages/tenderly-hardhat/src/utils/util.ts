@@ -13,7 +13,7 @@ export const getCompilerDataFromContracts = (
   flatContracts: ContractByName[],
   hhConfig: HardhatConfig
 ): TenderlyContractConfig | undefined => {
-  logger.trace("Obtaining compiler data from contracts...");
+  logger.debug("Obtaining compiler data from contracts...");
 
   let contract: TenderlyContract;
   let mainContract: ContractByName;
@@ -23,6 +23,7 @@ export const getCompilerDataFromContracts = (
       if (mainContract.name !== contract.contractName) {
         continue;
       }
+      logger.trace("Currently obtaining compiler data from contract:", mainContract.name);
 
       const contractConfig = newCompilerConfig(hhConfig, contract.sourcePath, contract.compiler?.version);
       if (config !== null && config !== undefined && !compareConfigs(contractConfig, config)) {
@@ -33,7 +34,8 @@ export const getCompilerDataFromContracts = (
       }
     }
   }
-  logger.trace("Compiler data has been obtained.");
+  logger.debug("Compiler data has been obtained.");
+  logger.silly("Obtained compiler configuration is:", config);
 
   return config;
 };
@@ -42,7 +44,7 @@ export const getContracts = async (
   hre: HardhatRuntimeEnvironment,
   flatContracts: ContractByName[]
 ): Promise<TenderlyContract[]> => {
-  logger.trace("Processing contracts from the artifacts/ folder.");
+  logger.debug("Processing contracts from the artifacts/ folder.");
 
   const sourcePaths = await hre.run("compile:solidity:get-source-paths");
   const sourceNames = await hre.run("compile:solidity:get-source-names", {
@@ -63,20 +65,41 @@ export const getContracts = async (
     },
     sources: {},
   };
+  logger.trace("Extracted compiler version is:", metadata.defaultCompiler.version);
 
   data._resolvedFiles.forEach((resolvedFile: any, _: any) => {
     const sourcePath: string = resolvedFile.sourceName;
+    logger.trace("Currently processing file:", sourcePath);
+
     const name = sourcePath.split("/").slice(-1)[0].split(".")[0];
+    logger.trace("Obtained name from source file:", name);
 
     for (contract of flatContracts) {
       if (contract.name !== name) {
         continue;
       }
+      logger.trace("Found contract:", contract.name);
 
       metadata.sources[sourcePath] = {
         content: resolvedFile.content.rawContent,
         versionPragma: resolvedFile.content.versionPragmas[0],
       };
+
+      if (
+        metadata.sources[sourcePath].content === undefined ||
+        metadata.sources[sourcePath].content === null ||
+        metadata.sources[sourcePath].content === ""
+      ) {
+        logger.error("Metadata source content is empty!");
+      }
+      if (
+        metadata.sources[sourcePath].versionPragma === undefined ||
+        metadata.sources[sourcePath].versionPragma === null ||
+        metadata.sources[sourcePath].versionPragma === ""
+      ) {
+        logger.error("Metadata source version pragma is empty!");
+      }
+
       const visited: Record<string, boolean> = {};
       resolveDependencies(data, sourcePath, metadata, visited);
     }
@@ -97,7 +120,8 @@ export const getContracts = async (
     requestContracts.push(contractToPush);
   }
 
-  logger.trace("Finished processing contracts from the artifacts/ folder.");
+  logger.silly("Finished processing contracts from the artifacts/ folder:", requestContracts);
+
   return requestContracts;
 };
 
@@ -144,6 +168,8 @@ export const newCompilerConfig = (
   contractCompiler?: string
 ): TenderlyContractConfig => {
   if (sourcePath !== undefined && config.solidity.overrides[sourcePath] !== undefined) {
+    logger.trace("There is an compiler config override for:", sourcePath);
+
     return {
       compiler_version: config.solidity.overrides[sourcePath].version,
       optimizations_used: config.solidity.overrides[sourcePath].settings.optimizer.enabled,
@@ -152,9 +178,13 @@ export const newCompilerConfig = (
       debug: config.solidity.overrides[sourcePath].settings.debug,
     };
   }
+
   if (contractCompiler !== undefined) {
+    logger.trace("There is a provided compiler configuration, determining it...");
     return determineCompilerConfig(config.solidity.compilers, contractCompiler);
   }
+
+  logger.trace("Returning the first compiler in the configuration");
 
   return {
     compiler_version: config.solidity.compilers[0].version,
@@ -183,6 +213,8 @@ export const extractCompilerVersion = (config: HardhatConfig, sourcePath?: strin
 const determineCompilerConfig = (compilers: SolcConfig[], contractCompiler: string): TenderlyContractConfig => {
   for (const compiler of compilers) {
     if (compareVersions(compiler.version, contractCompiler)) {
+      logger.trace("Provided compiler matched the version: ", compiler.version);
+
       return {
         compiler_version: compiler.version,
         optimizations_used: compiler.settings.optimizer.enabled,
@@ -192,6 +224,10 @@ const determineCompilerConfig = (compilers: SolcConfig[], contractCompiler: stri
       };
     }
   }
+
+  logger.trace(
+    "Couldn't find the provided compiler among compilers in the configuration, returning the configuration of the first one"
+  );
 
   return {
     compiler_version: compilers[0].version,
