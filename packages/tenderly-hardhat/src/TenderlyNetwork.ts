@@ -1,16 +1,16 @@
 import * as axios from "axios";
 
-import {HardhatRuntimeEnvironment} from "hardhat/types";
-import {TenderlyService} from "tenderly";
-import {TenderlyForkContractUploadRequest} from "tenderly/types";
-import {getConfig, writeConfig} from "tenderly/utils/config";
-import {TENDERLY_JSON_RPC_BASE_URL} from "tenderly/common/constants";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { TenderlyService } from "tenderly";
+import { TenderlyForkContractUploadRequest } from "tenderly/types";
+import { getConfig, writeConfig } from "tenderly/utils/config";
+import { TENDERLY_JSON_RPC_BASE_URL } from "tenderly/common/constants";
 
-import {PLUGIN_NAME} from "./constants";
-import {ContractByName} from "./tenderly/types";
-import {NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG} from "./tenderly/errors";
-import {getCompilerDataFromContracts, getContracts} from "./utils/util";
-import {logger} from "./utils/logger";
+import { PLUGIN_NAME } from "./constants";
+import { ContractByName } from "./tenderly/types";
+import { NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG } from "./tenderly/errors";
+import { getCompilerDataFromContracts, getContracts } from "./utils/util";
+import { logger } from "./utils/logger";
 
 export class TenderlyNetwork {
   public host: string;
@@ -176,7 +176,7 @@ export class TenderlyNetwork {
 
     const username: string = this.env.config.tenderly.username;
     const projectID: string = this.env.config.tenderly.project;
-    logger.trace("Username and projectID obtained from tenderly configuration:", {username, projectID});
+    logger.trace("Username and projectID obtained from tenderly configuration:", { username, projectID });
 
     try {
       logger.debug("Making a call to initialize fork...");
