@@ -4,6 +4,7 @@ import { extendConfig, extendEnvironment } from "hardhat/config";
 import { HardhatRuntimeEnvironment, HttpNetworkConfig, HardhatConfig } from "hardhat/types";
 import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/types";
 import { TenderlyService } from "tenderly";
+import { logger as serviceLogger } from "tenderly/utils/logger";
 import { TenderlyNetwork as TenderlyNetworkInterface } from "tenderly/types";
 import {
   CHAIN_ID_NETWORK_NAME_MAP,
@@ -21,8 +22,16 @@ import { wrapHHDeployments } from "./hardhat-deploy";
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
 export function setup() {
-  logger.settings.minLevel = Number(process.env.MIN_LOG_LEVEL);
-  logger.debug(`Setting up hardhat-tenderly plugin... Log level set to: ${logger.settings.minLevel}`);
+  logger.settings.minLevel = Number(process.env.MIN_LOG_LEVEL_HARDHAT);
+  logger.debug(
+    `Setting up hardhat-tenderly plugin... Log level of hardhat tenderly plugin set to: ${logger.settings.minLevel}`
+  );
+
+  // serviceLogger is used here just for initialization, nothing else, it will be used in TenderlyService.ts
+  serviceLogger.settings.minLevel = Number(process.env.MIN_LOG_LEVEL_SERVICE);
+  serviceLogger.debug(
+    `Setting up hardhat-tenderly plugin... Log level of tenderly service set to: ${serviceLogger.settings.minLevel}`
+  );
 
   extendEnvironment((hre: HardhatRuntimeEnvironment) => {
     hre.tenderly = lazyObject(() => new Tenderly(hre));

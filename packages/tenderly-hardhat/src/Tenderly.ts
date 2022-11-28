@@ -17,7 +17,7 @@ export class Tenderly {
   public env: HardhatRuntimeEnvironment;
   public tenderlyNetwork: TenderlyNetwork;
 
-  private tenderlyService = new TenderlyService(PLUGIN_NAME, Number(process.env.MIN_LOG_LEVEL));
+  private tenderlyService = new TenderlyService(PLUGIN_NAME);
 
   constructor(hre: HardhatRuntimeEnvironment) {
     logger.debug("Making hardhat Tenderly interface...");
