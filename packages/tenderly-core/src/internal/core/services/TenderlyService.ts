@@ -25,8 +25,7 @@ import { TenderlyApiService } from "./TenderlyApiService";
 export class TenderlyService {
   private pluginName: string;
 
-  constructor(pluginName: string, minLogLevel: number = 7) {
-    logger.settings.minLevel = minLogLevel;
+  constructor(pluginName: string) {
     logger.info("Made tenderly service with plugin name:", pluginName);
     this.pluginName = pluginName;
   }
