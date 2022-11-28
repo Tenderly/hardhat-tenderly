@@ -22,7 +22,7 @@ export class TenderlyNetwork {
   public accounts: Record<string, string> | undefined;
   public env: HardhatRuntimeEnvironment;
 
-  private tenderlyService = new TenderlyService(PLUGIN_NAME);
+  private tenderlyService = new TenderlyService(PLUGIN_NAME, Number(process.env.MIN_LOG_LEVEL));
 
   constructor(hre: HardhatRuntimeEnvironment) {
     logger.debug("Making an interface towards tenderly network...");

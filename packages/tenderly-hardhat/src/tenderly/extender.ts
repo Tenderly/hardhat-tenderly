@@ -106,7 +106,7 @@ const populateNetworks = (): void => {
           NETWORK_NAME_CHAIN_ID_MAP[slug] = network.ethereum_network_id;
         }
       }
-      logger.info("Obtained supported public networks: ", NETWORK_NAME_CHAIN_ID_MAP);
+      logger.silly("Obtained supported public networks: ", NETWORK_NAME_CHAIN_ID_MAP);
     })
     .catch((_) => {
       logger.error("Error encountered while fetching public networks");

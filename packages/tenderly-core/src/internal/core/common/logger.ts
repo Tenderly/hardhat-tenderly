@@ -1,4 +1,5 @@
 const API_ERR_MSG = "Unexpected error occurred. \n  Error reason %s %s. \n  Error context: %s";
+import { logger } from "../../../utils/logger";
 
 export function logApiError(err: any) {
   // api error
@@ -12,12 +13,12 @@ export function logApiError(err: any) {
       message = err.response.data;
     }
 
-    console.log(API_ERR_MSG, code, codeText, message);
+    logger.error(API_ERR_MSG, code, codeText, message);
     return;
   }
 
   // general error
   if (err instanceof Error) {
-    console.log(err.message);
+    logger.error(err.message);
   }
 }

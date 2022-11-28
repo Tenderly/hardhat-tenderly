@@ -19,23 +19,33 @@ import {
   TenderlyContractUploadRequest,
   TenderlyForkContractUploadRequest,
 } from "../types";
+import { logger } from "../../../utils/logger";
 import { TenderlyApiService } from "./TenderlyApiService";
 
 export class TenderlyService {
   private pluginName: string;
 
-  constructor(pluginName: string) {
+  constructor(pluginName: string, minLogLevel: number = 4) {
+    logger.settings.minLevel = minLogLevel;
+    logger.info("Made tenderly service with plugin name:", pluginName);
     this.pluginName = pluginName;
   }
 
   public async getNetworks(): Promise<TenderlyNetwork[]> {
+    logger.debug("Getting networks has been called.");
+
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
     if (TenderlyApiService.isAuthenticated()) {
+      logger.debug("API service has been authenticated. Configuring instance...");
       tenderlyApi = TenderlyApiService.configureInstance();
+      logger.debug("Instance has been configured.");
     }
 
     try {
+      logger.debug("Making a call to get all of the public networks...");
       const res = await tenderlyApi.get("/api/v1/public-networks");
+      logger.silly("Obtained public networks:", res.data);
+
       return res.data;
     } catch (err) {
       logApiError(err);
