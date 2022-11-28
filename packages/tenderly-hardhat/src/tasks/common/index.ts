@@ -15,7 +15,7 @@ export async function extractContractData(
   config: HardhatConfig,
   run: RunTaskFunction
 ): Promise<TenderlyContract[]> {
-  logger.info("Extracing contract data...");
+  logger.info("Extracting contract data...");
 
   let contract: string;
   const requestContracts: TenderlyContract[] = [];
