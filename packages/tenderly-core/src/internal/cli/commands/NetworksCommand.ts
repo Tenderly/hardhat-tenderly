@@ -1,5 +1,6 @@
 import Table from "cli-table3";
 import commander from "commander";
+import { logger } from "../../../utils/logger";
 
 import { PLUGIN_NAME } from "../../../common/constants";
 import { TenderlyService } from "../../core/services";
@@ -12,6 +13,7 @@ export const NetworksCommand = new commander.Command("networks")
   .option("-v, --verbose", "display detailed network information")
   .action(async (options) => {
     const verbose = options.verbose !== undefined && options.verbose === true;
+    logger.info("Making NetworksCommand... --verbose parameter is:", verbose);
 
     const headers = ["Network ID", "Network name"];
     if (verbose) {
@@ -21,6 +23,8 @@ export const NetworksCommand = new commander.Command("networks")
     const networks = await tenderlyService.getNetworks();
     const filteredNetworks = networks.filter(isNotExcluded);
     filteredNetworks.sort((a, b) => a.sort_order - b.sort_order);
+
+    logger.silly("Filtered networks:", filteredNetworks);
 
     const table = new Table({
       style: { head: ["magenta"] },
@@ -39,6 +43,7 @@ export const NetworksCommand = new commander.Command("networks")
         })
       ))
     );
+    logger.silly("Networks table:", table);
 
     console.log(table.toString());
   });
