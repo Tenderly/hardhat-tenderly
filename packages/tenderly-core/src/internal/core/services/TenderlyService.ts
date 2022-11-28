@@ -25,7 +25,7 @@ import { TenderlyApiService } from "./TenderlyApiService";
 export class TenderlyService {
   private pluginName: string;
 
-  constructor(pluginName: string, minLogLevel: number = 4) {
+  constructor(pluginName: string, minLogLevel: number = 7) {
     logger.settings.minLevel = minLogLevel;
     logger.info("Made tenderly service with plugin name:", pluginName);
     this.pluginName = pluginName;
@@ -55,22 +55,29 @@ export class TenderlyService {
   }
 
   public async getLatestBlockNumber(networkId: string): Promise<string | null> {
+    logger.debug("Getting latest block number...");
+
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
     if (TenderlyApiService.isAuthenticated()) {
       tenderlyApi = TenderlyApiService.configureInstance();
     }
 
     try {
+      logger.trace("Making a call to the api...");
       const res = await tenderlyApi.get(`/api/v1/network/${networkId}/block-number`);
+      logger.trace(`Api successfully returned: ${res.data.block_number}`);
+
       return res.data.block_number;
     } catch (err) {
       logApiError(err);
-      console.log(`Error in ${this.pluginName}: ${LATEST_BLOCK_NUMBER_FETCH_FAILED_ERR_MSG}`);
+      logger.error(`Error in ${this.pluginName}: ${LATEST_BLOCK_NUMBER_FETCH_FAILED_ERR_MSG}`);
     }
     return null;
   }
 
   public async verifyContracts(request: TenderlyContractUploadRequest): Promise<void> {
+    logger.info("Verifying contracts has been called.");
+
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
     if (TenderlyApiService.isAuthenticated()) {
       tenderlyApi = TenderlyApiService.configureInstance();
@@ -78,15 +85,18 @@ export class TenderlyService {
 
     try {
       if (request.contracts.length === 0) {
-        console.log(NO_VERIFIABLE_CONTRACTS_ERR_MSG);
+        logger.error(NO_VERIFIABLE_CONTRACTS_ERR_MSG);
         return;
       }
 
+      logger.debug("Making a call to the api...");
       const res = await tenderlyApi.post("/api/v1/public/verify-contracts", { ...request });
+      logger.debug("API call successfully made.");
+      logger.trace("Retrieved data:", res.data);
 
       const responseData: ContractResponse = res.data;
       if (responseData.bytecode_mismatch_errors !== null) {
-        console.log(`Error in ${this.pluginName}: ${BYTECODE_MISMATCH_ERR_MSG}`);
+        logger.error(`Error in ${this.pluginName}: ${BYTECODE_MISMATCH_ERR_MSG}`);
         return;
       }
 
@@ -96,7 +106,7 @@ export class TenderlyService {
           addresses += `${cont.contractName}, `;
         }
 
-        console.log(`Error in ${this.pluginName}: ${NO_NEW_CONTRACTS_VERIFIED_ERR_MSG}`, addresses);
+        logger.error(`Error in ${this.pluginName}: ${NO_NEW_CONTRACTS_VERIFIED_ERR_MSG}`, addresses);
         return;
       }
 
@@ -112,7 +122,7 @@ export class TenderlyService {
       console.groupEnd();
     } catch (err) {
       logApiError(err);
-      console.log(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
+      logger.error(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
     }
   }
 
@@ -122,19 +132,22 @@ export class TenderlyService {
     username: string
   ): Promise<void> {
     if (!TenderlyApiService.isAuthenticated()) {
-      console.log(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
+      logger.error(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
       return;
     }
 
     const tenderlyApi = TenderlyApiService.configureInstance();
     try {
+      logger.debug("Making a call to the api...");
       const res = await tenderlyApi.post(`/api/v1/account/${username}/project/${tenderlyProject}/contracts`, {
         ...request,
       });
+      logger.debug("Call to the api successfully made.");
+      logger.trace("Retrieved data:", res.data);
 
       const responseData: ContractResponse = res.data;
       if (responseData.bytecode_mismatch_errors !== null) {
-        console.log(`Error in ${this.pluginName}: ${BYTECODE_MISMATCH_ERR_MSG}`);
+        logger.error(`Error in ${this.pluginName}: ${BYTECODE_MISMATCH_ERR_MSG}`);
         return;
       }
 
@@ -144,7 +157,7 @@ export class TenderlyService {
           addresses += `${cont.contractName}, `;
         }
 
-        console.log(`Error in ${this.pluginName}: ${NO_NEW_CONTRACTS_VERIFIED_ERR_MSG}`, addresses);
+        logger.error(`Error in ${this.pluginName}: ${NO_NEW_CONTRACTS_VERIFIED_ERR_MSG}`, addresses);
         return;
       }
 
@@ -154,7 +167,7 @@ export class TenderlyService {
       );
     } catch (err) {
       logApiError(err);
-      console.log(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
+      logger.error(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
     }
   }
 
@@ -164,20 +177,25 @@ export class TenderlyService {
     username: string,
     fork: string
   ): Promise<void> {
+    logger.info("Fork verification has been called.");
+
     if (!TenderlyApiService.isAuthenticated()) {
-      console.log(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
+      logger.error(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
       return;
     }
 
     const tenderlyApi = TenderlyApiService.configureTenderlyRPCInstance();
     try {
+      logger.debug("Making a call to the api...");
       const res = await tenderlyApi.post(`/account/${username}/project/${tenderlyProject}/fork/${fork}/verify`, {
         ...request,
       });
+      logger.debug("Call to the api successfully made.");
+      logger.trace("Retrieved data:", res.data);
 
       const responseData: ContractResponse = res.data;
       if (responseData.bytecode_mismatch_errors !== null) {
-        console.log(BYTECODE_MISMATCH_ERR_MSG);
+        logger.error(BYTECODE_MISMATCH_ERR_MSG);
         return;
       }
 
@@ -187,7 +205,7 @@ export class TenderlyService {
           addresses += `${cont.contractName}, `;
         }
 
-        console.log(`Error in ${this.pluginName}: ${NO_NEW_CONTRACTS_VERIFIED_ERR_MSG}`, addresses);
+        logger.error(`Error in ${this.pluginName}: ${NO_NEW_CONTRACTS_VERIFIED_ERR_MSG}`, addresses);
         return;
       }
 
@@ -198,43 +216,53 @@ export class TenderlyService {
       console.groupEnd();
     } catch (err) {
       logApiError(err);
-      console.log(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
+      logger.error(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
     }
   }
 
   public async getPrincipal(): Promise<Principal | null> {
+    logger.debug("Getting principal has been called.");
+
     if (!TenderlyApiService.isAuthenticated()) {
-      console.log(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
+      logger.error(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
       return null;
     }
 
     const tenderlyApi = TenderlyApiService.configureInstance();
     try {
+      logger.debug("Making a call to the api...");
       const res = await tenderlyApi.get("/api/v1/user");
+      logger.trace("Retrieved data:", { id: res.data.user.id, username: res.data.user.username });
+
       return {
         id: res.data.user.id,
         username: res.data.user.username,
       };
     } catch (err) {
       logApiError(err);
-      console.log(`Error in ${this.pluginName}: ${PRINCIPAL_FETCH_FAILED_ERR_MSG}`);
+      logger.error(`Error in ${this.pluginName}: ${PRINCIPAL_FETCH_FAILED_ERR_MSG}`);
     }
     return null;
   }
 
   public async getProjectSlugs(principalId: string): Promise<Project[]> {
+    logger.debug("Getting project slugs has been called.");
+
     if (!TenderlyApiService.isAuthenticated()) {
-      console.log(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
+      logger.error(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
       return [];
     }
 
     const tenderlyApi = TenderlyApiService.configureInstance();
     try {
+      logger.debug("Making a call to the api...");
       const res = await tenderlyApi.get(`/api/v1/account/${principalId}/projects`);
+      logger.trace("Retrieved data:", res.data.projects);
+
       return res.data.projects;
     } catch (err) {
       logApiError(err);
-      console.log(`Error in ${this.pluginName}: ${PROJECTS_FETCH_FAILED_ERR_MSG}`);
+      logger.error(`Error in ${this.pluginName}: ${PROJECTS_FETCH_FAILED_ERR_MSG}`);
     }
     return [];
   }
