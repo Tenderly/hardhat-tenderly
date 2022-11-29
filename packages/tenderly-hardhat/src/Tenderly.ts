@@ -292,12 +292,7 @@ export class Tenderly {
       };
     }
 
-    if (
-      process.env.MIN_LOG_LEVEL !== undefined &&
-      process.env.MIN_LOG_LEVEL !== null &&
-      process.env.MIN_LOG_LEVEL !== "" &&
-      Number(process.env.MIN_LOG_LEVEL) <= 2
-    ) {
+    if (logger.settings.minLevel <= 2) {
       fs.outputFileSync("./filterContractsData.json", JSON.stringify(requestData));
       logger.debug("Wrote data to a separate file 'filterContractsData.json' to avoid console clutter.");
     }
