@@ -18,6 +18,11 @@ export interface TenderlyContract {
   networks?: Record<string, ContractNetwork>;
 }
 
+export interface TenderlyVerifyContractsSource {
+  name: string;
+  code: string;
+}
+
 export interface TenderlyArtifact {
   address: string;
   metadata: string;
