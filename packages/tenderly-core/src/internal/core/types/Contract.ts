@@ -1,3 +1,5 @@
+import { CompilerConfiguration } from "./Compiler";
+
 export interface TenderlyContractConfig {
   compiler_version?: string;
   optimizations_used?: boolean;
@@ -16,6 +18,13 @@ export interface TenderlyContract {
   sourcePath: string;
   compiler?: ContractCompiler;
   networks?: Record<string, ContractNetwork>;
+}
+
+export interface TenderlyVerificationContract {
+  contractToVerify: string;
+  sources: Record<string, TenderlyVerifyContractsSource>;
+  networks: Record<string, ContractNetwork>;
+  compiler: CompilerConfiguration;
 }
 
 export interface TenderlyVerifyContractsSource {
@@ -52,4 +61,11 @@ export interface BytecodeMismatchError {
   contract_id: string;
   expected: string;
   got: string;
+  similarity: number;
+  assumed_reason: string;
+}
+
+export interface VerificationResult {
+  bytecodeMismatchError: BytecodeMismatchError;
+  verifiedContract: any; // TODO(dusan) document this, it shouldn't be any type
 }

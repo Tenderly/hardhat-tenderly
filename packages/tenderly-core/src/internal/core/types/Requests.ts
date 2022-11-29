@@ -1,5 +1,4 @@
-import { TenderlyContract, TenderlyContractConfig, ContractNetwork, TenderlyVerifyContractsSource } from "./Contract";
-import { CompilerConfiguration } from "./Compiler";
+import { TenderlyContract, TenderlyContractConfig, TenderlyVerificationContract } from "./Contract";
 
 export interface TenderlyContractUploadRequest {
   config: TenderlyContractConfig;
@@ -8,10 +7,7 @@ export interface TenderlyContractUploadRequest {
 }
 
 export interface TenderlyVerifyContractsRequest {
-  contractToVerify: string;
-  sources: Record<string, TenderlyVerifyContractsSource>;
-  networks: Record<string, ContractNetwork>;
-  compiler: CompilerConfiguration;
+  contracts: TenderlyVerificationContract[];
 }
 
 export interface TenderlyForkContractUploadRequest {

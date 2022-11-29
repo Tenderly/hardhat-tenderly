@@ -51,3 +51,17 @@ interface Metadata {
 interface Libraries {
   addresses: Record<string, string>;
 }
+
+export interface SourceLocation {
+  file: string;
+  start: number;
+  end: number;
+}
+
+export interface CompilationError {
+  sourceLocation: SourceLocation;
+  errorType: string;
+  component: string;
+  message: string;
+  formattedMessage: string;
+}
