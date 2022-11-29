@@ -1,5 +1,5 @@
 import { TENDERLY_DASHBOARD_BASE_URL, CHAIN_ID_NETWORK_NAME_MAP } from "../../../common/constants";
-import { logApiError } from "../common/logger";
+import { logApiError, logVerificationResult } from "../common/logger";
 import {
   API_VERIFICATION_REQUEST_ERR_MSG,
   BYTECODE_MISMATCH_ERR_MSG,
@@ -17,7 +17,7 @@ import {
   TenderlyNetwork,
   ContractResponse,
   TenderlyContractUploadRequest,
-  TenderlyForkContractUploadRequest,
+  TenderlyForkContractUploadRequest, TenderlyVerifyContractsRequest, VerifyContractsResponse,
 } from "../types";
 import { logger } from "../../../utils/logger";
 import { TenderlyApiService } from "./TenderlyApiService";
@@ -74,7 +74,7 @@ export class TenderlyService {
     return null;
   }
 
-  public async verifyContracts(request: TenderlyContractUploadRequest): Promise<void> {
+  public async verifyContracts(request: TenderlyVerifyContractsRequest): Promise<void> {
     logger.info("Verifying contracts has been called.");
 
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
@@ -89,36 +89,30 @@ export class TenderlyService {
       }
 
       logger.debug("Making a call to the api...");
-      const res = await tenderlyApi.post("/api/v1/public/verify-contracts", { ...request });
+      const res = await tenderlyApi.post("/api/v1/public/contracts/verify", request);
       logger.debug("API call successfully made.");
       logger.trace("Retrieved data:", res.data);
 
-      const responseData: ContractResponse = res.data;
-      if (responseData.bytecode_mismatch_errors !== null) {
-        logger.error(`Error in ${this.pluginName}: ${BYTECODE_MISMATCH_ERR_MSG}`);
+      const responseData: VerifyContractsResponse = res.data;
+      if (responseData.compilation_errors?.length > 0) {
+        logger.error(
+          "There has been a compilation error during public contract verification. Error data is:",
+          responseData.compilation_errors
+        );
         return;
       }
 
-      if (responseData.contracts.length === 0) {
-        let addresses = "";
-        for (const cont of request.contracts) {
-          addresses += `${cont.contractName}, `;
-        }
-
-        logger.error(`Error in ${this.pluginName}: ${NO_NEW_CONTRACTS_VERIFIED_ERR_MSG}`, addresses);
-        return;
+      for (const verificationResult of responseData.results) {
+        logVerificationResult(verificationResult);
       }
 
-      console.log("Smart Contracts successfully verified");
-      console.group();
-
-      for (const contract of responseData.contracts) {
-        const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/contract/${
-          CHAIN_ID_NETWORK_NAME_MAP[contract.network_id]
-        }/${contract.address}`;
-        console.log(`Contract ${contract.address} verified. You can view the contract at ${contractLink}`);
-      }
-      console.groupEnd();
+      // TODO(dusan) see how to what information should we expose from the verification, and what should we hide
+      // for (const contract of responseData.contracts) {
+      //   const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/contract/${
+      //     CHAIN_ID_NETWORK_NAME_MAP[contract.network_id]
+      //   }/${contract.address}`;
+      //   console.log(`Contract ${contract.address} verified. You can view the contract at ${contractLink}`);
+      // }
     } catch (err) {
       logApiError(err);
       logger.error(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
