@@ -64,8 +64,3 @@ export interface BytecodeMismatchError {
   similarity: number;
   assumed_reason: string;
 }
-
-export interface VerificationResult {
-  bytecodeMismatchError: BytecodeMismatchError;
-  verifiedContract: any; // TODO(dusan) document this, it shouldn't be any type
-}

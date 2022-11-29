@@ -59,9 +59,9 @@ export interface SourceLocation {
 }
 
 export interface CompilationError {
-  sourceLocation: SourceLocation;
-  errorType: string;
+  source_location: SourceLocation;
+  error_type: string;
   component: string;
   message: string;
-  formattedMessage: string;
+  formatted_message: string;
 }
