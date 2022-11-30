@@ -1,7 +1,8 @@
-import { VerificationResult } from "../types";
+import {VerificationResult} from "../types";
 
 const API_ERR_MSG = "Unexpected error occurred. \n  Error reason %s %s. \n  Error context: %s";
 import { logger } from "../../../utils/logger";
+import { CHAIN_ID_NETWORK_NAME_MAP, TENDERLY_DASHBOARD_BASE_URL } from "../../../common/constants";
 
 export function logApiError(err: any) {
   // api error
@@ -31,6 +32,14 @@ export function logVerificationResult(res: VerificationResult) {
     logger.trace("There has been a bytecode mismatch:", res.bytecode_mismatch_error);
     return;
   }
-  console.log("Contract successfully verified:", res.verified_contract);
+
+  const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/contract/${
+    CHAIN_ID_NETWORK_NAME_MAP[res.verified_contract.network_id]
+  }/${res.verified_contract.address}`;
+
+  console.log(
+    `Contract ${res.verified_contract.address} successfully verified. You can view the contract at ${contractLink}`
+  );
+
   logger.trace("Contract successfully verified:", res.verified_contract);
 }

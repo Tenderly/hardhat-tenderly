@@ -105,14 +105,6 @@ export class TenderlyService {
       for (const verificationResult of responseData.results) {
         logVerificationResult(verificationResult);
       }
-
-      // TODO(dusan) see how to what information should we expose from the verification, and what should we hide
-      // for (const contract of responseData.contracts) {
-      //   const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/contract/${
-      //     CHAIN_ID_NETWORK_NAME_MAP[contract.network_id]
-      //   }/${contract.address}`;
-      //   console.log(`Contract ${contract.address} verified. You can view the contract at ${contractLink}`);
-      // }
     } catch (err) {
       logApiError(err);
       logger.error(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
