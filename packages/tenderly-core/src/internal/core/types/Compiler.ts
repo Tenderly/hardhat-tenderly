@@ -1,6 +1,6 @@
 export interface CompilerConfiguration {
   language?: string;
-  version: string;
+  version?: string;
   settings?: CompilerSettings;
 }
 
@@ -39,8 +39,8 @@ interface YulDetails {
 }
 
 interface Debug {
-  revertString: string;
-  debugInfo: string[];
+  revertString?: string;
+  debugInfo?: string[];
 }
 
 interface Metadata {

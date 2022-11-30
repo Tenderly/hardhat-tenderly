@@ -23,8 +23,8 @@ export interface TenderlyContract {
 export interface TenderlyVerificationContract {
   contractToVerify: string;
   sources: Record<string, TenderlyVerifyContractsSource>;
-  networks: Record<string, ContractNetwork>;
-  compiler: CompilerConfiguration;
+  networks?: Record<string, ContractNetwork>;
+  compiler?: CompilerConfiguration;
 }
 
 export interface TenderlyVerifyContractsSource {
