@@ -1,12 +1,103 @@
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatConfig } from "hardhat/src/types/config";
 import { HardhatRuntimeEnvironment, SolcConfig } from "hardhat/types";
-import { TenderlyContract, TenderlyContractConfig } from "tenderly/types";
+import {
+  TenderlyContract,
+  TenderlyContractConfig,
+  TenderlyVerificationContract,
+  TenderlyVerifyContractsSource,
+} from "tenderly/types";
 
+import { CompilerConfiguration } from "tenderly/internal/core/types/Compiler";
 import { PLUGIN_NAME } from "../constants";
 import { CONTRACTS_NOT_DETECTED } from "../tenderly/errors";
 import { ContractByName, Metadata } from "../tenderly/types";
 import { logger } from "./logger";
+
+export const fillCompilerConfigurationInContracts = async (
+  hre: HardhatRuntimeEnvironment,
+  contracts: TenderlyVerificationContract[]
+): Promise<TenderlyVerificationContract[]> => {
+  logger.debug("Filling compiler data in verification contracts...");
+  const hhConfig: HardhatConfig = hre.config;
+
+  for (const contract of contracts) {
+    let contractCompilerConfig: TenderlyContractConfig | undefined;
+    for (const [sourcePath, _] of Object.entries(contract.sources)) {
+      const sourceCompilerConfig: TenderlyContractConfig = newCompilerConfig(
+        hhConfig,
+        sourcePath,
+        extractCompilerVersion(hhConfig, sourcePath, await _getVersionPragma(hre, sourcePath))
+      );
+      if (
+        contractCompilerConfig !== undefined &&
+        contractCompilerConfig !== null &&
+        !compareConfigs(sourceCompilerConfig, contractCompilerConfig)
+      ) {
+        logger.error(`Error in ${PLUGIN_NAME}: Different compiler versions provided in same request`);
+        throw new Error("Compiler version mismatch");
+      } else {
+        contractCompilerConfig = sourceCompilerConfig;
+      }
+    }
+
+    // converting to match api request format
+    contract.compiler = _convertCompilerConfiguration(contractCompilerConfig!);
+
+    logger.silly("Obtained compiler configuration is:", contract.compiler);
+  }
+  logger.debug("Compiler data has been obtained.");
+
+  return contracts;
+};
+
+async function _getVersionPragma(hre: HardhatRuntimeEnvironment, sourcePath: string): Promise<string | undefined> {
+  const sourcePaths = await hre.run("compile:solidity:get-source-paths");
+  const sourceNames = await hre.run("compile:solidity:get-source-names", {
+    sourcePaths,
+  });
+  const data = await hre.run("compile:solidity:get-dependency-graph", {
+    sourceNames,
+  });
+
+  data._resolvedFiles.forEach((resolvedFile: any, _: any) => {
+    if (resolvedFile.sourceName === sourcePath) {
+      return resolvedFile.content.versionPragmas[0];
+    }
+  });
+
+  return undefined;
+}
+
+function _convertCompilerConfiguration(config: TenderlyContractConfig): CompilerConfiguration {
+  const convertedConfig: CompilerConfiguration = {};
+  if (config?.compiler_version !== undefined) {
+    convertedConfig.version = config.compiler_version;
+  }
+  if (config?.evm_version !== undefined) {
+    if (convertedConfig?.settings === undefined) {
+      convertedConfig.settings = {};
+    }
+    convertedConfig.settings.evmVersion = config.evm_version;
+  }
+  if (config?.optimizations_used !== undefined) {
+    if (convertedConfig?.settings === undefined) {
+      convertedConfig.settings = {};
+    }
+    convertedConfig.settings.optimizer = {
+      runs: config.optimizations_count,
+    };
+  }
+  if (config?.debug !== undefined && config.debug?.revertStrings !== undefined) {
+    if (convertedConfig?.settings === undefined) {
+      convertedConfig.settings = {};
+    }
+    convertedConfig.settings.debug = {
+      revertString: config.debug?.revertStrings,
+    };
+  }
+  return convertedConfig;
+}
 
 export const getCompilerDataFromContracts = (
   contracts: TenderlyContract[],
@@ -125,6 +216,69 @@ export const getContracts = async (
   return requestContracts;
 };
 
+export const getVerificationContracts = async (
+  hre: HardhatRuntimeEnvironment,
+  flatContracts: ContractByName[]
+): Promise<TenderlyVerificationContract[]> => {
+  logger.debug("Processing contracts from the artifacts/ folder.");
+
+  const sourcePaths = await hre.run("compile:solidity:get-source-paths");
+  const sourceNames = await hre.run("compile:solidity:get-source-names", {
+    sourcePaths,
+  });
+  const data = await hre.run("compile:solidity:get-dependency-graph", {
+    sourceNames,
+  });
+  if (data.length === 0) {
+    throw new HardhatPluginError(PLUGIN_NAME, CONTRACTS_NOT_DETECTED);
+  }
+
+  let contract: ContractByName;
+  const requestContracts: TenderlyVerificationContract[] = [];
+
+  data._resolvedFiles.forEach((resolvedFile: any, _: any) => {
+    const sourcePath: string = resolvedFile.sourceName;
+    const name = sourcePath.split("/").slice(-1)[0].split(".")[0];
+    const sources: Record<string, TenderlyVerifyContractsSource> = {};
+
+    for (contract of flatContracts) {
+      if (contract.name !== name) {
+        continue;
+      }
+      logger.trace("Currently processing:", {
+        file: sourcePath,
+        contractName: contract.name,
+      });
+
+      sources[sourcePath] = {
+        name: contract.name,
+        code: resolvedFile.content.rawContent,
+      };
+
+      if (
+        sources[sourcePath].code === undefined ||
+        sources[sourcePath].code === null ||
+        sources[sourcePath].code === ""
+      ) {
+        logger.error("Metadata source content is empty!");
+      }
+
+      const visited: Record<string, boolean> = {};
+      resolveDependenciesWithSources(data, sourcePath, sources, visited);
+
+      const contractToPush: TenderlyVerificationContract = {
+        contractToVerify: contract.name,
+        sources,
+      };
+      requestContracts.push(contractToPush);
+    }
+  });
+
+  logger.silly("Finished processing contracts from the artifacts/ folder:", requestContracts);
+
+  return requestContracts;
+};
+
 export const resolveDependencies = (
   dependencyData: any,
   sourcePath: string,
@@ -142,6 +296,29 @@ export const resolveDependencies = (
     metadata.sources[resolvedDependency.sourceName] = {
       content: resolvedDependency.content.rawContent,
       versionPragma: resolvedDependency.content.versionPragmas[0],
+    };
+  });
+};
+
+export const resolveDependenciesWithSources = (
+  dependencyData: any,
+  sourcePath: string,
+  sources: Record<string, TenderlyVerifyContractsSource>,
+  visited: Record<string, boolean>
+): void => {
+  if (visited[sourcePath]) {
+    return;
+  }
+
+  visited[sourcePath] = true;
+
+  dependencyData._dependenciesPerFile.get(sourcePath).forEach((resolvedDependency: any, _: any) => {
+    resolveDependenciesWithSources(dependencyData, resolvedDependency.sourceName, sources, visited);
+
+    const name = resolvedDependency.sourceName.split("/").slice(-1)[0].split(".")[0];
+    sources[resolvedDependency.sourceName] = {
+      name,
+      code: resolvedDependency.content.rawContent,
     };
   });
 };

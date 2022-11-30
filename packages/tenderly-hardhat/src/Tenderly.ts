@@ -5,11 +5,17 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { TenderlyService } from "tenderly";
 import { TenderlyArtifact, TenderlyContractUploadRequest, TenderlyForkContractUploadRequest } from "tenderly/types";
 import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";
+import { TenderlyVerifyContractsRequest } from "tenderly/internal/core/types";
 import { logger } from "./utils/logger";
 
 import { ContractByName, Metadata } from "./tenderly/types";
 import { CONTRACTS_NOT_DETECTED, NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG } from "./tenderly/errors";
-import { extractCompilerVersion, getCompilerDataFromContracts, getContracts, resolveDependencies } from "./utils/util";
+import {
+  extractCompilerVersion,
+  fillCompilerConfigurationInContracts,
+  getVerificationContracts,
+  resolveDependencies,
+} from "./utils/util";
 import { DEFAULT_CHAIN_ID, PLUGIN_NAME } from "./constants";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 
@@ -239,11 +245,11 @@ export class Tenderly {
     });
   }
 
-  private async _filterContracts(flatContracts: ContractByName[]): Promise<TenderlyContractUploadRequest | null> {
+  private async _filterContracts(flatContracts: ContractByName[]): Promise<TenderlyVerifyContractsRequest | null> {
     logger.info("Contract filtering has been called.");
 
     let contract: ContractByName;
-    let requestData: TenderlyContractUploadRequest;
+    let requestData: TenderlyVerifyContractsRequest;
     try {
       requestData = await this._getContractData(flatContracts);
       logger.silly("Request data obtained: ", requestData);
@@ -266,7 +272,7 @@ export class Tenderly {
       logger.trace("Found network is:", network);
 
       const index = requestData.contracts.findIndex(
-        (requestContract) => requestContract.contractName === contract.name
+        (requestContract) => requestContract.contractToVerify === contract.name
       );
       if (index === -1) {
         logger.error(`Contract '${contract.name}' was not found in processed data.`);
@@ -300,17 +306,16 @@ export class Tenderly {
     return requestData;
   }
 
-  private async _getContractData(flatContracts: ContractByName[]): Promise<TenderlyContractUploadRequest> {
-    const contracts = await getContracts(this.env, flatContracts);
+  private async _getContractData(flatContracts: ContractByName[]): Promise<TenderlyVerifyContractsRequest> {
+    let contracts = await getVerificationContracts(this.env, flatContracts);
 
-    const config = getCompilerDataFromContracts(contracts, flatContracts, this.env.config);
-    if (config === undefined) {
+    contracts = await fillCompilerConfigurationInContracts(this.env, contracts);
+    if (contracts === undefined) {
       logger.error(NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG);
     }
 
     return {
       contracts,
-      config: config!,
     };
   }
 }
