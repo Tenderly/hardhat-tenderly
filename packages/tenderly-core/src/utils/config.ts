@@ -15,7 +15,23 @@ export function getConfig(): TenderlyConfig {
     const fileData = fs.readFileSync(configFilePath);
 
     const tenderlyConfig = yaml.load(fileData.toString()) as TenderlyConfig;
-    logger.trace("Tenderly config exists. Value of the config:", tenderlyConfig);
+    logger.trace("Tenderly config exists. Value of the config:", {
+      email: tenderlyConfig.email,
+      account_id: tenderlyConfig.account_id,
+      username: tenderlyConfig.username,
+      access_key:
+        tenderlyConfig.access_key !== undefined &&
+        tenderlyConfig.access_key !== null &&
+        tenderlyConfig.access_key !== ""
+          ? "super secret access_key is set"
+          : "undefined or null or empty string",
+      access_key_id:
+        tenderlyConfig.access_key_id !== undefined &&
+        tenderlyConfig.access_key_id !== null &&
+        tenderlyConfig.access_key_id !== ""
+          ? "super secret access_key_id is set"
+          : "undefined or null or empty string",
+    });
 
     return tenderlyConfig;
   }

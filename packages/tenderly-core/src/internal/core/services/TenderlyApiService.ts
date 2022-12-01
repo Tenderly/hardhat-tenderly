@@ -13,7 +13,14 @@ export class TenderlyApiService {
       baseURL: TENDERLY_API_BASE_URL,
       accessKey: tdlyConfig.access_key,
     };
-    logger.debug("Configured instance with parameters:", params);
+
+    logger.debug("Configured instance with parameters:", {
+      baseURL: TENDERLY_API_BASE_URL,
+      accessKey:
+        tdlyConfig.access_key !== undefined && tdlyConfig.access_key !== null && tdlyConfig.access_key !== ""
+          ? "super secret access_key is set"
+          : "undefined or null or empty string",
+    });
 
     return axios.default.create(params);
   }
