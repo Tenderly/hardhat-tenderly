@@ -26,7 +26,6 @@ export class TenderlyService {
   private pluginName: string;
 
   constructor(pluginName: string) {
-    logger.info("Made tenderly service with plugin name:", pluginName);
     this.pluginName = pluginName;
   }
 

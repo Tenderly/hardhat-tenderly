@@ -292,10 +292,7 @@ export class Tenderly {
       };
     }
 
-    if (logger.settings.minLevel <= 2) {
-      fs.outputFileSync("./filterContractsData.json", JSON.stringify(requestData));
-      logger.debug("Wrote data to a separate file 'filterContractsData.json' to avoid console clutter.");
-    }
+    logger.debug("Processed request data from _filterContracts:", requestData);
 
     return requestData;
   }
