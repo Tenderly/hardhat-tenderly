@@ -22,19 +22,25 @@ import { wrapHHDeployments } from "./hardhat-deploy";
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
 export function setup() {
-  logger.settings.minLevel = Number(process.env.MIN_LOG_LEVEL_HARDHAT);
-  logger.debug(
-    `Setting up hardhat-tenderly plugin... Log level of hardhat tenderly plugin set to: ${logger.settings.minLevel}`
-  );
-
-  // serviceLogger is used here just for initialization, nothing else, it will be used in TenderlyService.ts
-  serviceLogger.settings.minLevel = Number(process.env.MIN_LOG_LEVEL_SERVICE);
-  serviceLogger.debug(
-    `Setting up hardhat-tenderly plugin... Log level of tenderly service set to: ${serviceLogger.settings.minLevel}`
-  );
+  // set to loggers to error level by default
+  logger.settings.minLevel = 4;
+  serviceLogger.settings.minLevel = 4;
 
   extendEnvironment((hre: HardhatRuntimeEnvironment) => {
     hre.tenderly = lazyObject(() => new Tenderly(hre));
+
+    if (hre.hardhatArguments.verbose) {
+      logger.settings.minLevel = 1; // trace level
+      serviceLogger.settings.minLevel = 1; // trace level
+    }
+    logger.info(
+      `Setting up hardhat-tenderly plugin... Log level of hardhat tenderly plugin set to: ${logger.settings.minLevel}`
+    );
+    // serviceLogger is used here just for initialization, nothing else, it will be used in TenderlyService.ts
+    serviceLogger.info(`Log level of tenderly service set to: ${serviceLogger.settings.minLevel}`);
+
+    const pjson = require("../../package.json");
+    logger.info("@tenderly/hardhat-tenderly version:", pjson.version);
 
     logger.info("Tenderly running configuration: ", {
       username: hre.config.tenderly?.username,

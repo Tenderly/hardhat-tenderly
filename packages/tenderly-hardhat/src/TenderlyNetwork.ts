@@ -31,13 +31,11 @@ export class TenderlyNetwork {
     this.connected = true;
 
     const tdlyGlobalConfig = getConfig();
-    logger.info("Obtained global tenderly config:", tdlyGlobalConfig);
 
     this.accessKey = tdlyGlobalConfig?.access_key;
 
     this.tenderlyJsonRpc = this._configureTenderlyRPCInstance();
     this.host = this.tenderlyJsonRpc.defaults.baseURL!;
-    logger.info("Obtained tenderly json rpc:", tdlyGlobalConfig);
 
     if (hre.network.name === "tenderly" && "url" in hre.network.config && hre.network.config.url !== undefined) {
       this.forkID = hre.network.config.url.split("/").pop();

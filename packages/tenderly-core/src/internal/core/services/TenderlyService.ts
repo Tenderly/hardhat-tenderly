@@ -1,4 +1,4 @@
-import { TENDERLY_DASHBOARD_BASE_URL, CHAIN_ID_NETWORK_NAME_MAP } from "../../../common/constants";
+import { TENDERLY_DASHBOARD_BASE_URL } from "../../../common/constants";
 import { logApiError, logVerificationResult } from "../common/logger";
 import {
   API_VERIFICATION_REQUEST_ERR_MSG,
@@ -17,7 +17,9 @@ import {
   TenderlyNetwork,
   ContractResponse,
   TenderlyContractUploadRequest,
-  TenderlyForkContractUploadRequest, TenderlyVerifyContractsRequest, VerifyContractsResponse,
+  TenderlyForkContractUploadRequest,
+  TenderlyVerifyContractsRequest,
+  VerifyContractsResponse,
 } from "../types";
 import { logger } from "../../../utils/logger";
 import { TenderlyApiService } from "./TenderlyApiService";
@@ -26,7 +28,6 @@ export class TenderlyService {
   private pluginName: string;
 
   constructor(pluginName: string) {
-    logger.info("Made tenderly service with plugin name:", pluginName);
     this.pluginName = pluginName;
   }
 
