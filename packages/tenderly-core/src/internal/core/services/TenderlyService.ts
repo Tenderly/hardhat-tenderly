@@ -98,6 +98,11 @@ export class TenderlyService {
         return;
       }
 
+      if (responseData.contracts === null) {
+        logger.error("API call returned null value for contracts.");
+        return;
+      }
+
       if (responseData.contracts.length === 0) {
         let addresses = "";
         for (const cont of request.contracts) {

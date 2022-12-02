@@ -39,6 +39,9 @@ export function setup() {
     // serviceLogger is used here just for initialization, nothing else, it will be used in TenderlyService.ts
     serviceLogger.info(`Log level of tenderly service set to: ${serviceLogger.settings.minLevel}`);
 
+    const pjson = require("../../package.json");
+    logger.info("@tenderly/hardhat-tenderly version:", pjson.version);
+
     logger.info("Tenderly running configuration: ", {
       username: hre.config.tenderly?.username,
       project: hre.config.tenderly?.project,

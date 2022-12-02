@@ -23,13 +23,13 @@ export function getConfig(): TenderlyConfig {
         tenderlyConfig.access_key !== undefined &&
         tenderlyConfig.access_key !== null &&
         tenderlyConfig.access_key !== ""
-          ? "super secret access_key is set"
+          ? "super secret access_key is set in 'access_key' field"
           : "undefined or null or empty string",
       access_key_id:
         tenderlyConfig.access_key_id !== undefined &&
         tenderlyConfig.access_key_id !== null &&
         tenderlyConfig.access_key_id !== ""
-          ? "super secret access_key_id is set"
+          ? "super secret access_key_id is set in 'access_key' field"
           : "undefined or null or empty string",
     });
 

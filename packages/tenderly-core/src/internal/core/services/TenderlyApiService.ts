@@ -16,9 +16,9 @@ export class TenderlyApiService {
 
     logger.debug("Configured instance with parameters:", {
       baseURL: TENDERLY_API_BASE_URL,
-      accessKey:
+      access_key:
         tdlyConfig.access_key !== undefined && tdlyConfig.access_key !== null && tdlyConfig.access_key !== ""
-          ? "super secret access_key is set"
+          ? "super secret access_key is set in 'access_key' field"
           : "undefined or null or empty string",
     });
 
