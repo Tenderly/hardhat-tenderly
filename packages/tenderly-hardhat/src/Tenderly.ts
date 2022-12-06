@@ -269,7 +269,7 @@ export class Tenderly {
         (requestContract) => requestContract.contractName === contract.name
       );
       if (index === -1) {
-        logger.error(`Contract '${contract.name}' was not found in processed data.`);
+        logger.error(`Contract '${contract.name}' was not found among the contracts in /artifacts.`);
         continue;
       }
       let chainID: string = NETWORK_NAME_CHAIN_ID_MAP[network!.toLowerCase()];
