@@ -29,12 +29,12 @@ export function logConfig(config: TenderlyConfig) {
   logger.trace("Value of the config:", {
     email:
       config.email !== undefined && config.email !== null && config.email !== ""
-        ? "super secret access_key is set in 'access_key' field"
+        ? "set in 'email' field"
         : "undefined or null or empty string",
     account_id: config.account_id,
     username:
       config.username !== undefined && config.username !== null && config.username !== ""
-        ? "super secret access_key is set in 'access_key' field"
+        ? "set in 'username' field"
         : "undefined or null or empty string",
     access_key:
       config.access_key !== undefined && config.access_key !== null && config.access_key !== ""
