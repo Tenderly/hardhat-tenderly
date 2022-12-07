@@ -20,16 +20,16 @@ export class Tenderly {
   private tenderlyService = new TenderlyService(PLUGIN_NAME);
 
   constructor(hre: HardhatRuntimeEnvironment) {
-    logger.debug("Making hardhat Tenderly interface...");
+    logger.debug("Creating Tenderly plugin...");
 
     this.env = hre;
     this.tenderlyNetwork = new TenderlyNetwork(hre);
 
-    logger.debug("Finished making hardhat Tenderly interface.");
+    logger.debug("Created Tenderly plugin.");
   }
 
   public async verify(...contracts: any[]): Promise<void> {
-    logger.info("Public verification has been called.");
+    logger.info("Invoked public verification.");
 
     const priv = this.env.config.tenderly?.privateVerification;
     if (priv !== undefined && priv && this.env.network.name !== "tenderly") {
@@ -49,7 +49,7 @@ export class Tenderly {
     const requestData = await this._filterContracts(flatContracts);
 
     if (requestData === null) {
-      logger.error("Verification failed");
+      logger.error("Verification failed due to bad processing of the data in /artifacts directory.");
       return;
     }
 
@@ -57,7 +57,7 @@ export class Tenderly {
   }
 
   public async verifyAPI(request: TenderlyContractUploadRequest): Promise<void> {
-    logger.info("Public verification API has been called.");
+    logger.info("Invoked public verification through API request.");
 
     if (this.env.network.name === "tenderly") {
       logger.error(
@@ -75,7 +75,7 @@ export class Tenderly {
     username: string,
     forkID: string
   ): Promise<void> {
-    logger.info("Fork verification has been called.");
+    logger.info("Invoked fork verification through API request.");
     if (this.env.network.name !== "tenderly") {
       console.log(
         `Error in ${PLUGIN_NAME}: Network parameter is not set to 'tenderly' and verifyForkAPI() is only available for tenderly fork deployments, please use --network tenderly.`
@@ -98,7 +98,7 @@ export class Tenderly {
   }
 
   public async push(...contracts: any[]): Promise<void> {
-    logger.info("Private verification has been called.");
+    logger.info("Invoked pushing onto Tenderly.");
 
     const priv = this.env.config.tenderly?.privateVerification;
     if (priv !== undefined && !priv) {
@@ -127,7 +127,7 @@ export class Tenderly {
     }
 
     if (requestData === null) {
-      console.log("Push failed");
+      logger.error("Pushing failed due to bad processing of the data in /artifacts directory.");
       return;
     }
 
@@ -143,7 +143,7 @@ export class Tenderly {
     tenderlyProject: string,
     username: string
   ): Promise<void> {
-    logger.info("Private verification API has been called.");
+    logger.info("Invoked pushing contracts through API.");
 
     if (this.env.network.name === "tenderly") {
       logger.error(
@@ -156,7 +156,7 @@ export class Tenderly {
   }
 
   public async persistArtifacts(...contracts: ContractByName[]) {
-    logger.info("Artifact persisting has been called.");
+    logger.info("Invoked persisting artifacts.");
     if (contracts.length === 0) {
       logger.error("No contracts were provided during artifact persisting.");
       return;
@@ -240,13 +240,13 @@ export class Tenderly {
   }
 
   private async _filterContracts(flatContracts: ContractByName[]): Promise<TenderlyContractUploadRequest | null> {
-    logger.info("Contract filtering has been called.");
+    logger.info("Processing data needed for verification...");
 
     let contract: ContractByName;
     let requestData: TenderlyContractUploadRequest;
     try {
       requestData = await this._getContractData(flatContracts);
-      logger.silly("Request data obtained: ", requestData);
+      logger.silly("Processed request data:", requestData);
     } catch (e) {
       logger.error("Error caught while trying to process contracts by name: ", e);
       return null;

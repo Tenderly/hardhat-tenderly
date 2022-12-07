@@ -69,7 +69,7 @@ export const getContracts = async (
 
   data._resolvedFiles.forEach((resolvedFile: any, _: any) => {
     const sourcePath: string = resolvedFile.sourceName;
-    logger.trace("Currently processing file:", sourcePath);
+    logger.trace("Processing file:", sourcePath);
 
     const name = sourcePath.split("/").slice(-1)[0].split(".")[0];
     logger.trace("Obtained name from source file:", name);

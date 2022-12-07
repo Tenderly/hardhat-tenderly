@@ -21,7 +21,7 @@ export function getConfig(): TenderlyConfig {
     return tenderlyConfig;
   }
 
-  logger.trace("Tenderly config doesn't exist, empty string values are returned instead.");
+  logger.warn("Tenderly config doesn't exist, empty string values are returned instead.");
   return {
     access_key: "",
     access_key_id: "",
@@ -33,7 +33,7 @@ export function getConfig(): TenderlyConfig {
 }
 
 export function writeConfig(config: TenderlyConfig): void {
-  logger.trace(`Writing config to a file @ ${configDir}/${configFilePath}`);
+  logger.trace(`Writing tenderly config to a file @ ${configDir}/${configFilePath}`);
   logConfig(config);
 
   fs.mkdirSync(configDir, { recursive: true });
@@ -41,8 +41,11 @@ export function writeConfig(config: TenderlyConfig): void {
 }
 
 export function configExists(): boolean {
-  logger.trace("Checking if config exists...");
-  return fs.existsSync(configFilePath);
+  logger.trace("Checking if tenderly config exists...");
+  const exists = fs.existsSync(configFilePath);
+  logger.trace(exists ? "Tenderly config exists." : "Tenderly config doesn't exist.");
+
+  return exists;
 }
 
 export function isAccessTokenSet(): boolean {
@@ -58,7 +61,7 @@ export function isAccessTokenSet(): boolean {
 export function getAccessToken(): string {
   logger.trace("Getting access token...");
   if (!isAccessTokenSet()) {
-    logger.trace("Access key is not set, returning empty string value.");
+    logger.warn("Access key is not set, returning empty string value.");
     return "";
   }
 

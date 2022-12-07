@@ -30,7 +30,7 @@ export class TenderlyService {
   }
 
   public async getNetworks(): Promise<TenderlyNetwork[]> {
-    logger.debug("Getting networks has been called.");
+    logger.debug("Obtaining public networks...");
 
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
     if (TenderlyApiService.isAuthenticated()) {
@@ -38,7 +38,6 @@ export class TenderlyService {
     }
 
     try {
-      logger.debug("Obtaining public networks...");
       const res = await tenderlyApi.get("/api/v1/public-networks");
       if (res.data === undefined || res.data === null) {
         logger.error("There was an error while obtaining public networks from Tenderly. Obtained response is invalid.");
@@ -81,7 +80,7 @@ export class TenderlyService {
   }
 
   public async verifyContracts(request: TenderlyContractUploadRequest): Promise<void> {
-    logger.info("Verifying contracts has been called.");
+    logger.debug("Verifying contracts publicly...");
 
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
     if (TenderlyApiService.isAuthenticated()) {
@@ -94,7 +93,6 @@ export class TenderlyService {
         return;
       }
 
-      logger.debug("Verifying contracts publicly...");
       const res = await tenderlyApi.post("/api/v1/public/verify-contracts", { ...request });
       if (res.data === undefined || res.data === null) {
         logger.error(
@@ -110,8 +108,8 @@ export class TenderlyService {
         return;
       }
 
-      if (responseData.contracts === null) {
-        logger.error("API call returned null value for contracts.");
+      if (responseData.contracts === undefined || responseData.contracts === null) {
+        logger.error("There was an error during public verification. There are no returned contracts.");
         return;
       }
 
@@ -146,6 +144,7 @@ export class TenderlyService {
     tenderlyProject: string,
     username: string
   ): Promise<void> {
+    logger.debug("Pushing contracts onto Tenderly...");
     if (!TenderlyApiService.isAuthenticated()) {
       logger.error(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
       return;
@@ -153,7 +152,6 @@ export class TenderlyService {
 
     const tenderlyApi = TenderlyApiService.configureInstance();
     try {
-      logger.debug("Trying to push contracts onto Tenderly...");
       const res = await tenderlyApi.post(`/api/v1/account/${username}/project/${tenderlyProject}/contracts`, {
         ...request,
       });
@@ -195,7 +193,7 @@ export class TenderlyService {
     username: string,
     fork: string
   ): Promise<void> {
-    logger.info("Fork verification has been called.");
+    logger.info("Verifying contracts on fork...");
 
     if (!TenderlyApiService.isAuthenticated()) {
       logger.error(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
@@ -204,7 +202,6 @@ export class TenderlyService {
 
     const tenderlyApi = TenderlyApiService.configureTenderlyRPCInstance();
     try {
-      logger.debug("Trying to verify contracts on fork...");
       const res = await tenderlyApi.post(`/account/${username}/project/${tenderlyProject}/fork/${fork}/verify`, {
         ...request,
       });
@@ -241,7 +238,7 @@ export class TenderlyService {
   }
 
   public async getPrincipal(): Promise<Principal | null> {
-    logger.debug("Getting principal has been called.");
+    logger.debug("Getting principal...");
 
     if (!TenderlyApiService.isAuthenticated()) {
       logger.error(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);

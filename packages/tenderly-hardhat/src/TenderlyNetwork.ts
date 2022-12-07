@@ -91,7 +91,7 @@ export class TenderlyNetwork {
   }
 
   public async verify(...contracts: any[]) {
-    logger.info("Fork verification has been called.");
+    logger.info("Invoked fork verification.");
     if (!this._checkNetwork()) {
       return;
     }
@@ -103,12 +103,12 @@ export class TenderlyNetwork {
 
     const flatContracts: ContractByName[] = contracts.reduce((accumulator, value) => accumulator.concat(value), []);
     const requestData = await this._filterContracts(flatContracts);
-    logger.silly("Obtained request data needed for verifying contracts:", requestData);
-
     if (requestData === null) {
-      logger.error("Filtering contracts did not succeed.");
+      logger.error("Fork verification failed due to bad processing of data in /artifacts directory.");
       return;
     }
+    logger.silly("Processed request data:", requestData);
+
     if (requestData?.contracts.length === 0) {
       logger.error("Filtering contracts did not succeed. The length of the contracts is 0.");
       return;
@@ -128,7 +128,7 @@ export class TenderlyNetwork {
     username: string,
     forkID: string
   ) {
-    logger.info("Fork verification via API has been called,");
+    logger.info("Invoked fork verification via API.");
     await this.tenderlyService.verifyForkContracts(request, tenderlyProject, username, forkID);
   }
 
@@ -162,7 +162,7 @@ export class TenderlyNetwork {
   }
 
   public async initializeFork() {
-    logger.debug("Fork initialization has been called.");
+    logger.debug("Initializing tenderly fork...");
 
     if (!this._checkNetwork()) {
       return;
@@ -174,10 +174,9 @@ export class TenderlyNetwork {
 
     const username: string = this.env.config.tenderly.username;
     const projectID: string = this.env.config.tenderly.project;
-    logger.trace("Username and projectID obtained from tenderly configuration:", { username, projectID });
+    logger.trace("ProjectID obtained from tenderly configuration:", { projectID });
 
     try {
-      logger.debug("Making a call to initialize fork...");
       const resp = await this.tenderlyJsonRpc.post(`/account/${username}/project/${projectID}/fork`, {
         network_id: this.env.config.tenderly.forkNetwork,
       });
@@ -188,7 +187,7 @@ export class TenderlyNetwork {
       this.accounts = resp.data.simulation_fork.accounts;
       this.forkID = resp.data.simulation_fork.id;
 
-      logger.debug("Successfully initialized fork.");
+      logger.debug("Successfully initialized tenderly fork.");
     } catch (err) {
       logger.error("Error was caught while calling fork initialization:", err);
       throw err;
@@ -202,7 +201,7 @@ export class TenderlyNetwork {
   }
 
   private async _filterContracts(flatContracts: ContractByName[]): Promise<TenderlyForkContractUploadRequest | null> {
-    logger.info("Filtering contracts for fork verification has been called.");
+    logger.info("Processing data needed for fork verification...");
 
     let contract: ContractByName;
     let requestData: TenderlyForkContractUploadRequest;
@@ -237,11 +236,11 @@ export class TenderlyNetwork {
   }
 
   private async _getForkContractData(flatContracts: ContractByName[]): Promise<TenderlyForkContractUploadRequest> {
-    logger.trace("Getting contract data for fork verification has been called.");
+    logger.trace("Getting contract data needed for fork verification...");
 
     const contracts = await getContracts(this.env, flatContracts);
     if (contracts.length === 0) {
-      throw new Error("Failed to get contracts");
+      throw new Error("Fork verification failed due to bad processing of data in /artifacts folder.");
     }
 
     const solcConfig = getCompilerDataFromContracts(contracts, flatContracts, this.env.config);
