@@ -42,7 +42,7 @@ export class TenderlyService {
     }
 
     try {
-      logger.debug("Making a call to get all of the public networks...");
+      logger.debug("Obtaining public networks...");
       const res = await tenderlyApi.get("/api/v1/public-networks");
       logger.silly("Obtained public networks:", res.data);
 

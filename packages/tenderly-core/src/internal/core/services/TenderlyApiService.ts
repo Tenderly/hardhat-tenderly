@@ -26,7 +26,7 @@ export class TenderlyApiService {
   }
 
   public static configureAnonymousInstance(): axios.AxiosInstance {
-    logger.debug("Configured anonymous instance with base url:", TENDERLY_API_BASE_URL);
+    logger.debug("Configured anonymous instance towards tenderly api.");
 
     return axios.default.create({
       baseURL: TENDERLY_API_BASE_URL,
@@ -50,9 +50,9 @@ export class TenderlyApiService {
   }
 
   public static isAuthenticated(): boolean {
-    logger.debug("Getting if user is authenticated...");
+    logger.debug("Checking if user is authenticated...");
     const isAuth = isAccessTokenSet();
-    logger.debug("isAuthenticated returned:", isAuth);
+    logger.debug(isAuth ? "User is authenticated." : "User is not authenticated.");
 
     return isAuth;
   }

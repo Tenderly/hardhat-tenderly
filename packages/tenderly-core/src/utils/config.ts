@@ -36,7 +36,7 @@ export function getConfig(): TenderlyConfig {
     return tenderlyConfig;
   }
 
-  logger.trace("Tenderly config doesn't exist, empty string values have been returned.");
+  logger.trace("Tenderly config doesn't exist, empty string values are returned instead.");
   return {
     access_key: "",
     access_key_id: "",
@@ -49,7 +49,19 @@ export function getConfig(): TenderlyConfig {
 
 export function writeConfig(config: TenderlyConfig): void {
   logger.trace(`Writing config to a file @ ${configDir}/${configFilePath}`);
-  logger.trace("Value of the config:", config);
+  logger.trace("Value of the config:", {
+    email: config.email,
+    account_id: config.account_id,
+    username: config.username,
+    access_key:
+      config.access_key !== undefined && config.access_key !== null && config.access_key !== ""
+        ? "super secret access_key is set in 'access_key' field"
+        : "undefined or null or empty string",
+    access_key_id:
+      config.access_key_id !== undefined && config.access_key_id !== null && config.access_key_id !== ""
+        ? "super secret access_key_id is set in 'access_key' field"
+        : "undefined or null or empty string",
+  });
 
   fs.mkdirSync(configDir, { recursive: true });
   fs.writeFileSync(configFilePath, yaml.dump(config), "utf8");
@@ -64,8 +76,8 @@ export function isAccessTokenSet(): boolean {
   logger.trace("Determining if access token in tenderly config file is set...");
   const config = getConfig();
 
-  const isSet = config.access_key !== undefined || config.access_key !== "";
-  logger.trace("Access key is set:", isSet);
+  const isSet = config.access_key !== undefined && config.access_key !== null && config.access_key !== "";
+  logger.trace(isSet ? "Access key is set." : "Access key is not set.");
 
   return isSet;
 }
@@ -77,14 +89,11 @@ export function getAccessToken(): string {
     return "";
   }
 
-  const accessKey = getConfig().access_key;
-  logger.trace("Access key:", accessKey);
-
-  return accessKey;
+  return getConfig().access_key;
 }
 
 export function setAccessToken(accessToken: string): void {
-  logger.trace("Setting access key to value:", accessToken, " ....");
+  logger.trace("Setting access key...");
   const config = getConfig();
   config.access_key = accessToken;
   writeConfig(config);

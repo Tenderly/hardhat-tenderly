@@ -13,7 +13,6 @@ export const NetworksCommand = new commander.Command("networks")
   .option("-v, --verbose", "display detailed network information")
   .action(async (options) => {
     const verbose = options.verbose !== undefined && options.verbose === true;
-    logger.info("Making NetworksCommand... --verbose parameter is:", verbose);
 
     const headers = ["Network ID", "Network name"];
     if (verbose) {
