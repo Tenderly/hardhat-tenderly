@@ -34,14 +34,16 @@ export class TenderlyService {
 
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
     if (TenderlyApiService.isAuthenticated()) {
-      logger.debug("API service has been authenticated. Configuring instance...");
       tenderlyApi = TenderlyApiService.configureInstance();
-      logger.debug("Instance has been configured.");
     }
 
     try {
       logger.debug("Obtaining public networks...");
       const res = await tenderlyApi.get("/api/v1/public-networks");
+      if (res.data === undefined || res.data === null) {
+        logger.error("There was an error while obtaining public networks from Tenderly. Obtained response is invalid.");
+        return [];
+      }
       logger.silly("Obtained public networks:", res.data);
 
       return res.data;
@@ -61,8 +63,13 @@ export class TenderlyService {
     }
 
     try {
-      logger.trace("Making a call to the api...");
       const res = await tenderlyApi.get(`/api/v1/network/${networkId}/block-number`);
+      if (res.data === undefined || res.data === null) {
+        logger.error(
+          "There was an error while obtaining latest block number from Tenderly. Obtained response is invalid."
+        );
+        return null;
+      }
       logger.trace(`Api successfully returned: ${res.data.block_number}`);
 
       return res.data.block_number;
@@ -87,9 +94,14 @@ export class TenderlyService {
         return;
       }
 
-      logger.debug("Making a call to the api...");
+      logger.debug("Verifying contracts publicly...");
       const res = await tenderlyApi.post("/api/v1/public/verify-contracts", { ...request });
-      logger.debug("API call successfully made.");
+      if (res.data === undefined || res.data === null) {
+        logger.error(
+          "There was an error while publicly verifying contracts on Tenderly. Obtained response is invalid."
+        );
+        return;
+      }
       logger.trace("Retrieved data:", res.data);
 
       const responseData: ContractResponse = res.data;
@@ -141,11 +153,14 @@ export class TenderlyService {
 
     const tenderlyApi = TenderlyApiService.configureInstance();
     try {
-      logger.debug("Making a call to the api...");
+      logger.debug("Trying to push contracts onto Tenderly...");
       const res = await tenderlyApi.post(`/api/v1/account/${username}/project/${tenderlyProject}/contracts`, {
         ...request,
       });
-      logger.debug("Call to the api successfully made.");
+      if (res.data === undefined || res.data === null) {
+        logger.error("There was an error while pushing contracts to Tenderly. Obtained response is invalid.");
+        return;
+      }
       logger.trace("Retrieved data:", res.data);
 
       const responseData: ContractResponse = res.data;
@@ -189,11 +204,13 @@ export class TenderlyService {
 
     const tenderlyApi = TenderlyApiService.configureTenderlyRPCInstance();
     try {
-      logger.debug("Making a call to the api...");
+      logger.debug("Trying to verify contracts on fork...");
       const res = await tenderlyApi.post(`/account/${username}/project/${tenderlyProject}/fork/${fork}/verify`, {
         ...request,
       });
-      logger.debug("Call to the api successfully made.");
+      if (res.data === undefined || res.data === null) {
+        logger.error("There was an error while verifying contracts on fork. Obtained response is invalid.");
+      }
       logger.trace("Retrieved data:", res.data);
 
       const responseData: ContractResponse = res.data;
@@ -233,9 +250,11 @@ export class TenderlyService {
 
     const tenderlyApi = TenderlyApiService.configureInstance();
     try {
-      logger.debug("Making a call to the api...");
       const res = await tenderlyApi.get("/api/v1/user");
-      logger.trace("Retrieved data:", { id: res.data.user.id, username: res.data.user.username });
+      if (res.data === undefined || res.data === null) {
+        logger.error("There was an error while obtaining principal from Tenderly. Obtained response is invalid.");
+      }
+      logger.trace("Retrieved data:", { id: res.data.user.id });
 
       return {
         id: res.data.user.id,
@@ -249,7 +268,7 @@ export class TenderlyService {
   }
 
   public async getProjectSlugs(principalId: string): Promise<Project[]> {
-    logger.debug("Getting project slugs has been called.");
+    logger.debug("Getting project slugs...");
 
     if (!TenderlyApiService.isAuthenticated()) {
       logger.error(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
@@ -258,8 +277,10 @@ export class TenderlyService {
 
     const tenderlyApi = TenderlyApiService.configureInstance();
     try {
-      logger.debug("Making a call to the api...");
       const res = await tenderlyApi.get(`/api/v1/account/${principalId}/projects`);
+      if (res.data === undefined || res.data === null) {
+        logger.error("There was an error while obtaining project slug from Tenderly. Obtained response is invalid.");
+      }
       logger.trace("Retrieved data:", res.data.projects);
 
       return res.data.projects;

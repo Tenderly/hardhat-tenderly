@@ -23,7 +23,7 @@ export const getCompilerDataFromContracts = (
       if (mainContract.name !== contract.contractName) {
         continue;
       }
-      logger.trace("Currently obtaining compiler data from contract:", mainContract.name);
+      logger.trace("Obtaining compiler data from contract:", mainContract.name);
 
       const contractConfig = newCompilerConfig(hhConfig, contract.sourcePath, contract.compiler?.version);
       if (config !== null && config !== undefined && !compareConfigs(contractConfig, config)) {
@@ -44,7 +44,7 @@ export const getContracts = async (
   hre: HardhatRuntimeEnvironment,
   flatContracts: ContractByName[]
 ): Promise<TenderlyContract[]> => {
-  logger.debug("Processing contracts from the artifacts/ folder.");
+  logger.debug("Processing contracts from the artifacts/ directory.");
 
   const sourcePaths = await hre.run("compile:solidity:get-source-paths");
   const sourceNames = await hre.run("compile:solidity:get-source-names", {
@@ -168,7 +168,7 @@ export const newCompilerConfig = (
   contractCompiler?: string
 ): TenderlyContractConfig => {
   if (sourcePath !== undefined && config.solidity.overrides[sourcePath] !== undefined) {
-    logger.trace("There is an compiler config override for:", sourcePath);
+    logger.trace("There is a compiler config override for:", sourcePath);
 
     return {
       compiler_version: config.solidity.overrides[sourcePath].version,

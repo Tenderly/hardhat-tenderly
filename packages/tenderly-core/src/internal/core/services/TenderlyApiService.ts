@@ -44,7 +44,14 @@ export class TenderlyApiService {
         Head: tdlyConfig.head !== undefined ? tdlyConfig.head : "",
       },
     };
-    logger.debug("Configured tenderly rpc instance with parameters:", params);
+
+    logger.debug("Configured tenderly rpc instance with parameters:", {
+      baseURL: TENDERLY_API_BASE_URL,
+      access_key:
+        tdlyConfig.access_key !== undefined && tdlyConfig.access_key !== null && tdlyConfig.access_key !== ""
+          ? "super secret access_key is set in 'access_key' field"
+          : "undefined or null or empty string",
+    });
 
     return axios.default.create(params);
   }
