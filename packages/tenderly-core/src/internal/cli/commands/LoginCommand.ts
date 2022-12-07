@@ -8,7 +8,7 @@ import { isAccessTokenSet, setAccessToken } from "../../../utils/config";
 import { TENDERLY_API_BASE_URL, TENDERLY_DASHBOARD_BASE_URL } from "../../../common/constants";
 
 export const LoginCommand = new commander.Command("login").description("login to Tenderly").action(async () => {
-  logger.info("Making LoginCommand...");
+  logger.info("Trying to log in to Tenderly...");
 
   if (isAccessTokenSet()) {
     logger.debug("Access token is set. Prompting user to overwrite access token with a new one.");
@@ -18,7 +18,7 @@ export const LoginCommand = new commander.Command("login").description("login to
       message: "Access token already set. Would you like to overwrite it?",
     });
     if (!response.overwrite) {
-      logger.debug("User didn't request an overwrite of the token. Login command is made with existing token.");
+      logger.debug("User didn't request an overwrite of the token. Proceeding logging in with existing token.");
       return;
     }
   }
@@ -44,7 +44,7 @@ async function promptAccessToken(): Promise<string> {
     validate: validator,
   });
 
-  logger.info("User entered access token:", response.accessToken);
+  logger.info("User entered access token.");
   return response.accessToken;
 }
 
@@ -63,17 +63,15 @@ const validator = async function (value: string) {
 
 async function canAuthenticate(accessToken: string): Promise<boolean> {
   try {
-    logger.debug("Determining if the user can be authenticated with provided access token:", accessToken);
-
-    logger.trace("Making a call to the url...");
+    logger.debug("Checking if user access token is valid...");
     const response = await axios.get(`${TENDERLY_API_BASE_URL}/api/v1/user`, {
       headers: { "x-access-key": accessToken },
     });
     if (response.data.user !== undefined) {
-      logger.debug("The user can be authenticated.");
+      logger.debug("User has a valid access token.");
       return true;
     }
-    logger.error("The user cannot be authenticated with access token:", accessToken);
+    logger.error("User doesn't have a valid access token.");
     return false;
   } catch (err) {
     logger.error(`There was an error while making the api call ${TENDERLY_API_BASE_URL}/api/v1/user`);
