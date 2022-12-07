@@ -57,10 +57,6 @@ export class TenderlyApiService {
   }
 
   public static isAuthenticated(): boolean {
-    logger.debug("Checking if user is authenticated...");
-    const isAuth = isAccessTokenSet();
-    logger.debug(isAuth ? "User is authenticated." : "User is not authenticated.");
-
-    return isAuth;
+    return isAccessTokenSet();
   }
 }
