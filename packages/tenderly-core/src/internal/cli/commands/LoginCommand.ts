@@ -63,7 +63,7 @@ const validator = async function (value: string) {
 
 async function canAuthenticate(accessToken: string): Promise<boolean> {
   try {
-    logger.debug("Checking if user access token is valid...");
+    logger.debug("Checking if access token is valid.");
     const response = await axios.get(`${TENDERLY_API_BASE_URL}/api/v1/user`, {
       headers: { "x-access-key": accessToken },
     });
