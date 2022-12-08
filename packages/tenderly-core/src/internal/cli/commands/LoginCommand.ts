@@ -68,7 +68,7 @@ async function canAuthenticate(accessToken: string): Promise<boolean> {
       headers: { "x-access-key": accessToken },
     });
     if (response.data.user === undefined || response.data.user === null) {
-      logger.error("User doesn't have a valid access token.");
+      logger.error("Access token is invalid.");
       return false;
     }
     logger.debug("User has a valid access token.");
