@@ -26,7 +26,7 @@ export const LoginCommand = new commander.Command("login").description("login to
   logger.info("Access token not set.");
   const accessToken = await promptAccessToken();
 
-  logger.debug("User access token accepted. Trying to log in...");
+  logger.debug("Access token accepted. Trying to log in.");
   setAccessToken(accessToken);
 
   logger.info("The user successfully logged in to Tenderly.");
