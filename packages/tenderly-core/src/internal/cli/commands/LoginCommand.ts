@@ -23,7 +23,7 @@ export const LoginCommand = new commander.Command("login").description("login to
     }
   }
 
-  logger.info("Access token isn't set. Waiting for user to provide it...");
+  logger.info("Access token not set.");
   const accessToken = await promptAccessToken();
 
   logger.debug("User access token accepted. Trying to log in...");
