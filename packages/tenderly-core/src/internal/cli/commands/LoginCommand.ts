@@ -71,7 +71,7 @@ async function canAuthenticate(accessToken: string): Promise<boolean> {
       logger.error("Access token is invalid.");
       return false;
     }
-    logger.debug("User has a valid access token.");
+    logger.debug("Access token is valid.");
     return true;
   } catch (err) {
     logger.error(`There was an error while trying to authenticate user.`);
