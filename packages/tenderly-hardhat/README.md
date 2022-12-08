@@ -159,7 +159,7 @@ module.exports = {
 };
 ```
 
-If you are having trouble with the plugin and want to contact support, you can rum the deploy script with the following ```--verbose``` flag as so:
+If you are having trouble with the plugin and want to contact support, you can run the deploy script with the following ```--verbose``` flag as so:
 ```bash
 npx hardhat run scripts/{your_deploy_script_here.js} --network {network_name} --verbose > tenderly.log 2>&1
 ```
