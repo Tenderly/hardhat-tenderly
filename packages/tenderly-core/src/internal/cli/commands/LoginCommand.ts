@@ -11,7 +11,7 @@ export const LoginCommand = new commander.Command("login").description("login to
   logger.info("Trying to login to Tenderly...");
 
   if (isAccessTokenSet()) {
-    logger.debug("Access token is already set. Checking if user wants to overwrite it with a new one...");
+    logger.debug("Access token is already set. Checking if access token overwrite is needed.");
     const response = await prompts({
       type: "confirm",
       name: "overwrite",
