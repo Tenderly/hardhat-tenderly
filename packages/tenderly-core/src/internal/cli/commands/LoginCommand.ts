@@ -18,7 +18,7 @@ export const LoginCommand = new commander.Command("login").description("login to
       message: "Access token already set. Would you like to overwrite it?",
     });
     if (!response.overwrite) {
-      logger.debug("User didn't request an overwrite of the token. Proceeding logging in with existing token.");
+      logger.debug("Access token overwrite skipped. Trying to login with the existing token.");
       return;
     }
   }
