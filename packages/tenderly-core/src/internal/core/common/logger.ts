@@ -46,3 +46,14 @@ export function logConfig(config: TenderlyConfig) {
         : "undefined or null or empty string",
   });
 }
+
+export function logGetProjectsResponse(projects: any[]) {
+  for (const project of projects) {
+    const projectLog = {
+      owner_principal_id: project.owner.id,
+      owner_principal_type: project.owner.type,
+      owner_permissions_for_project: project.permissions,
+    };
+    logger.trace("Obtained project:", projectLog);
+  }
+}

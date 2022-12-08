@@ -1,5 +1,5 @@
 import { TENDERLY_DASHBOARD_BASE_URL, CHAIN_ID_NETWORK_NAME_MAP } from "../../../common/constants";
-import { logApiError } from "../common/logger";
+import { logApiError, logGetProjectsResponse } from "../common/logger";
 import {
   API_VERIFICATION_REQUEST_ERR_MSG,
   BYTECODE_MISMATCH_ERR_MSG,
@@ -278,7 +278,7 @@ export class TenderlyService {
       if (res.data === undefined || res.data === null) {
         logger.error("There was an error while obtaining project slug from Tenderly. Obtained response is invalid.");
       }
-      logger.trace("Retrieved data:", res.data.projects);
+      logGetProjectsResponse(res.data.projects);
 
       return res.data.projects;
     } catch (err) {
