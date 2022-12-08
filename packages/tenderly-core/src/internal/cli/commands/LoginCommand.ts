@@ -36,7 +36,7 @@ async function promptAccessToken(): Promise<string> {
   logger.debug(`Redirecting to ${TENDERLY_DASHBOARD_BASE_URL}/account/authorization`);
   await open(`${TENDERLY_DASHBOARD_BASE_URL}/account/authorization`);
 
-  logger.info("Prompting user to enter access token");
+  logger.info("Requesting access token.");
   const response = await prompts({
     type: "text",
     name: "accessToken",
