@@ -50,7 +50,17 @@ export function logConfig(config: TenderlyConfig) {
 export function logGetProjectsResponse(projects: any[]) {
   for (const project of projects) {
     const projectLog = {
-      owner_principal_id: project.owner.id,
+      project_id: project.id,
+      project_name: project.name,
+      project_slug: project.slug,
+      high_volume: project.high_volume,
+      in_transfer: project.in_transfer,
+      is_module: project.is_module,
+      created_at: project.created_at,
+      last_push_at: project.last_push_at,
+      number_of_users: project.number_of_users,
+      options: project.options,
+      owner_principal_id: project.owner_id,
       owner_principal_type: project.owner.type,
       owner_permissions_for_project: project.permissions,
     };
