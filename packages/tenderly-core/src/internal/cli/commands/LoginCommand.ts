@@ -11,32 +11,32 @@ export const LoginCommand = new commander.Command("login").description("login to
   logger.info("Trying to login to Tenderly...");
 
   if (isAccessTokenSet()) {
-    logger.debug("Access token is already set. Checking if user wants to overwrite it with a new one...");
+    logger.debug("Access token is already set. Checking if access token overwrite is needed.");
     const response = await prompts({
       type: "confirm",
       name: "overwrite",
       message: "Access token already set. Would you like to overwrite it?",
     });
     if (!response.overwrite) {
-      logger.debug("User didn't request an overwrite of the token. Proceeding logging in with existing token.");
+      logger.debug("Access token overwrite skipped. Trying to login with the existing token.");
       return;
     }
   }
 
-  logger.info("Access token isn't set. Waiting for user to provide it...");
+  logger.info("Access token not set.");
   const accessToken = await promptAccessToken();
 
-  logger.debug("User access token accepted. Trying to log in...");
+  logger.debug("Access token accepted. Trying to log in.");
   setAccessToken(accessToken);
 
-  logger.info("The user successfully logged in to Tenderly.");
+  logger.info("Successfully logged in to Tenderly.");
 });
 
 async function promptAccessToken(): Promise<string> {
   logger.debug(`Redirecting to ${TENDERLY_DASHBOARD_BASE_URL}/account/authorization`);
   await open(`${TENDERLY_DASHBOARD_BASE_URL}/account/authorization`);
 
-  logger.info("Prompting user to enter access token");
+  logger.info("Requesting access token.");
   const response = await prompts({
     type: "text",
     name: "accessToken",
@@ -44,7 +44,7 @@ async function promptAccessToken(): Promise<string> {
     validate: validator,
   });
 
-  logger.info("User access token accepted.");
+  logger.info("Access token accepted.");
   return response.accessToken;
 }
 
@@ -63,18 +63,18 @@ const validator = async function (value: string) {
 
 async function canAuthenticate(accessToken: string): Promise<boolean> {
   try {
-    logger.debug("Checking if user access token is valid...");
+    logger.debug("Checking if access token is valid.");
     const response = await axios.get(`${TENDERLY_API_BASE_URL}/api/v1/user`, {
       headers: { "x-access-key": accessToken },
     });
     if (response.data.user === undefined || response.data.user === null) {
-      logger.error("User doesn't have a valid access token.");
+      logger.error("Access token is invalid.");
       return false;
     }
-    logger.debug("User has a valid access token.");
+    logger.debug("Access token is valid.");
     return true;
   } catch (err) {
-    logger.error(`There was an error while trying to authenticate user.`);
+    logger.error("Authentication error.");
     return false;
   }
 }
