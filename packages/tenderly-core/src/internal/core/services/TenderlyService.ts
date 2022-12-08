@@ -1,5 +1,10 @@
 import { TENDERLY_DASHBOARD_BASE_URL, CHAIN_ID_NETWORK_NAME_MAP } from "../../../common/constants";
-import { logApiError, logGetProjectsResponse } from "../common/logger";
+import {
+  logApiError,
+  logGetProjectsResponse,
+  logGetPublicNetworksResponse,
+  logVerifyContractsResponse,
+} from "../common/logger";
 import {
   API_VERIFICATION_REQUEST_ERR_MSG,
   BYTECODE_MISMATCH_ERR_MSG,
@@ -43,7 +48,7 @@ export class TenderlyService {
         logger.error("There was an error while obtaining public networks from Tenderly. Obtained response is invalid.");
         return [];
       }
-      logger.silly("Obtained public networks:", res.data);
+      logGetPublicNetworksResponse(res.data);
 
       return res.data;
     } catch (err) {
@@ -100,7 +105,7 @@ export class TenderlyService {
         );
         return;
       }
-      logger.trace("Retrieved data:", res.data);
+      logVerifyContractsResponse(res.data);
 
       const responseData: ContractResponse = res.data;
       if (responseData.bytecode_mismatch_errors !== null) {
