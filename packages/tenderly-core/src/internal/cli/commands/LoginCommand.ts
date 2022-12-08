@@ -44,7 +44,7 @@ async function promptAccessToken(): Promise<string> {
     validate: validator,
   });
 
-  logger.info("User access token accepted.");
+  logger.info("Access token accepted.");
   return response.accessToken;
 }
 
