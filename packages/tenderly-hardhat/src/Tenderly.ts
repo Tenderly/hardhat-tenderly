@@ -77,7 +77,7 @@ export class Tenderly {
   ): Promise<void> {
     logger.info("Invoked fork verification through API request.");
     if (this.env.network.name !== "tenderly") {
-      console.log(
+      logger.error(
         `Error in ${PLUGIN_NAME}: Network parameter is not set to 'tenderly' and verifyForkAPI() is only available for tenderly fork deployments, please use --network tenderly.`
       );
       return;
