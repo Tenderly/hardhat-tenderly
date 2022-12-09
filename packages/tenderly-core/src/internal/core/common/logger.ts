@@ -92,7 +92,7 @@ export function logGetPublicNetworksResponse(networks: any[]) {
   }
 }
 
-export function logVerifyContractsResponse(response: ContractResponse) {
+export function logVerificationResponse(response: ContractResponse) {
   for (const contract of response.contracts) {
     const contractLog = {
       id: contract.id,
@@ -135,4 +135,12 @@ export function logVerifyContractsResponse(response: ContractResponse) {
     };
     logger.trace("Bytecode mismatch error:", errLog);
   }
+}
+
+export function logInitializeForkResponse(data: any) {
+  logger.trace("Initialized fork:", {
+    fork_id: data.simulation_fork.id,
+    root_transaction: data.root_transaction.id,
+    project_id: data.simulation_fork.project_id,
+  });
 }

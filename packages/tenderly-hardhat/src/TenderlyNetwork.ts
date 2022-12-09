@@ -6,6 +6,7 @@ import { TenderlyForkContractUploadRequest } from "tenderly/types";
 import { getConfig, writeConfig } from "tenderly/utils/config";
 import { TENDERLY_JSON_RPC_BASE_URL } from "tenderly/common/constants";
 
+import { logInitializeForkResponse } from "tenderly/internal/core/common/logger";
 import { PLUGIN_NAME } from "./constants";
 import { ContractByName } from "./tenderly/types";
 import { NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG } from "./tenderly/errors";
@@ -180,8 +181,7 @@ export class TenderlyNetwork {
       const resp = await this.tenderlyJsonRpc.post(`/account/${username}/project/${projectID}/fork`, {
         network_id: this.env.config.tenderly.forkNetwork,
       });
-
-      logger.trace("Obtained information from a call:", resp);
+      logInitializeForkResponse(resp.data);
 
       this.head = resp.data.root_transaction.id;
       this.accounts = resp.data.simulation_fork.accounts;

@@ -3,8 +3,9 @@ import {
   logApiError,
   logGetProjectsResponse,
   logGetPublicNetworksResponse,
-  logVerifyContractsResponse,
+  logVerificationResponse,
 } from "../common/logger";
+
 import {
   API_VERIFICATION_REQUEST_ERR_MSG,
   BYTECODE_MISMATCH_ERR_MSG,
@@ -105,7 +106,7 @@ export class TenderlyService {
         );
         return;
       }
-      logVerifyContractsResponse(res.data);
+      logVerificationResponse(res.data);
 
       const responseData: ContractResponse = res.data;
       if (responseData.bytecode_mismatch_errors !== null) {
@@ -164,7 +165,7 @@ export class TenderlyService {
         logger.error("There was an error while pushing contracts to Tenderly. Obtained response is invalid.");
         return;
       }
-      logger.trace("Retrieved data:", res.data);
+      logVerificationResponse(res.data);
 
       const responseData: ContractResponse = res.data;
       if (responseData.bytecode_mismatch_errors !== null) {
@@ -213,7 +214,7 @@ export class TenderlyService {
       if (res.data === undefined || res.data === null) {
         logger.error("There was an error while verifying contracts on fork. Obtained response is invalid.");
       }
-      logger.trace("Retrieved data:", res.data);
+      logVerificationResponse(res.data);
 
       const responseData: ContractResponse = res.data;
       if (responseData.bytecode_mismatch_errors !== null) {
