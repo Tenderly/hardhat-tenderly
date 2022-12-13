@@ -48,92 +48,100 @@ export function logConfig(config: TenderlyConfig) {
 }
 
 export function logGetProjectsResponse(projects: any[]) {
-  for (const project of projects) {
-    const projectLog = {
-      project_id: project.id,
-      project_name: project.name,
-      project_slug: project.slug,
-      high_volume: project.high_volume,
-      in_transfer: project.in_transfer,
-      is_module: project.is_module,
-      created_at: project.created_at,
-      last_push_at: project.last_push_at,
-      number_of_users: project.number_of_users,
-      options: project.options,
-      owner_principal_id: project.owner_id,
-      owner_principal_type: project.owner.type,
-      owner_permissions_for_project: project.permissions,
-    };
-    logger.trace("Obtained project:", projectLog);
+  if (projects) {
+    for (const project of projects) {
+      const projectLog = {
+        project_id: project.id,
+        project_name: project.name,
+        project_slug: project.slug,
+        high_volume: project.high_volume,
+        in_transfer: project.in_transfer,
+        is_module: project.is_module,
+        created_at: project.created_at,
+        last_push_at: project.last_push_at,
+        number_of_users: project.number_of_users,
+        options: project.options,
+        owner_principal_id: project.owner_id,
+        owner_principal_type: project.owner.type,
+        owner_permissions_for_project: project.permissions,
+      };
+      logger.trace("Obtained project:", projectLog);
+    }
   }
 }
 
 export function logGetPublicNetworksResponse(networks: any[]) {
-  for (const network of networks) {
-    const networkLog = {
-      id: network.id,
-      name: network.name,
-      ethereum_network_id: network.ethereum_network_id,
-      slug: network.slug,
-      metadata: {
-        color: network.metadata.color,
-        explorer_base_url: network.metadata.explorer_base_url,
-        icon: network.metadata.icon,
-        label: network.metadata.label,
-        native_currency: network.metadata.native_currency,
-        secondary_slugs: network.metadata.secondary_slugs,
-        short_identifier: network.metadata.short_identifier,
-        slug: network.metadata.slug,
-      },
-      chain_config: network.chain_config,
-      sort_order: network.sort_order,
-    };
-    logger.silly("Obtained public network:", networkLog);
+  if (networks) {
+    for (const network of networks) {
+      const networkLog = {
+        id: network.id,
+        name: network.name,
+        ethereum_network_id: network.ethereum_network_id,
+        slug: network.slug,
+        metadata: {
+          color: network.metadata.color,
+          explorer_base_url: network.metadata.explorer_base_url,
+          icon: network.metadata.icon,
+          label: network.metadata.label,
+          native_currency: network.metadata.native_currency,
+          secondary_slugs: network.metadata.secondary_slugs,
+          short_identifier: network.metadata.short_identifier,
+          slug: network.metadata.slug,
+        },
+        chain_config: network.chain_config,
+        sort_order: network.sort_order,
+      };
+      logger.silly("Obtained public network:", networkLog);
+    }
   }
 }
 
 export function logVerificationResponse(response: ContractResponse) {
-  for (const contract of response.contracts) {
-    const contractLog = {
-      id: contract.id,
-      contract_id: contract.contract_id,
-      balance: contract.balance,
-      network_id: contract.network_id,
-      public: contract.public,
-      export: contract.export,
-      verification_date: contract.verification_date,
-      address: contract.address,
-      contract_name: contract.contract_name,
-      ens_domain: contract.ens_domain,
-      type: contract.type,
-      evm_version: contract.evm_version,
-      compiler_version: contract.compiler_version,
-      optimizations_used: contract.optimizations_used,
-      optimization_runs: contract.optimization_runs,
-      libraries: contract.libraries,
-      data: contract.data,
-      creation_block: contract.creation_block,
-      creation_tx: contract.creation_tx,
-      creator_address: contract.creator_address,
-      created_at: contract.created_at,
-      number_of_watches: contract.number_of_watches,
-      language: contract.language,
-      in_project: contract.in_project,
-      number_of_files: contract.number_of_files,
-    };
+  if (response.contracts) {
+    for (const contract of response.contracts) {
+      const contractLog = {
+        id: contract.id,
+        contract_id: contract.contract_id,
+        balance: contract.balance,
+        network_id: contract.network_id,
+        public: contract.public,
+        export: contract.export,
+        verification_date: contract.verification_date,
+        address: contract.address,
+        contract_name: contract.contract_name,
+        ens_domain: contract.ens_domain,
+        type: contract.type,
+        evm_version: contract.evm_version,
+        compiler_version: contract.compiler_version,
+        optimizations_used: contract.optimizations_used,
+        optimization_runs: contract.optimization_runs,
+        libraries: contract.libraries,
+        data: contract.data,
+        creation_block: contract.creation_block,
+        creation_tx: contract.creation_tx,
+        creator_address: contract.creator_address,
+        created_at: contract.created_at,
+        number_of_watches: contract.number_of_watches,
+        language: contract.language,
+        in_project: contract.in_project,
+        number_of_files: contract.number_of_files,
+      };
 
-    logger.trace("Verified contract:", contractLog);
-  }
+      logger.trace("Verified contract:", contractLog);
+    }
+  } 
 
-  for (const err of response.bytecode_mismatch_errors) {
-    const errLog = {
-      contract_id: err.contract_id,
-      expected: err.expected,
-      got: err.got,
-      similarity: err.similarity,
-      assumed_reason: err.assumed_reason,
-    };
-    logger.trace("Bytecode mismatch error:", errLog);
+  if (response.bytecode_mismatch_errors) {
+    for (const err of response?.bytecode_mismatch_errors) {
+      const errLog = {
+        contract_id: err.contract_id,
+        expected: err.expected,
+        got: err.got,
+        similarity: err.similarity,
+        assumed_reason: err.assumed_reason,
+      };
+      logger.trace("Bytecode mismatch error:", errLog);
+    }
   }
 }
 
