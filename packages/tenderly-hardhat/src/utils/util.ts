@@ -1,6 +1,6 @@
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatConfig } from "hardhat/src/types/config";
-import {CompilationJob, DependencyGraph, HardhatRuntimeEnvironment, SolcConfig} from "hardhat/types";
+import { CompilationJob, DependencyGraph, HardhatRuntimeEnvironment, SolcConfig } from "hardhat/types";
 import { TenderlyContract, TenderlyContractConfig } from "tenderly/types";
 
 import { PLUGIN_NAME } from "../constants";
