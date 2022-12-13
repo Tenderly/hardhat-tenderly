@@ -9,7 +9,7 @@ import { TENDERLY_JSON_RPC_BASE_URL } from "tenderly/common/constants";
 import { PLUGIN_NAME } from "./constants";
 import { ContractByName } from "./tenderly/types";
 import { NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG } from "./tenderly/errors";
-import { getCompilerDataFromContracts, getContracts } from "./utils/util";
+import { getCompilerDataFromHardhat, getContracts} from "./utils/util";
 
 export class TenderlyNetwork {
   public host: string;
@@ -209,7 +209,7 @@ export class TenderlyNetwork {
       throw new Error("Failed to get contracts");
     }
 
-    const solcConfig = getCompilerDataFromContracts(contracts, flatContracts, this.env.config);
+    const solcConfig = await getCompilerDataFromHardhat(this.env, contracts[0].contractName);
 
     if (solcConfig === undefined) {
       console.log(NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG);

@@ -1,6 +1,6 @@
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatConfig } from "hardhat/src/types/config";
-import { HardhatRuntimeEnvironment, SolcConfig } from "hardhat/types";
+import { CompilationJob, DependencyGraph, HardhatRuntimeEnvironment, SolcConfig } from "hardhat/types";
 import { TenderlyContract, TenderlyContractConfig } from "tenderly/types";
 
 import { PLUGIN_NAME } from "../constants";
@@ -129,6 +129,47 @@ export const compareConfigs = (originalConfig: TenderlyContractConfig, newConfig
   }
   return true;
 };
+
+export const getCompilerDataFromHardhat = async (
+  hre: HardhatRuntimeEnvironment,
+  contractName: string,
+): Promise<TenderlyContractConfig> => {
+  const dependencyGraph: DependencyGraph = await _getDependencyGraph(hre);
+  const file = dependencyGraph.getResolvedFiles().find((resolvedFile) => {
+    const name = resolvedFile.sourceName.split("/").slice(-1)[0].split(".")[0];
+    return name === contractName;
+  });
+  const job: CompilationJob = await hre.run("compile:solidity:get-compilation-job-for-file", {
+    dependencyGraph,
+    file
+  });
+
+  const hhConfig: SolcConfig = job.getSolcConfig();
+
+  const tenderlyConfig: TenderlyContractConfig = {
+    compiler_version: hhConfig?.version,
+    optimizations_used: hhConfig?.settings?.optimizer?.enabled,
+    optimizations_count: hhConfig?.settings?.optimizer?.runs,
+    evm_version: hhConfig?.settings?.evmVersion,
+  }
+  if (hhConfig?.settings?.debug?.revertStrings) {
+    tenderlyConfig.debug = {
+      revertStrings: hhConfig.settings.debug.revertStrings
+    }
+  }
+
+  return tenderlyConfig;
+}
+
+async function _getDependencyGraph(hre: HardhatRuntimeEnvironment): Promise<DependencyGraph> {
+  const sourcePaths = await hre.run("compile:solidity:get-source-paths");
+  const sourceNames: string[] = await hre.run("compile:solidity:get-source-names", {
+    sourcePaths,
+  });
+  return hre.run("compile:solidity:get-dependency-graph", {
+    sourceNames,
+  });
+}
 
 export const newCompilerConfig = (
   config: HardhatConfig,
