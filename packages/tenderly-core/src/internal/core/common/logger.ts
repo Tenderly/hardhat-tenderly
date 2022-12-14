@@ -26,7 +26,7 @@ export function logApiError(err: any) {
 }
 
 export function logConfig(config: TenderlyConfig) {
-  logger.trace("Value of the config:", {
+  logger.trace("Checking config:", {
     email:
       config.email !== undefined && config.email !== null && config.email !== ""
         ? "set in 'email' field"
