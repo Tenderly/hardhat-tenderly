@@ -3,8 +3,8 @@ import os from "os";
 import path from "path";
 import * as yaml from "js-yaml";
 import { TenderlyConfig } from "../types";
-import { logConfig } from "../internal/core/common/logger";
 import { logger } from "./logger";
+import { convertToLogCompliantTenderlyConfig } from "./log-compliance";
 
 const configDir = `${os.homedir() + path.sep}.tenderly`;
 export const configFilePath = `${configDir + path.sep}config.yaml`;
@@ -16,7 +16,9 @@ export function getConfig(): TenderlyConfig {
     const fileData = fs.readFileSync(configFilePath);
 
     const tenderlyConfig = yaml.load(fileData.toString()) as TenderlyConfig;
-    logConfig(tenderlyConfig);
+    
+    const logCompliantTenderlyConfig = convertToLogCompliantTenderlyConfig(tenderlyConfig);
+    logger.trace("Checking config:", logCompliantTenderlyConfig);
 
     return tenderlyConfig;
   }
@@ -34,7 +36,9 @@ export function getConfig(): TenderlyConfig {
 
 export function writeConfig(config: TenderlyConfig): void {
   logger.trace(`Writing tenderly config to a file @ ${configDir}/${configFilePath}`);
-  logConfig(config);
+  
+  const logCompliantTenderlyConfig = convertToLogCompliantTenderlyConfig(config);
+  logger.trace("Checking config:", logCompliantTenderlyConfig);
 
   fs.mkdirSync(configDir, { recursive: true });
   fs.writeFileSync(configFilePath, yaml.dump(config), "utf8");

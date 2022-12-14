@@ -1,12 +1,5 @@
 import { TENDERLY_DASHBOARD_BASE_URL, CHAIN_ID_NETWORK_NAME_MAP } from "../../../common/constants";
 import {
-  logApiError,
-  logGetProjectsResponse,
-  logGetPublicNetworksResponse,
-  logVerificationResponse,
-} from "../common/logger";
-
-import {
   API_VERIFICATION_REQUEST_ERR_MSG,
   BYTECODE_MISMATCH_ERR_MSG,
   NO_NEW_CONTRACTS_VERIFIED_ERR_MSG,
@@ -27,6 +20,12 @@ import {
 } from "../types";
 import { logger } from "../../../utils/logger";
 import { TenderlyApiService } from "./TenderlyApiService";
+import {
+  convertToLogCompliantApiError,
+  convertToLogCompliantNetworks,
+  convertToLogCompliantProjects,
+  convertToLogCompliantVerificationResponse
+} from "../../../utils/log-compliance";
 
 export class TenderlyService {
   private pluginName: string;
@@ -49,11 +48,13 @@ export class TenderlyService {
         logger.error("There was an error while obtaining public networks from Tenderly. Obtained response is invalid.");
         return [];
       }
-      logGetPublicNetworksResponse(res.data);
+      const logCompliantNetworks = convertToLogCompliantNetworks(res.data);
+      logger.silly("Obtained public networks:", logCompliantNetworks);
 
       return res.data;
     } catch (err) {
-      logApiError(err);
+      const logCompliantApiErr = convertToLogCompliantApiError(err);
+      logger.error(logCompliantApiErr);
       console.log(`Error in ${this.pluginName}: ${NETWORK_FETCH_FAILED_ERR_MSG}`);
     }
     return [];
@@ -79,7 +80,8 @@ export class TenderlyService {
 
       return res.data.block_number;
     } catch (err) {
-      logApiError(err);
+      const logCompliantApiErr = convertToLogCompliantApiError(err);
+      logger.error(logCompliantApiErr);
       logger.error(`Error in ${this.pluginName}: ${LATEST_BLOCK_NUMBER_FETCH_FAILED_ERR_MSG}`);
     }
     return null;
@@ -106,7 +108,8 @@ export class TenderlyService {
         );
         return;
       }
-      logVerificationResponse(res.data);
+      const logCompliantVerificationResponse = convertToLogCompliantVerificationResponse(res.data);
+      logger.trace("Verification response:", logCompliantVerificationResponse);
 
       const responseData: ContractResponse = res.data;
       if (responseData.bytecode_mismatch_errors !== null) {
@@ -140,7 +143,8 @@ export class TenderlyService {
       }
       console.groupEnd();
     } catch (err) {
-      logApiError(err);
+      const logCompliantApiError = convertToLogCompliantApiError(err);
+      logger.error(logCompliantApiError);
       logger.error(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
     }
   }
@@ -165,7 +169,8 @@ export class TenderlyService {
         logger.error("There was an error while pushing contracts to Tenderly. Obtained response is invalid.");
         return;
       }
-      logVerificationResponse(res.data);
+      const logCompliantVerificationResponse = convertToLogCompliantVerificationResponse(res.data);
+      logger.trace("Verification response:", logCompliantVerificationResponse);
 
       const responseData: ContractResponse = res.data;
       if (responseData.bytecode_mismatch_errors !== null) {
@@ -188,7 +193,8 @@ export class TenderlyService {
         `Successfully privately verified Smart Contracts for project ${tenderlyProject}. You can view your contracts at ${dashLink}`
       );
     } catch (err) {
-      logApiError(err);
+      const logCompliantApiError = convertToLogCompliantApiError(err);
+      logger.error(logCompliantApiError);
       logger.error(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
     }
   }
@@ -214,7 +220,8 @@ export class TenderlyService {
       if (res.data === undefined || res.data === null) {
         logger.error("There was an error while verifying contracts on fork. Obtained response is invalid.");
       }
-      logVerificationResponse(res.data);
+      const logCompliantVerificationResponse = convertToLogCompliantVerificationResponse(res.data);
+      logger.trace("Verification response:", logCompliantVerificationResponse);
 
       const responseData: ContractResponse = res.data;
       if (responseData.bytecode_mismatch_errors !== null) {
@@ -238,7 +245,8 @@ export class TenderlyService {
       }
       console.groupEnd();
     } catch (err) {
-      logApiError(err);
+      const logCompliantApiError = convertToLogCompliantApiError(err);
+      logger.error(logCompliantApiError);
       logger.error(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
     }
   }
@@ -264,7 +272,8 @@ export class TenderlyService {
         username: res.data.user.username,
       };
     } catch (err) {
-      logApiError(err);
+      const logCompliantApiError = convertToLogCompliantApiError(err);
+      logger.error(logCompliantApiError);
       logger.error(`Error in ${this.pluginName}: ${PRINCIPAL_FETCH_FAILED_ERR_MSG}`);
     }
     return null;
@@ -284,11 +293,13 @@ export class TenderlyService {
       if (res.data === undefined || res.data === null) {
         logger.error("There was an error while obtaining project slug from Tenderly. Obtained response is invalid.");
       }
-      logGetProjectsResponse(res.data.projects);
+      const logCompliantProjects = convertToLogCompliantProjects(res.data.projects);
+      logger.trace("Obtained projects:", logCompliantProjects);
 
       return res.data.projects;
     } catch (err) {
-      logApiError(err);
+      const logCompliantApiError = convertToLogCompliantApiError(err);
+      logger.error(logCompliantApiError);
       logger.error(`Error in ${this.pluginName}: ${PROJECTS_FETCH_FAILED_ERR_MSG}`);
     }
     return [];

@@ -6,12 +6,12 @@ import { TenderlyForkContractUploadRequest } from "tenderly/types";
 import { getConfig, writeConfig } from "tenderly/utils/config";
 import { TENDERLY_JSON_RPC_BASE_URL } from "tenderly/common/constants";
 
-import { logInitializeForkResponse } from "tenderly/internal/core/common/logger";
 import { PLUGIN_NAME } from "./constants";
 import { ContractByName } from "./tenderly/types";
 import { NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG } from "./tenderly/errors";
-import { getCompilerDataFromHardhat, getContracts} from "./utils/util";
+import {getCompilerDataFromContracts, getCompilerDataFromHardhat, getContracts} from "./utils/util";
 import { logger } from "./utils/logger";
+import { convertToLogCompliantForkInitializeResponse } from "tenderly/utils/log-compliance";
 
 export class TenderlyNetwork {
   public host: string;
@@ -180,7 +180,8 @@ export class TenderlyNetwork {
       const resp = await this.tenderlyJsonRpc.post(`/account/${username}/project/${projectID}/fork`, {
         network_id: this.env.config.tenderly.forkNetwork,
       });
-      logInitializeForkResponse(resp.data);
+      const logCompliantInitializeForkResponse = convertToLogCompliantForkInitializeResponse(resp);
+      logger.trace("Initialized fork:", logCompliantInitializeForkResponse);
 
       this.head = resp.data.root_transaction.id;
       this.accounts = resp.data.simulation_fork.accounts;
@@ -242,8 +243,9 @@ export class TenderlyNetwork {
       throw new Error("Fork verification failed due to bad processing of data in /artifacts folder.");
     }
 
-    const solcConfig = await getCompilerDataFromHardhat(this.env, contracts[0].contractName);
-
+    // const solcConfig = await getCompilerDataFromHardhat(this.env, contracts[0].contractName);
+    const solcConfig = await getCompilerDataFromContracts(contracts, flatContracts, this.env.config);
+    
     if (solcConfig === undefined) {
       logger.error(NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG);
     }
