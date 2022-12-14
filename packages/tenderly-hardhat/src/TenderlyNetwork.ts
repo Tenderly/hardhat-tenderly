@@ -10,7 +10,7 @@ import { logInitializeForkResponse } from "tenderly/internal/core/common/logger"
 import { PLUGIN_NAME } from "./constants";
 import { ContractByName } from "./tenderly/types";
 import { NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG } from "./tenderly/errors";
-import { getCompilerDataFromContracts, getContracts } from "./utils/util";
+import { getCompilerDataFromHardhat, getContracts} from "./utils/util";
 import { logger } from "./utils/logger";
 
 export class TenderlyNetwork {
@@ -59,7 +59,6 @@ export class TenderlyNetwork {
   }
 
   public async send(payload: any, cb: any) {
-    // I won't put logs here because it isn't called from anywhere
     if (!this._checkNetwork()) {
       return;
     }
@@ -243,7 +242,7 @@ export class TenderlyNetwork {
       throw new Error("Fork verification failed due to bad processing of data in /artifacts folder.");
     }
 
-    const solcConfig = getCompilerDataFromContracts(contracts, flatContracts, this.env.config);
+    const solcConfig = await getCompilerDataFromHardhat(this.env, contracts[0].contractName);
 
     if (solcConfig === undefined) {
       logger.error(NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG);
