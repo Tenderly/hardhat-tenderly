@@ -23,8 +23,8 @@ const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
 export function setup() {
   // set to loggers to error level by default
-  logger.settings.minLevel = 1;
-  serviceLogger.settings.minLevel = 1;
+  logger.settings.minLevel = 4;
+  serviceLogger.settings.minLevel = 4;
 
   extendEnvironment((hre: HardhatRuntimeEnvironment) => {
     hre.tenderly = lazyObject(() => new Tenderly(hre));
