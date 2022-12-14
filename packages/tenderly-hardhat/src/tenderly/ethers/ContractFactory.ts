@@ -1,4 +1,4 @@
-import { Contract, ContractFactory, Signer } from "ethers";
+import {Contract, ContractFactory, ContractInterface, Signer} from "ethers";
 import { Libraries } from "@nomiclabs/hardhat-ethers/types";
 
 import { classFunctions } from "../../utils/util";
@@ -8,10 +8,10 @@ import { TdlyContract } from "./Contract";
 export class TdlyContractFactory {
   [key: string]: any;
 
-  private readonly contractName: string;
-  private libs: Libraries | undefined;
+  private static readonly contractName: string;
+  private static libs: Libraries | undefined;
   private nativeContractFactory: ContractFactory;
-  private tenderly: TenderlyPlugin;
+  private static tenderly: TenderlyPlugin;
 
   constructor(
     nativeContractFactory: ContractFactory,
@@ -42,6 +42,12 @@ export class TdlyContractFactory {
   public async deploy(...args: any[]): Promise<Contract> {
     const contract = await this.nativeContractFactory.deploy(...args);
 
+    return new TdlyContract(contract, this.tenderly, this.contractName, this.libs) as unknown as Contract;
+  }
+
+  public static getContract(address: string, contractInterface: ContractInterface, signer?: Signer): Contract {
+    const contract = ContractFactory.getContract(address, contractInterface, signer);
+    
     return new TdlyContract(contract, this.tenderly, this.contractName, this.libs) as unknown as Contract;
   }
 
