@@ -25,7 +25,7 @@ export const NetworksCommand = new commander.Command("networks")
     filteredNetworks.sort((a, b) => a.sort_order - b.sort_order);
 
     const logCompliantNetworks = convertToLogCompliantNetworks(filteredNetworks);
-    logger.silly("Obtained filtered public networks:", filteredNetworks);
+    logger.silly("Obtained filtered public networks:", logCompliantNetworks);
 
     const table = new Table({
       style: { head: ["magenta"] },
