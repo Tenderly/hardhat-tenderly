@@ -2,6 +2,7 @@ import { task } from "hardhat/config";
 import { HardhatPluginError } from "hardhat/plugins";
 import { TenderlyService } from "tenderly";
 
+import { logger } from "../utils/logger";
 import { PLUGIN_NAME } from "../constants";
 import { newCompilerConfig } from "../utils/util";
 import { extractContractData } from "./common";
@@ -16,6 +17,7 @@ task("tenderly:verify", "Verifies contracts on Tenderly")
   .setAction(verifyContract);
 
 async function verifyContract({ contracts }: any, { config, hardhatArguments, run }: any) {
+  logger.info("Public verification hardhat task has been invoked.");
   if (contracts === undefined) {
     throw new HardhatPluginError(
       PLUGIN_NAME,

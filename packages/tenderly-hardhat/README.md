@@ -159,6 +159,11 @@ module.exports = {
 };
 ```
 
+If you are having trouble with the plugin and want to contact support, you can run the deploy script with the following ```--verbose``` flag as so:
+```bash
+npx hardhat run scripts/{your_deploy_script_here.js} --network {network_name} --verbose > tenderly.log 2>&1
+```
+This will create a ```tenderly.log``` file that you can send to our customer support engineers for investigation.
 ## Usage
 
 For this plugin to function you need to create a `config.yaml` file at `$HOME/.tenderly/config.yaml` or `%HOMEPATH%\.tenderly\config.yaml` and add an `access_key` field to it:

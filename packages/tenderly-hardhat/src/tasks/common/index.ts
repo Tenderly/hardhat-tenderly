@@ -3,6 +3,7 @@ import { RunTaskFunction, HardhatConfig } from "hardhat/types";
 import { TenderlyContract } from "tenderly/types";
 import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";
 
+import { logger } from "../../utils/logger";
 import { PLUGIN_NAME } from "../../constants";
 import { Metadata } from "../../tenderly/types";
 import { CONTRACTS_NOT_DETECTED } from "../../tenderly/errors";
@@ -14,6 +15,8 @@ export async function extractContractData(
   config: HardhatConfig,
   run: RunTaskFunction
 ): Promise<TenderlyContract[]> {
+  logger.info("Extracting contract data.");
+
   let contract: string;
   const requestContracts: TenderlyContract[] = [];
 
@@ -63,6 +66,7 @@ export async function extractContractData(
   for (const [key, value] of Object.entries(metadata.sources)) {
     const name = key.split("/").slice(-1)[0].split(".")[0];
 
+    logger.trace("Currently processing contract:", name);
     const contractToPush: TenderlyContract = {
       contractName: name,
       source: value.content,
@@ -82,7 +86,7 @@ export async function extractContractData(
           chainID = config.networks[network!].chainId!.toString();
         }
         if (chainID === undefined) {
-          console.log(
+          logger.error(
             `Error in ${PLUGIN_NAME}: Couldn't identify network. Please provide a chainID in the network config object`
           );
           return [];
@@ -94,6 +98,8 @@ export async function extractContractData(
         };
       }
     }
+    logger.silly(`Processed contract ${name}:`, contractToPush);
+
     requestContracts.push(contractToPush);
   }
   return requestContracts;
