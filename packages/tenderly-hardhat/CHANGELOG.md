@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 2.0.0-beta.2
+
+### Patch Changes
+
+- Set logger configuration to 4 by default
+
 ## 2.0.0-beta.1
 
 ### Minor Changes
