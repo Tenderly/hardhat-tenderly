@@ -39,12 +39,37 @@ export interface ContractNetwork {
 }
 
 export interface ApiContract {
-  address: string;
+  id: string;
+  contract_id: string;
+  balance: string;
   network_id: string;
+  public: boolean;
+  export: boolean;
+  verification_date: string;
+  address: string;
+  contract_name: string;
+  ens_domain: string[];
+  type: string;
+  evm_version: string;
+  compiler_version: string;
+  optimizations_used: boolean;
+  optimization_runs: number;
+  libraries: Record<string, string>;
+  data: object;
+  creation_block: number;
+  creation_tx: string;
+  creator_address: string;
+  created_at: string;
+  number_of_watches: number;
+  language: string;
+  in_project: boolean;
+  number_of_files: number;
 }
 
 export interface BytecodeMismatchError {
   contract_id: string;
   expected: string;
   got: string;
+  similarity: number;
+  assumed_reason: string;
 }
