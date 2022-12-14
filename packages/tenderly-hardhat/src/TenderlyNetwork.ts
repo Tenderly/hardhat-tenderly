@@ -9,7 +9,9 @@ import { TENDERLY_JSON_RPC_BASE_URL } from "tenderly/common/constants";
 import { PLUGIN_NAME } from "./constants";
 import { ContractByName } from "./tenderly/types";
 import { NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG } from "./tenderly/errors";
-import { getCompilerDataFromContracts, getContracts } from "./utils/util";
+import {getCompilerDataFromContracts, getCompilerDataFromHardhat, getContracts} from "./utils/util";
+import { logger } from "./utils/logger";
+import { convertToLogCompliantForkInitializeResponse } from "tenderly/utils/log-compliance";
 
 export class TenderlyNetwork {
   public host: string;
@@ -24,10 +26,13 @@ export class TenderlyNetwork {
   private tenderlyService = new TenderlyService(PLUGIN_NAME);
 
   constructor(hre: HardhatRuntimeEnvironment) {
+    logger.debug("Making an interface towards tenderly network.");
+
     this.env = hre;
     this.connected = true;
 
     const tdlyGlobalConfig = getConfig();
+
     this.accessKey = tdlyGlobalConfig?.access_key;
 
     this.tenderlyJsonRpc = this._configureTenderlyRPCInstance();
@@ -35,6 +40,7 @@ export class TenderlyNetwork {
 
     if (hre.network.name === "tenderly" && "url" in hre.network.config && hre.network.config.url !== undefined) {
       this.forkID = hre.network.config.url.split("/").pop();
+      logger.info("Fork ID is:", this.forkID);
     }
   }
 
@@ -85,20 +91,26 @@ export class TenderlyNetwork {
   }
 
   public async verify(...contracts: any[]) {
+    logger.info("Invoked fork verification.");
     if (!this._checkNetwork()) {
       return;
     }
 
     if (this.head === undefined && this.forkID === undefined) {
+      logger.warn("Head or fork are not initialized.");
       await this.initializeFork();
     }
 
     const flatContracts: ContractByName[] = contracts.reduce((accumulator, value) => accumulator.concat(value), []);
     const requestData = await this._filterContracts(flatContracts);
     if (requestData === null) {
+      logger.error("Fork verification failed due to bad processing of data in /artifacts directory.");
       return;
     }
+    logger.silly("Processed request data:", requestData);
+
     if (requestData?.contracts.length === 0) {
+      logger.error("Filtering contracts did not succeed. The length of the contracts is 0.");
       return;
     }
 
@@ -116,6 +128,7 @@ export class TenderlyNetwork {
     username: string,
     forkID: string
   ) {
+    logger.info("Invoked fork verification via API.");
     await this.tenderlyService.verifyForkContracts(request, tenderlyProject, username, forkID);
   }
 
@@ -149,23 +162,34 @@ export class TenderlyNetwork {
   }
 
   public async initializeFork() {
+    logger.debug("Initializing tenderly fork.");
+
     if (!this._checkNetwork()) {
       return;
     }
     if (this.env.config.tenderly?.forkNetwork === undefined) {
+      logger.error("There is no information about the fork network. Fork won't be initialized");
       return;
     }
 
     const username: string = this.env.config.tenderly.username;
     const projectID: string = this.env.config.tenderly.project;
+    logger.trace("ProjectID obtained from tenderly configuration:", { projectID });
+
     try {
       const resp = await this.tenderlyJsonRpc.post(`/account/${username}/project/${projectID}/fork`, {
         network_id: this.env.config.tenderly.forkNetwork,
       });
+      const logCompliantInitializeForkResponse = convertToLogCompliantForkInitializeResponse(resp);
+      logger.trace("Initialized fork:", logCompliantInitializeForkResponse);
+
       this.head = resp.data.root_transaction.id;
       this.accounts = resp.data.simulation_fork.accounts;
       this.forkID = resp.data.simulation_fork.id;
+
+      logger.debug("Successfully initialized tenderly fork.");
     } catch (err) {
+      logger.error("Error was caught while calling fork initialization:", err);
       throw err;
     }
   }
@@ -177,11 +201,15 @@ export class TenderlyNetwork {
   }
 
   private async _filterContracts(flatContracts: ContractByName[]): Promise<TenderlyForkContractUploadRequest | null> {
+    logger.info("Processing data needed for fork verification.");
+
     let contract: ContractByName;
     let requestData: TenderlyForkContractUploadRequest;
     try {
       requestData = await this._getForkContractData(flatContracts);
+      logger.silly("Obtained request data needed for fork verification:", requestData);
     } catch (e) {
+      logger.error("Caught and error while trying to obtain data needed for fork verification", e);
       return null;
     }
 
@@ -190,29 +218,35 @@ export class TenderlyNetwork {
         (requestContract) => requestContract.contractName === contract.name
       );
       if (index === -1) {
+        logger.error(`Couldn't find a contract '${contract.name}' among the obtained request data.`);
         continue;
       }
+
+      logger.trace("Currently processing contract:", contract.name);
       requestData.contracts[index].networks = {
         [this.forkID!]: {
           address: contract.address,
           links: contract.libraries,
         },
       };
+      logger.trace(`Contract ${contract.name} has been processed,`);
     }
 
     return requestData;
   }
 
   private async _getForkContractData(flatContracts: ContractByName[]): Promise<TenderlyForkContractUploadRequest> {
+    logger.trace("Getting contract data needed for fork verification.");
+
     const contracts = await getContracts(this.env, flatContracts);
     if (contracts.length === 0) {
-      throw new Error("Failed to get contracts");
+      throw new Error("Fork verification failed due to bad processing of data in /artifacts folder.");
     }
 
-    const solcConfig = getCompilerDataFromContracts(contracts, flatContracts, this.env.config);
-
+    const solcConfig = await getCompilerDataFromHardhat(this.env, contracts[0].contractName);
+    
     if (solcConfig === undefined) {
-      console.log(NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG);
+      logger.error(NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG);
     }
 
     return {
@@ -224,7 +258,7 @@ export class TenderlyNetwork {
 
   private _checkNetwork(): boolean {
     if (this.env.network.name !== "tenderly") {
-      console.log(
+      logger.error(
         `Warning in ${PLUGIN_NAME}: Network is not set to tenderly. Please call the task again with --network tenderly`
       );
       return false;

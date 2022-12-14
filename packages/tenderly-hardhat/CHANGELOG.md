@@ -1,17 +1,27 @@
 # @tenderly/hardhat-tenderly
 
-## 1.3.2
+## 2.0.0-beta.2
 
 ### Patch Changes
 
-- Updated dependencies [[`913aad5`](https://github.com/Tenderly/hardhat-tenderly/commit/913aad5b23e3c3c170a600b7153dfe085be34919)]:
-  - tenderly@0.0.3
+- Set logger configuration to 4 by default
 
-## 1.3.1
+## 2.0.0-beta.1
+
+### Minor Changes
+
+- Added loggers to tenderly service and hardhat-tenderly plugin.
 
 ### Patch Changes
 
-- [#86](https://github.com/Tenderly/hardhat-tenderly/pull/86) [`aee1c9b`](https://github.com/Tenderly/hardhat-tenderly/commit/aee1c9be6452842a4eb9090ef2d1b2d62626be23) Thanks [@Riphal](https://github.com/Riphal)! - Fix for https://github.com/Tenderly/hardhat-tenderly/issues/84
+- Updated dependencies []:
+  - tenderly@0.1.0-beta.0
+
+## 1.3.1-beta.0
+
+### Patch Changes
+
+- Fix for https://github.com/Tenderly/hardhat-tenderly/issues/84
 
 ## 1.3.0
 
