@@ -1,5 +1,11 @@
 # tenderly
 
+## 0.1.0-beta.0
+
+### Minor Changes
+
+- Added loggers to tenderly service and hardhat-tenderly plugin.
+
 ## 0.0.3
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @tenderly/hardhat-tenderly
 
+## 2.0.0-beta.1
+
+### Minor Changes
+
+- Added loggers to tenderly service and hardhat-tenderly plugin.
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tenderly@0.1.0-beta.0
+
 ## 1.3.1-beta.0
 
 ### Patch Changes
