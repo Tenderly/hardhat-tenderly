@@ -10,7 +10,7 @@ const configDir = `${os.homedir() + path.sep}.tenderly`;
 export const configFilePath = `${configDir + path.sep}config.yaml`;
 
 export function getConfig(): TenderlyConfig {
-  logger.trace("Getting tenderly config...");
+  logger.trace("Getting tenderly config.");
 
   if (configExists()) {
     const fileData = fs.readFileSync(configFilePath);
@@ -41,7 +41,7 @@ export function writeConfig(config: TenderlyConfig): void {
 }
 
 export function configExists(): boolean {
-  logger.trace("Checking if tenderly config exists...");
+  logger.trace("Checking if tenderly config exists.");
   const exists = fs.existsSync(configFilePath);
   logger.trace(exists ? "Tenderly config exists." : "Tenderly config doesn't exist.");
 
@@ -49,7 +49,7 @@ export function configExists(): boolean {
 }
 
 export function isAccessTokenSet(): boolean {
-  logger.trace("Determining if access token in tenderly config file is set...");
+  logger.trace("Determining if access token in tenderly config file is set.");
   const config = getConfig();
 
   const isSet = config.access_key !== undefined && config.access_key !== null && config.access_key !== "";
@@ -59,7 +59,7 @@ export function isAccessTokenSet(): boolean {
 }
 
 export function getAccessToken(): string {
-  logger.trace("Getting access token...");
+  logger.trace("Getting access token.");
   if (!isAccessTokenSet()) {
     logger.warn("Access key is not set, returning empty string value.");
     return "";
@@ -69,7 +69,7 @@ export function getAccessToken(): string {
 }
 
 export function setAccessToken(accessToken: string): void {
-  logger.trace("Setting access key...");
+  logger.trace("Setting access key.");
   const config = getConfig();
   config.access_key = accessToken;
   writeConfig(config);

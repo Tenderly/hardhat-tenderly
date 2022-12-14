@@ -26,7 +26,7 @@ export class TenderlyNetwork {
   private tenderlyService = new TenderlyService(PLUGIN_NAME);
 
   constructor(hre: HardhatRuntimeEnvironment) {
-    logger.debug("Making an interface towards tenderly network...");
+    logger.debug("Making an interface towards tenderly network.");
 
     this.env = hre;
     this.connected = true;
@@ -162,7 +162,7 @@ export class TenderlyNetwork {
   }
 
   public async initializeFork() {
-    logger.debug("Initializing tenderly fork...");
+    logger.debug("Initializing tenderly fork.");
 
     if (!this._checkNetwork()) {
       return;
@@ -200,7 +200,7 @@ export class TenderlyNetwork {
   }
 
   private async _filterContracts(flatContracts: ContractByName[]): Promise<TenderlyForkContractUploadRequest | null> {
-    logger.info("Processing data needed for fork verification...");
+    logger.info("Processing data needed for fork verification.");
 
     let contract: ContractByName;
     let requestData: TenderlyForkContractUploadRequest;
@@ -235,7 +235,7 @@ export class TenderlyNetwork {
   }
 
   private async _getForkContractData(flatContracts: ContractByName[]): Promise<TenderlyForkContractUploadRequest> {
-    logger.trace("Getting contract data needed for fork verification...");
+    logger.trace("Getting contract data needed for fork verification.");
 
     const contracts = await getContracts(this.env, flatContracts);
     if (contracts.length === 0) {

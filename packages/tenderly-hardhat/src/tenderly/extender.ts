@@ -34,7 +34,7 @@ export function setup() {
       serviceLogger.settings.minLevel = 1; // trace level
     }
     logger.info(
-      `Setting up hardhat-tenderly plugin... Log level of hardhat tenderly plugin set to: ${logger.settings.minLevel}`
+      `Setting up hardhat-tenderly plugin. Log level of hardhat tenderly plugin set to: ${logger.settings.minLevel}`
     );
     // serviceLogger is used here just for initialization, nothing else, it will be used in TenderlyService.ts
     serviceLogger.info(`Log level of tenderly service set to: ${serviceLogger.settings.minLevel}`);
@@ -53,7 +53,7 @@ export function setup() {
     extendProvider(hre);
     populateNetworks();
     if (process.env.AUTOMATIC_VERIFICATION_ENABLED === "true") {
-      logger.debug("Automatic verification is enabled, proceeding to extend ethers library...");
+      logger.debug("Automatic verification is enabled, proceeding to extend ethers library.");
       extendEthers(hre);
       extendHardhatDeploy(hre);
       logger.debug("Wrapping ethers library finished.");

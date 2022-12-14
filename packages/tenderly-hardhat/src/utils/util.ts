@@ -13,7 +13,7 @@ export const getCompilerDataFromContracts = (
   flatContracts: ContractByName[],
   hhConfig: HardhatConfig
 ): TenderlyContractConfig | undefined => {
-  logger.debug("Obtaining compiler data from contracts...");
+  logger.debug("Obtaining compiler data from contracts.");
 
   let contract: TenderlyContract;
   let mainContract: ContractByName;
@@ -221,7 +221,7 @@ export const newCompilerConfig = (
   }
 
   if (contractCompiler !== undefined) {
-    logger.trace("There is a provided compiler configuration, determining it...");
+    logger.trace("There is a provided compiler configuration, determining it.");
     return determineCompilerConfig(config.solidity.compilers, contractCompiler);
   }
 

@@ -8,7 +8,7 @@ import { isAccessTokenSet, setAccessToken } from "../../../utils/config";
 import { TENDERLY_API_BASE_URL, TENDERLY_DASHBOARD_BASE_URL } from "../../../common/constants";
 
 export const LoginCommand = new commander.Command("login").description("login to Tenderly").action(async () => {
-  logger.info("Trying to login to Tenderly...");
+  logger.info("Trying to login to Tenderly.");
 
   if (isAccessTokenSet()) {
     logger.debug("Access token is already set. Checking if access token overwrite is needed.");

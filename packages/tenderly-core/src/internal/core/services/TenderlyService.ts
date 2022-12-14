@@ -36,7 +36,7 @@ export class TenderlyService {
   }
 
   public async getNetworks(): Promise<TenderlyNetwork[]> {
-    logger.debug("Obtaining public networks...");
+    logger.debug("Obtaining public networks.");
 
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
     if (TenderlyApiService.isAuthenticated()) {
@@ -60,7 +60,7 @@ export class TenderlyService {
   }
 
   public async getLatestBlockNumber(networkId: string): Promise<string | null> {
-    logger.debug("Getting latest block number...");
+    logger.debug("Getting latest block number.");
 
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
     if (TenderlyApiService.isAuthenticated()) {
@@ -86,7 +86,7 @@ export class TenderlyService {
   }
 
   public async verifyContracts(request: TenderlyContractUploadRequest): Promise<void> {
-    logger.debug("Verifying contracts publicly...");
+    logger.debug("Verifying contracts publicly.");
 
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
     if (TenderlyApiService.isAuthenticated()) {
@@ -150,7 +150,7 @@ export class TenderlyService {
     tenderlyProject: string,
     username: string
   ): Promise<void> {
-    logger.debug("Pushing contracts onto Tenderly...");
+    logger.debug("Pushing contracts onto Tenderly.");
     if (!TenderlyApiService.isAuthenticated()) {
       logger.error(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
       return;
@@ -199,7 +199,7 @@ export class TenderlyService {
     username: string,
     fork: string
   ): Promise<void> {
-    logger.info("Verifying contracts on fork...");
+    logger.info("Verifying contracts on fork.");
 
     if (!TenderlyApiService.isAuthenticated()) {
       logger.error(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
@@ -244,7 +244,7 @@ export class TenderlyService {
   }
 
   public async getPrincipal(): Promise<Principal | null> {
-    logger.debug("Getting principal...");
+    logger.debug("Getting principal.");
 
     if (!TenderlyApiService.isAuthenticated()) {
       logger.error(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
@@ -271,7 +271,7 @@ export class TenderlyService {
   }
 
   public async getProjectSlugs(principalId: string): Promise<Project[]> {
-    logger.debug("Getting project slugs...");
+    logger.debug("Getting project slugs.");
 
     if (!TenderlyApiService.isAuthenticated()) {
       logger.error(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);

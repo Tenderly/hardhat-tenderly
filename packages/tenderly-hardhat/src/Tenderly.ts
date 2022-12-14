@@ -20,7 +20,7 @@ export class Tenderly {
   private tenderlyService = new TenderlyService(PLUGIN_NAME);
 
   constructor(hre: HardhatRuntimeEnvironment) {
-    logger.debug("Creating Tenderly plugin...");
+    logger.debug("Creating Tenderly plugin.");
 
     this.env = hre;
     this.tenderlyNetwork = new TenderlyNetwork(hre);
@@ -34,13 +34,13 @@ export class Tenderly {
     const priv = this.env.config.tenderly?.privateVerification;
     if (priv !== undefined && priv && this.env.network.name !== "tenderly") {
       logger.info(
-        "Private verification flag is set to TRUE in tenderly configuration. Redirecting to private verification..."
+        "Private verification flag is set to TRUE in tenderly configuration. Redirecting to private verification."
       );
       return this.push(...contracts);
     }
 
     if (this.env.network.name === "tenderly") {
-      logger.info("Network parameter is set to 'tenderly', redirecting to fork verification...");
+      logger.info("Network parameter is set to 'tenderly', redirecting to fork verification.");
       return this.tenderlyNetwork.verify(contracts);
     }
 
@@ -103,7 +103,7 @@ export class Tenderly {
     const priv = this.env.config.tenderly?.privateVerification;
     if (priv !== undefined && !priv) {
       logger.info(
-        "Private verification flag is set to FALSE in tenderly configuration. Redirecting to public verification..."
+        "Private verification flag is set to FALSE in tenderly configuration. Redirecting to public verification."
       );
       return this.verify(...contracts);
     }
@@ -240,7 +240,7 @@ export class Tenderly {
   }
 
   private async _filterContracts(flatContracts: ContractByName[]): Promise<TenderlyContractUploadRequest | null> {
-    logger.info("Processing data needed for verification...");
+    logger.info("Processing data needed for verification.");
 
     let contract: ContractByName;
     let requestData: TenderlyContractUploadRequest;

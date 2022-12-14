@@ -6,7 +6,7 @@ import { TENDERLY_API_BASE_URL, TENDERLY_JSON_RPC_BASE_URL } from "../../../comm
 
 export class TenderlyApiService {
   public static configureInstance(): axios.AxiosInstance {
-    logger.debug("Configuring instance...");
+    logger.debug("Configuring instance.");
 
     const tdlyConfig = getConfig();
     const params = {
@@ -34,7 +34,7 @@ export class TenderlyApiService {
   }
 
   public static configureTenderlyRPCInstance(): axios.AxiosInstance {
-    logger.debug("Configuring tenderly RPC instance...");
+    logger.debug("Configuring tenderly RPC instance.");
 
     const tdlyConfig = getConfig();
     const params = {
