@@ -280,7 +280,7 @@ export class Tenderly {
 
       if (chainID === undefined) {
         logger.error(
-          `Error in ${PLUGIN_NAME}: Couldn't identify network. Please provide a chainID in the network config object`
+          `Error in ${PLUGIN_NAME}: Couldn't identify network. Please provide a chainId in the network config object`
         );
         return null;
       }
