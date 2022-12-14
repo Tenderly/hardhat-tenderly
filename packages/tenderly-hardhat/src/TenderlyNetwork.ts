@@ -243,8 +243,7 @@ export class TenderlyNetwork {
       throw new Error("Fork verification failed due to bad processing of data in /artifacts folder.");
     }
 
-    // const solcConfig = await getCompilerDataFromHardhat(this.env, contracts[0].contractName);
-    const solcConfig = await getCompilerDataFromContracts(contracts, flatContracts, this.env.config);
+    const solcConfig = await getCompilerDataFromHardhat(this.env, contracts[0].contractName);
     
     if (solcConfig === undefined) {
       logger.error(NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG);
