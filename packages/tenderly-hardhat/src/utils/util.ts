@@ -14,42 +14,43 @@ import { CONTRACTS_NOT_DETECTED } from "../tenderly/errors";
 import { ContractByName, Metadata } from "../tenderly/types";
 import { logger } from "./logger";
 
-export const fillCompilerConfigurationInContracts = async (
-  hre: HardhatRuntimeEnvironment,
-  contracts: TenderlyVerificationContract[]
-): Promise<TenderlyVerificationContract[]> => {
-  logger.debug("Filling compiler data in verification contracts...");
-  const hhConfig: HardhatConfig = hre.config;
-
-  for (const contract of contracts) {
-    let contractCompilerConfig: TenderlyContractConfig | undefined;
-    for (const [sourcePath, _] of Object.entries(contract.sources)) {
-      const sourceCompilerConfig: TenderlyContractConfig = newCompilerConfig(
-        hhConfig,
-        sourcePath,
-        extractCompilerVersion(hhConfig, sourcePath, await _getVersionPragma(hre, sourcePath))
-      );
-      if (
-        contractCompilerConfig !== undefined &&
-        contractCompilerConfig !== null &&
-        !compareConfigs(sourceCompilerConfig, contractCompilerConfig)
-      ) {
-        logger.error(`Error in ${PLUGIN_NAME}: Different compiler versions provided in same request`);
-        throw new Error("Compiler version mismatch");
-      } else {
-        contractCompilerConfig = sourceCompilerConfig;
-      }
-    }
-
-    // converting to match api request format
-    contract.compiler = _convertCompilerConfiguration(contractCompilerConfig!);
-
-    logger.silly("Obtained compiler configuration is:", contract.compiler);
-  }
-  logger.debug("Compiler data has been obtained.");
-
-  return contracts;
-};
+// TODO(dusan) This function should be deleted since we have getCompilationJob
+// export const fillCompilerConfigurationInContracts = async (
+//   hre: HardhatRuntimeEnvironment,
+//   contracts: TenderlyVerificationContract[]
+// ): Promise<TenderlyVerificationContract[]> => {
+//   logger.debug("Filling compiler data in verification contracts...");
+//   const hhConfig: HardhatConfig = hre.config;
+//
+//   for (const contract of contracts) {
+//     let contractCompilerConfig: TenderlyContractConfig | undefined;
+//     for (const [sourcePath, _] of Object.entries(contract.sources)) {
+//       const sourceCompilerConfig: TenderlyContractConfig = newCompilerConfig(
+//         hhConfig,
+//         sourcePath,
+//         extractCompilerVersion(hhConfig, sourcePath, await _getVersionPragma(hre, sourcePath))
+//       );
+//       if (
+//         contractCompilerConfig !== undefined &&
+//         contractCompilerConfig !== null &&
+//         !compareConfigs(sourceCompilerConfig, contractCompilerConfig)
+//       ) {
+//         logger.error(`Error in ${PLUGIN_NAME}: Different compiler versions provided in same request`);
+//         throw new Error("Compiler version mismatch");
+//       } else {
+//         contractCompilerConfig = sourceCompilerConfig;
+//       }
+//     }
+//
+//     // converting to match api request format
+//     contract.compiler = _convertCompilerConfiguration(contractCompilerConfig!);
+//
+//     logger.silly("Obtained compiler configuration is:", contract.compiler);
+//   }
+//   logger.debug("Compiler data has been obtained.");
+//
+//   return contracts;
+// };
 
 async function _getVersionPragma(hre: HardhatRuntimeEnvironment, sourcePath: string): Promise<string | undefined> {
   const sourcePaths = await hre.run("compile:solidity:get-source-paths");
@@ -342,20 +343,31 @@ export const compareConfigs = (originalConfig: TenderlyContractConfig, newConfig
   return true;
 };
 
-export const getCompilerDataFromHardhat = async (
+export const getCompilationJob = async (
   hre: HardhatRuntimeEnvironment,
   contractName: string,
-): Promise<TenderlyContractConfig> => {
+): Promise<CompilationJob> => {
+  logger.trace("Getting compilation job for contract:", contractName);
+  
   const dependencyGraph: DependencyGraph = await _getDependencyGraph(hre);
+  
   const file = dependencyGraph.getResolvedFiles().find((resolvedFile) => {
     const name = resolvedFile.sourceName.split("/").slice(-1)[0].split(".")[0];
     return name === contractName;
   });
-  const job: CompilationJob = await hre.run("compile:solidity:get-compilation-job-for-file", {
+
+  return await hre.run("compile:solidity:get-compilation-job-for-file", {
     dependencyGraph,
     file
   });
+}
 
+// TODO(dusan) This function should be deleted since we have getCompilationJob
+export const getCompilerDataFromHardhat = async (
+  hre: HardhatRuntimeEnvironment,
+  contractName: string,
+): Promise<TenderlyContractConfig> => {
+  const job: CompilationJob = await getCompilationJob(hre, contractName);
   const hhConfig: SolcConfig = job.getSolcConfig();
 
   const tenderlyConfig: TenderlyContractConfig = {
