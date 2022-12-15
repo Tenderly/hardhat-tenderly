@@ -16,12 +16,12 @@ import {
   TenderlyNetwork,
   ContractResponse,
   TenderlyContractUploadRequest,
-  TenderlyForkContractUploadRequest,
+  TenderlyForkContractUploadRequest, TenderlyVerifyContractsRequest, VerifyContractsResponse,
 } from "../types";
 import { logger } from "../../../utils/logger";
 import { TenderlyApiService } from "./TenderlyApiService";
 import {
-  convertToLogCompliantApiError,
+  convertToLogCompliantApiError, convertToLogCompliantForkVerificationResponse,
   convertToLogCompliantNetworks,
   convertToLogCompliantProjects,
   convertToLogCompliantVerificationResponse
@@ -87,7 +87,7 @@ export class TenderlyService {
     return null;
   }
 
-  public async verifyContracts(request: TenderlyContractUploadRequest): Promise<void> {
+  public async verifyContracts(request: TenderlyVerifyContractsRequest): Promise<void> {
     logger.debug("Verifying contracts publicly.");
 
     let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
@@ -101,7 +101,7 @@ export class TenderlyService {
         return;
       }
 
-      const res = await tenderlyApi.post("/api/v1/public/verify-contracts", { ...request });
+      const res = await tenderlyApi.post("/api/v1/public/contracts/verify", { ...request });
       if (res.data === undefined || res.data === null) {
         logger.error(
           "There was an error while publicly verifying contracts on Tenderly. Obtained response is invalid."
@@ -110,38 +110,30 @@ export class TenderlyService {
       }
       const logCompliantVerificationResponse = convertToLogCompliantVerificationResponse(res.data);
       logger.trace("Verification response:", logCompliantVerificationResponse);
-
-      const responseData: ContractResponse = res.data;
-      if (responseData.bytecode_mismatch_errors !== null) {
-        logger.error(`Error in ${this.pluginName}: ${BYTECODE_MISMATCH_ERR_MSG}`);
+      
+      if (logCompliantVerificationResponse.compilation_errors) {
+        logger.error("There have been compilation errors while verifying contracts.", logCompliantVerificationResponse.compilation_errors);
+        return;
+      }
+      
+      if (!logCompliantVerificationResponse.results) {
+        logger.error("There has been an error while verifying contracts, no verified contracts nor bytecode mismatch errors are returned.");
         return;
       }
 
-      if (responseData.contracts === undefined || responseData.contracts === null) {
-        logger.error("There was an error during public verification. There are no returned contracts.");
-        return;
-      }
-
-      if (responseData.contracts.length === 0) {
-        let addresses = "";
-        for (const cont of request.contracts) {
-          addresses += `${cont.contractName}, `;
+      if (logCompliantVerificationResponse.results.bytecode_mismatch_errors) {
+        for (const bytecodeMismatchError of logCompliantVerificationResponse.results.bytecode_mismatch_errors) {
+          logger.error("There has been a bytecode mismatch error while verifying contract.", bytecodeMismatchError);
         }
-
-        logger.error(`Error in ${this.pluginName}: ${NO_NEW_CONTRACTS_VERIFIED_ERR_MSG}`, addresses);
-        return;
       }
-
-      console.log("Smart Contracts successfully verified");
-      console.group();
-
-      for (const contract of responseData.contracts) {
-        const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/contract/${
-          CHAIN_ID_NETWORK_NAME_MAP[contract.network_id]
-        }/${contract.address}`;
-        console.log(`Contract ${contract.address} verified. You can view the contract at ${contractLink}`);
+      if (logCompliantVerificationResponse.results.verified_contracts) {
+        for (const verifiedContract of logCompliantVerificationResponse.results.verified_contracts) {
+          const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/contract/${
+            CHAIN_ID_NETWORK_NAME_MAP[verifiedContract.network_id]
+          }/${verifiedContract.address}`;
+          console.log(`Contract ${verifiedContract.address} verified. You can view the contract at ${contractLink}`);
+        }
       }
-      console.groupEnd();
     } catch (err) {
       const logCompliantApiError = convertToLogCompliantApiError(err);
       logger.error(logCompliantApiError);
@@ -220,7 +212,7 @@ export class TenderlyService {
       if (res.data === undefined || res.data === null) {
         logger.error("There was an error while verifying contracts on fork. Obtained response is invalid.");
       }
-      const logCompliantVerificationResponse = convertToLogCompliantVerificationResponse(res.data);
+      const logCompliantVerificationResponse = convertToLogCompliantForkVerificationResponse(res.data);
       logger.trace("Verification response:", logCompliantVerificationResponse);
 
       const responseData: ContractResponse = res.data;

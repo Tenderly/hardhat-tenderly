@@ -1,9 +1,10 @@
 import {
   ApiContract,
   BytecodeMismatchError,
-  ContractResponse,
+  ContractResponse, VerificationResult, VerifyContractsResponse,
 } from "../internal/core/types";
 import { TenderlyConfig } from "../types";
+import {CompilationError} from "../internal/core/types/Compiler";
 
 export function convertToLogCompliantApiError(err: any) {
   // api error
@@ -25,7 +26,7 @@ export function convertToLogCompliantApiError(err: any) {
   }
 }
 
-export function convertToLogCompliantVerificationResponse(res: ContractResponse) {
+export function convertToLogCompliantForkVerificationResponse(res: ContractResponse) {
   const logCompliantContracts = convertToLogCompliantContracts(res.contracts);
   const logCompliantBytecodeMismatchErrors = convertToLogCompliantBytecodeMismatchErrors(res.bytecode_mismatch_errors);
 
@@ -36,7 +37,7 @@ export function convertToLogCompliantVerificationResponse(res: ContractResponse)
 }
 
 export function convertToLogCompliantContracts(contracts: ApiContract[]) {
-  if (contracts === undefined || contracts === null) {
+  if (!contracts) {
     return undefined;
   }
 
@@ -74,7 +75,7 @@ export function convertToLogCompliantContracts(contracts: ApiContract[]) {
 }
 
 export function convertToLogCompliantBytecodeMismatchErrors(bytecodeMismatchErrors: BytecodeMismatchError[]) {
-  if (bytecodeMismatchErrors === undefined || bytecodeMismatchErrors === null) {
+  if (!bytecodeMismatchErrors) {
     return undefined;
   }
 
@@ -91,8 +92,91 @@ export function convertToLogCompliantBytecodeMismatchErrors(bytecodeMismatchErro
   return logCompliantBytecodeMismatchErrors;
 }
 
+export function convertToLogCompliantVerificationResponse(res: VerifyContractsResponse) {
+  const logCompliantCompilationErrors = convertToLogCompliantCompilationErrors(res?.compilation_errors);
+  const logCompliantVerificationResults = convertToLogCompliantVerificationResults(res?.results);
+
+  return {
+    results: logCompliantVerificationResults,
+    compilation_errors: logCompliantCompilationErrors,
+  }
+}
+
+function convertToLogCompliantVerificationResults(results: VerificationResult[]) {
+  if (!results) {
+    return undefined;
+  }
+
+  const logCompliantVerifiedContracts = [];
+  const logCompliantBytecodeMismatchErrors = [];
+  
+  for (const res of results) {
+    if (res.bytecode_mismatch_error) {
+      logCompliantBytecodeMismatchErrors.push({
+        contract_id: res.bytecode_mismatch_error.contract_id,
+        expected: res.bytecode_mismatch_error.expected,
+        got: res.bytecode_mismatch_error.got,
+        similarity: res.bytecode_mismatch_error.similarity,
+        assumed_reason: res.bytecode_mismatch_error.assumed_reason,
+      });
+    } else if (res.verified_contract) {
+      logCompliantVerifiedContracts.push({
+        id: res.verified_contract.id,
+        contract_id: res.verified_contract.contract_id,
+        balance: res.verified_contract.balance,
+        network_id: res.verified_contract.network_id,
+        public: res.verified_contract.public,
+        export: res.verified_contract.export,
+        verification_date: res.verified_contract.verification_date,
+        address: res.verified_contract.address,
+        contract_name: res.verified_contract.contract_name,
+        ens_domain: res.verified_contract.ens_domain,
+        type: res.verified_contract.type,
+        evm_version: res.verified_contract.evm_version,
+        compiler_version: res.verified_contract.compiler_version,
+        optimizations_used: res.verified_contract.optimizations_used,
+        optimization_runs: res.verified_contract.optimization_runs,
+        libraries: res.verified_contract.libraries,
+        data: res.verified_contract.data,
+        creation_block: res.verified_contract.creation_block,
+        creation_tx: res.verified_contract.creation_tx,
+        creator_address: res.verified_contract.creator_address,
+        created_at: res.verified_contract.created_at,
+        number_of_watches: res.verified_contract.number_of_watches,
+        language: res.verified_contract.language,
+        in_project: res.verified_contract.in_project,
+        number_of_files: res.verified_contract.number_of_files,
+      });
+    }
+  }
+  
+  return {
+    verified_contracts: logCompliantVerifiedContracts,
+    bytecode_mismatch_errors: logCompliantBytecodeMismatchErrors,
+  }
+}
+
+function convertToLogCompliantCompilationErrors(compilation_errors: CompilationError[]) {
+  if (!compilation_errors) {
+    return undefined;
+  }
+
+  const logCompliantCompilationErrors = [];
+  for (const err of compilation_errors) {
+    logCompliantCompilationErrors.push({
+      source_location: err.source_location,
+      error_type: err.error_type,
+      component: err.component,
+      message: err.message,
+      formatted_message: err.formatted_message,
+    });
+  }
+
+  return logCompliantCompilationErrors;
+}
+
 export function convertToLogCompliantProjects(projects: any[]) {
-  if (projects === undefined || projects === null) {
+  if (!projects) {
     return undefined;
   }
 
@@ -118,7 +202,7 @@ export function convertToLogCompliantProjects(projects: any[]) {
 }
 
 export function convertToLogCompliantNetworks(networks: any[]) {
-  if (networks === undefined || networks === null) {
+  if (!networks) {
     return undefined;
   }
 
