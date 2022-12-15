@@ -1,5 +1,14 @@
 # @tenderly/hardhat-tenderly
 
+## 2.0.0
+
+### Patch Changes
+
+- [#99](https://github.com/Tenderly/hardhat-tenderly/pull/99) [`58ac06f`](https://github.com/Tenderly/hardhat-tenderly/commit/58ac06f9fd7e39b08913dccc380c69f3575f7d28) Thanks [@dule-git](https://github.com/dule-git)! - Bump minor version because 0.1.\* was already published in 2018.
+
+- Updated dependencies [[`58ac06f`](https://github.com/Tenderly/hardhat-tenderly/commit/58ac06f9fd7e39b08913dccc380c69f3575f7d28)]:
+  - tenderly@0.2.0
+
 ## 1.4.0
 
 ### Minor Changes
