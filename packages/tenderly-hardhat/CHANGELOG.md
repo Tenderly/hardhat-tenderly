@@ -1,5 +1,16 @@
 # @tenderly/hardhat-tenderly
 
+## 2.0.0
+
+### Minor Changes
+
+- [#97](https://github.com/Tenderly/hardhat-tenderly/pull/97) [`0052d68`](https://github.com/Tenderly/hardhat-tenderly/commit/0052d682abb1d87339160a9898a31ed50b54a1dc) Thanks [@dule-git](https://github.com/dule-git)! - Added logs to tenderly service and hardhat-tenderly plugin
+
+### Patch Changes
+
+- Updated dependencies [[`0052d68`](https://github.com/Tenderly/hardhat-tenderly/commit/0052d682abb1d87339160a9898a31ed50b54a1dc)]:
+  - tenderly@0.1.0
+
 ## 1.3.3
 
 ### Patch Changes
