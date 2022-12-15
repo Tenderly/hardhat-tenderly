@@ -5,6 +5,7 @@ import { logger } from "../../../utils/logger";
 import { PLUGIN_NAME } from "../../../common/constants";
 import { TenderlyService } from "../../core/services";
 import { TenderlyNetwork } from "../../core/types";
+import { convertToLogCompliantNetworks } from "../../../utils/log-compliance";
 
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
@@ -23,7 +24,8 @@ export const NetworksCommand = new commander.Command("networks")
     const filteredNetworks = networks.filter(isNotExcluded);
     filteredNetworks.sort((a, b) => a.sort_order - b.sort_order);
 
-    logger.silly("Filtered networks:", filteredNetworks);
+    const logCompliantNetworks = convertToLogCompliantNetworks(filteredNetworks);
+    logger.silly("Obtained filtered public networks:", logCompliantNetworks);
 
     const table = new Table({
       style: { head: ["magenta"] },

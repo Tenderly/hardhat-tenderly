@@ -1,6 +1,6 @@
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatConfig } from "hardhat/src/types/config";
-import { HardhatRuntimeEnvironment, SolcConfig } from "hardhat/types";
+import { CompilationJob, DependencyGraph, HardhatRuntimeEnvironment, SolcConfig } from "hardhat/types";
 import {
   TenderlyContract,
   TenderlyContractConfig,
@@ -104,7 +104,7 @@ export const getCompilerDataFromContracts = (
   flatContracts: ContractByName[],
   hhConfig: HardhatConfig
 ): TenderlyContractConfig | undefined => {
-  logger.debug("Obtaining compiler data from contracts...");
+  logger.debug("Obtaining compiler data from contracts.");
 
   let contract: TenderlyContract;
   let mainContract: ContractByName;
@@ -114,7 +114,7 @@ export const getCompilerDataFromContracts = (
       if (mainContract.name !== contract.contractName) {
         continue;
       }
-      logger.trace("Currently obtaining compiler data from contract:", mainContract.name);
+      logger.trace("Obtaining compiler data from contract:", mainContract.name);
 
       const contractConfig = newCompilerConfig(hhConfig, contract.sourcePath, contract.compiler?.version);
       if (config !== null && config !== undefined && !compareConfigs(contractConfig, config)) {
@@ -135,7 +135,7 @@ export const getContracts = async (
   hre: HardhatRuntimeEnvironment,
   flatContracts: ContractByName[]
 ): Promise<TenderlyContract[]> => {
-  logger.debug("Processing contracts from the artifacts/ folder.");
+  logger.debug("Processing contracts from the artifacts/ directory.");
 
   const sourcePaths = await hre.run("compile:solidity:get-source-paths");
   const sourceNames = await hre.run("compile:solidity:get-source-names", {
@@ -160,7 +160,7 @@ export const getContracts = async (
 
   data._resolvedFiles.forEach((resolvedFile: any, _: any) => {
     const sourcePath: string = resolvedFile.sourceName;
-    logger.trace("Currently processing file:", sourcePath);
+    logger.trace("Processing file:", sourcePath);
 
     const name = sourcePath.split("/").slice(-1)[0].split(".")[0];
     logger.trace("Obtained name from source file:", name);
@@ -210,6 +210,9 @@ export const getContracts = async (
     };
     requestContracts.push(contractToPush);
   }
+
+  logger.silly("Finished processing contracts from the artifacts/ folder:", requestContracts);
+
 
   logger.silly("Finished processing contracts from the artifacts/ folder:", requestContracts);
 
@@ -339,13 +342,54 @@ export const compareConfigs = (originalConfig: TenderlyContractConfig, newConfig
   return true;
 };
 
+export const getCompilerDataFromHardhat = async (
+  hre: HardhatRuntimeEnvironment,
+  contractName: string,
+): Promise<TenderlyContractConfig> => {
+  const dependencyGraph: DependencyGraph = await _getDependencyGraph(hre);
+  const file = dependencyGraph.getResolvedFiles().find((resolvedFile) => {
+    const name = resolvedFile.sourceName.split("/").slice(-1)[0].split(".")[0];
+    return name === contractName;
+  });
+  const job: CompilationJob = await hre.run("compile:solidity:get-compilation-job-for-file", {
+    dependencyGraph,
+    file
+  });
+
+  const hhConfig: SolcConfig = job.getSolcConfig();
+
+  const tenderlyConfig: TenderlyContractConfig = {
+    compiler_version: hhConfig?.version,
+    optimizations_used: hhConfig?.settings?.optimizer?.enabled,
+    optimizations_count: hhConfig?.settings?.optimizer?.runs,
+    evm_version: hhConfig?.settings?.evmVersion,
+  }
+  if (hhConfig?.settings?.debug?.revertStrings) {
+    tenderlyConfig.debug = {
+      revertStrings: hhConfig.settings.debug.revertStrings
+    }
+  }
+
+  return tenderlyConfig;
+}
+
+async function _getDependencyGraph(hre: HardhatRuntimeEnvironment): Promise<DependencyGraph> {
+  const sourcePaths = await hre.run("compile:solidity:get-source-paths");
+  const sourceNames: string[] = await hre.run("compile:solidity:get-source-names", {
+    sourcePaths,
+  });
+  return hre.run("compile:solidity:get-dependency-graph", {
+    sourceNames,
+  });
+}
+
 export const newCompilerConfig = (
   config: HardhatConfig,
   sourcePath?: string,
   contractCompiler?: string
 ): TenderlyContractConfig => {
   if (sourcePath !== undefined && config.solidity.overrides[sourcePath] !== undefined) {
-    logger.trace("There is an compiler config override for:", sourcePath);
+    logger.trace("There is a compiler config override for:", sourcePath);
 
     return {
       compiler_version: config.solidity.overrides[sourcePath].version,
@@ -357,7 +401,7 @@ export const newCompilerConfig = (
   }
 
   if (contractCompiler !== undefined) {
-    logger.trace("There is a provided compiler configuration, determining it...");
+    logger.trace("There is a provided compiler configuration, determining it.");
     return determineCompilerConfig(config.solidity.compilers, contractCompiler);
   }
 

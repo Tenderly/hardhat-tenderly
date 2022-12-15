@@ -5,17 +5,11 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { TenderlyService } from "tenderly";
 import { TenderlyArtifact, TenderlyContractUploadRequest, TenderlyForkContractUploadRequest } from "tenderly/types";
 import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";
-import { TenderlyVerifyContractsRequest } from "tenderly/internal/core/types";
 import { logger } from "./utils/logger";
 
 import { ContractByName, Metadata } from "./tenderly/types";
 import { CONTRACTS_NOT_DETECTED, NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG } from "./tenderly/errors";
-import {
-  extractCompilerVersion,
-  fillCompilerConfigurationInContracts,
-  getVerificationContracts,
-  resolveDependencies,
-} from "./utils/util";
+import { extractCompilerVersion, getCompilerDataFromContracts, getContracts, resolveDependencies } from "./utils/util";
 import { DEFAULT_CHAIN_ID, PLUGIN_NAME } from "./constants";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 
@@ -26,27 +20,27 @@ export class Tenderly {
   private tenderlyService = new TenderlyService(PLUGIN_NAME);
 
   constructor(hre: HardhatRuntimeEnvironment) {
-    logger.debug("Making hardhat Tenderly interface...");
+    logger.debug("Creating Tenderly plugin.");
 
     this.env = hre;
     this.tenderlyNetwork = new TenderlyNetwork(hre);
 
-    logger.debug("Finished making hardhat Tenderly interface.");
+    logger.debug("Created Tenderly plugin.");
   }
 
   public async verify(...contracts: any[]): Promise<void> {
-    logger.info("Public verification has been called.");
+    logger.info("Invoked public verification.");
 
     const priv = this.env.config.tenderly?.privateVerification;
     if (priv !== undefined && priv && this.env.network.name !== "tenderly") {
       logger.info(
-        "Private verification flag is set to TRUE in tenderly configuration. Redirecting to private verification..."
+        "Private verification flag is set to TRUE in tenderly configuration. Redirecting to private verification."
       );
       return this.push(...contracts);
     }
 
     if (this.env.network.name === "tenderly") {
-      logger.info("Network parameter is set to 'tenderly', redirecting to fork verification...");
+      logger.info("Network parameter is set to 'tenderly', redirecting to fork verification.");
       return this.tenderlyNetwork.verify(contracts);
     }
 
@@ -55,7 +49,7 @@ export class Tenderly {
     const requestData = await this._filterContracts(flatContracts);
 
     if (requestData === null) {
-      logger.error("Verification failed");
+      logger.error("Verification failed due to bad processing of the data in /artifacts directory.");
       return;
     }
 
@@ -63,7 +57,7 @@ export class Tenderly {
   }
 
   public async verifyAPI(request: TenderlyContractUploadRequest): Promise<void> {
-    logger.info("Public verification API has been called.");
+    logger.info("Invoked public verification through API request.");
 
     if (this.env.network.name === "tenderly") {
       logger.error(
@@ -81,9 +75,9 @@ export class Tenderly {
     username: string,
     forkID: string
   ): Promise<void> {
-    logger.info("Fork verification has been called.");
+    logger.info("Invoked fork verification through API request.");
     if (this.env.network.name !== "tenderly") {
-      console.log(
+      logger.error(
         `Error in ${PLUGIN_NAME}: Network parameter is not set to 'tenderly' and verifyForkAPI() is only available for tenderly fork deployments, please use --network tenderly.`
       );
       return;
@@ -104,12 +98,12 @@ export class Tenderly {
   }
 
   public async push(...contracts: any[]): Promise<void> {
-    logger.info("Private verification has been called.");
+    logger.info("Invoked pushing onto Tenderly.");
 
     const priv = this.env.config.tenderly?.privateVerification;
     if (priv !== undefined && !priv) {
       logger.info(
-        "Private verification flag is set to FALSE in tenderly configuration. Redirecting to public verification..."
+        "Private verification flag is set to FALSE in tenderly configuration. Redirecting to public verification."
       );
       return this.verify(...contracts);
     }
@@ -133,7 +127,7 @@ export class Tenderly {
     }
 
     if (requestData === null) {
-      console.log("Push failed");
+      logger.error("Pushing failed due to bad processing of the data in /artifacts directory.");
       return;
     }
 
@@ -149,7 +143,7 @@ export class Tenderly {
     tenderlyProject: string,
     username: string
   ): Promise<void> {
-    logger.info("Private verification API has been called.");
+    logger.info("Invoked pushing contracts through API.");
 
     if (this.env.network.name === "tenderly") {
       logger.error(
@@ -162,7 +156,7 @@ export class Tenderly {
   }
 
   public async persistArtifacts(...contracts: ContractByName[]) {
-    logger.info("Artifact persisting has been called.");
+    logger.info("Invoked persisting artifacts.");
     if (contracts.length === 0) {
       logger.error("No contracts were provided during artifact persisting.");
       return;
@@ -245,14 +239,14 @@ export class Tenderly {
     });
   }
 
-  private async _filterContracts(flatContracts: ContractByName[]): Promise<TenderlyVerifyContractsRequest | null> {
-    logger.info("Contract filtering has been called.");
+  private async _filterContracts(flatContracts: ContractByName[]): Promise<TenderlyContractUploadRequest | null> {
+    logger.info("Processing data needed for verification.");
 
     let contract: ContractByName;
-    let requestData: TenderlyVerifyContractsRequest;
+    let requestData: TenderlyContractUploadRequest;
     try {
       requestData = await this._getContractData(flatContracts);
-      logger.silly("Request data obtained: ", requestData);
+      logger.silly("Processed request data:", requestData);
     } catch (e) {
       logger.error("Error caught while trying to process contracts by name: ", e);
       return null;
@@ -272,10 +266,10 @@ export class Tenderly {
       logger.trace("Found network is:", network);
 
       const index = requestData.contracts.findIndex(
-        (requestContract) => requestContract.contractToVerify === contract.name
+        (requestContract) => requestContract.contractName === contract.name
       );
       if (index === -1) {
-        logger.error(`Contract '${contract.name}' was not found in processed data.`);
+        logger.error(`Contract '${contract.name}' was not found among the contracts in /artifacts.`);
         continue;
       }
       let chainID: string = NETWORK_NAME_CHAIN_ID_MAP[network!.toLowerCase()];
@@ -286,7 +280,7 @@ export class Tenderly {
 
       if (chainID === undefined) {
         logger.error(
-          `Error in ${PLUGIN_NAME}: Couldn't identify network. Please provide a chainID in the network config object`
+          `Error in ${PLUGIN_NAME}: Couldn't identify network. Please provide a chainId in the network config object`
         );
         return null;
       }
@@ -303,16 +297,17 @@ export class Tenderly {
     return requestData;
   }
 
-  private async _getContractData(flatContracts: ContractByName[]): Promise<TenderlyVerifyContractsRequest> {
-    let contracts = await getVerificationContracts(this.env, flatContracts);
+  private async _getContractData(flatContracts: ContractByName[]): Promise<TenderlyContractUploadRequest> {
+    const contracts = await getContracts(this.env, flatContracts);
 
-    contracts = await fillCompilerConfigurationInContracts(this.env, contracts);
-    if (contracts === undefined) {
+    const config = getCompilerDataFromContracts(contracts, flatContracts, this.env.config);
+    if (config === undefined) {
       logger.error(NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG);
     }
 
     return {
       contracts,
+      config: config!,
     };
   }
 }
