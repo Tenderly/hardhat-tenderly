@@ -2,6 +2,7 @@ import { HardhatPluginError } from "hardhat/plugins";
 import { task } from "hardhat/config";
 import { TenderlyService } from "tenderly";
 
+import { logger } from "../utils/logger";
 import { PLUGIN_NAME } from "../constants";
 import { newCompilerConfig } from "../utils/util";
 import { extractContractData } from "./common";
@@ -16,6 +17,8 @@ task("tenderly:push", "Privately pushes contracts to Tenderly")
   .setAction(pushContracts);
 
 async function pushContracts({ contracts }: any, { config, hardhatArguments, run }: any) {
+  logger.info("Private verification hardhat task has been invoked.");
+
   if (contracts === undefined) {
     throw new HardhatPluginError(PLUGIN_NAME, `At least one contract must be provided (ContractName=Address)`);
   }
