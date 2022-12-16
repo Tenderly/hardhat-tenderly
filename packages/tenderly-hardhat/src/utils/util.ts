@@ -1,6 +1,13 @@
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatConfig } from "hardhat/src/types/config";
-import { CompilationJob, DependencyGraph, HardhatRuntimeEnvironment, SolcConfig } from "hardhat/types";
+import {
+  Artifact,
+  CompilationJob,
+  DependencyGraph,
+  HardhatRuntimeEnvironment,
+  ResolvedFile,
+  SolcConfig
+} from "hardhat/types";
 import { TenderlyContract, TenderlyContractConfig } from "tenderly/types";
 
 import { PLUGIN_NAME } from "../constants";
@@ -50,10 +57,10 @@ export const getContracts = async (
   const sourceNames = await hre.run("compile:solidity:get-source-names", {
     sourcePaths,
   });
-  const data = await hre.run("compile:solidity:get-dependency-graph", {
+  const data: DependencyGraph = await hre.run("compile:solidity:get-dependency-graph", {
     sourceNames,
   });
-  if (data.length === 0) {
+  if (data.getResolvedFiles().length === 0) {
     throw new HardhatPluginError(PLUGIN_NAME, CONTRACTS_NOT_DETECTED);
   }
 
@@ -67,54 +74,37 @@ export const getContracts = async (
   };
   logger.trace("Extracted compiler version is:", metadata.defaultCompiler.version);
 
-  data._resolvedFiles.forEach((resolvedFile: any, _: any) => {
-    const sourcePath: string = resolvedFile.sourceName;
-    logger.trace("Processing file:", sourcePath);
-
-    const name = sourcePath.split("/").slice(-1)[0].split(".")[0];
-    logger.trace("Obtained name from source file:", name);
-
-    for (contract of flatContracts) {
-      if (contract.name !== name) {
+  for (const resolvedFile of data.getResolvedFiles()) {
+     for (contract of flatContracts) {
+      const artifact: Artifact = hre.artifacts.readArtifactSync(contract.name);
+      
+      if (artifact.sourceName !== resolvedFile.sourceName) {
         continue;
       }
+      
       logger.trace("Found contract:", contract.name);
 
-      metadata.sources[sourcePath] = {
+      metadata.sources[artifact.sourceName] = {
+        contractName: artifact.contractName,
         content: resolvedFile.content.rawContent,
         versionPragma: resolvedFile.content.versionPragmas[0],
       };
 
-      if (
-        metadata.sources[sourcePath].content === undefined ||
-        metadata.sources[sourcePath].content === null ||
-        metadata.sources[sourcePath].content === ""
-      ) {
-        logger.error("Metadata source content is empty!");
-      }
-      if (
-        metadata.sources[sourcePath].versionPragma === undefined ||
-        metadata.sources[sourcePath].versionPragma === null ||
-        metadata.sources[sourcePath].versionPragma === ""
-      ) {
-        logger.error("Metadata source version pragma is empty!");
-      }
-
       const visited: Record<string, boolean> = {};
-      resolveDependencies(data, sourcePath, metadata, visited);
-    }
-  });
+      await resolveDependenciesTemp(hre, data, resolvedFile, metadata, visited);
+      logger.info("Metadata:", metadata);
+    }   
+  }
 
-  for (const [key, value] of Object.entries(metadata.sources)) {
-    const name = key.split("/").slice(-1)[0].split(".")[0];
+  for (const [sourcePath, source] of Object.entries(metadata.sources)) {
     const contractToPush: TenderlyContract = {
-      contractName: name,
-      source: value.content,
-      sourcePath: key,
+      contractName: source.contractName!,
+      source: source.content,
+      sourcePath: sourcePath,
       networks: {},
       compiler: {
         name: "solc",
-        version: extractCompilerVersion(hre.config, key, value.versionPragma),
+        version: extractCompilerVersion(hre.config, sourcePath, source.versionPragma),
       },
     };
     requestContracts.push(contractToPush);
@@ -124,6 +114,39 @@ export const getContracts = async (
 
   return requestContracts;
 };
+
+// TODO(dusan) Because of TIC-87, there was a need to verify contracts that whether they are provided with
+// short name parameter e.g. "Token" or with full name parameter e.g. "contracts/Token.sol:Token".
+// For the reasons explained in that ticket, I made a temp resolvedDependencies function which should be removed 
+// during the next iteration of the plugin.
+export const resolveDependenciesTemp = async (
+  hre: HardhatRuntimeEnvironment,
+  dependencyGraph: DependencyGraph,
+  file: ResolvedFile,
+  metadata: Metadata,
+  visited: Record<string, boolean>
+): Promise<void> => {
+  const fullyQualifiedNames = await hre.artifacts.getAllFullyQualifiedNames();
+  logger.info("Fully qualified names:", fullyQualifiedNames);
+  for (const dependencyFile of dependencyGraph.getDependencies(file)) {
+    logger.info("Dependency file:", dependencyFile.sourceName);
+    for (const contractName of fullyQualifiedNames) {
+      const artifact: Artifact = hre.artifacts.readArtifactSync(contractName);
+      logger.info("Artifact:", artifact.sourceName);
+      if (visited[contractName] || artifact.sourceName !== dependencyFile.sourceName) {
+        continue;
+      }
+      logger.info("Artifact passed:", contractName);
+      visited[contractName] = true;
+      metadata.sources[artifact.sourceName] = {
+        contractName: artifact.contractName,
+        content: dependencyFile.content.rawContent,
+        versionPragma: dependencyFile.content.versionPragmas[0],
+      };
+      await resolveDependenciesTemp(hre, dependencyGraph, dependencyFile, metadata, visited);
+    }
+  }
+}
 
 export const resolveDependencies = (
   dependencyData: any,
@@ -164,12 +187,11 @@ export const compareConfigs = (originalConfig: TenderlyContractConfig, newConfig
 
 export const getCompilerDataFromHardhat = async (
   hre: HardhatRuntimeEnvironment,
-  contractName: string,
+  sourceName: string,
 ): Promise<TenderlyContractConfig> => {
   const dependencyGraph: DependencyGraph = await _getDependencyGraph(hre);
   const file = dependencyGraph.getResolvedFiles().find((resolvedFile) => {
-    const name = resolvedFile.sourceName.split("/").slice(-1)[0].split(".")[0];
-    return name === contractName;
+    return resolvedFile.sourceName === sourceName;
   });
   const job: CompilationJob = await hre.run("compile:solidity:get-compilation-job-for-file", {
     dependencyGraph,

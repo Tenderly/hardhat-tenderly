@@ -215,7 +215,11 @@ export class TenderlyNetwork {
 
     for (contract of flatContracts) {
       const index = requestData.contracts.findIndex(
-        (requestContract) => requestContract.contractName === contract.name
+        (requestContract) => {
+          const partialName = requestContract.contractName;
+          const fullName = requestContract.sourcePath + ":" + requestContract.contractName;
+          return partialName === contract.name || fullName === contract.name; 
+        }
       );
       if (index === -1) {
         logger.error(`Couldn't find a contract '${contract.name}' among the obtained request data.`);
@@ -243,7 +247,7 @@ export class TenderlyNetwork {
       throw new Error("Fork verification failed due to bad processing of data in /artifacts folder.");
     }
 
-    const solcConfig = await getCompilerDataFromHardhat(this.env, contracts[0].contractName);
+    const solcConfig = await getCompilerDataFromHardhat(this.env, contracts[0].sourcePath);
     
     if (solcConfig === undefined) {
       logger.error(NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG);

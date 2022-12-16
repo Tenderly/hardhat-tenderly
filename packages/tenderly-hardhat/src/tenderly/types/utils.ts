@@ -20,6 +20,7 @@ export interface Metadata {
 }
 
 export interface MetadataSources {
+  contractName?: string;
   content: string;
   versionPragma: string;
 }

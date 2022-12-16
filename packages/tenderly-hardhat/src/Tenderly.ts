@@ -266,7 +266,11 @@ export class Tenderly {
       logger.trace("Found network is:", network);
 
       const index = requestData.contracts.findIndex(
-        (requestContract) => requestContract.contractName === contract.name
+        (requestContract) => {
+          const partialName = requestContract.contractName;
+          const fullName = requestContract.sourcePath + ":" + requestContract.contractName;
+          return partialName === contract.name || fullName === contract.name; 
+        }
       );
       if (index === -1) {
         logger.error(`Contract '${contract.name}' was not found among the contracts in /artifacts.`);
