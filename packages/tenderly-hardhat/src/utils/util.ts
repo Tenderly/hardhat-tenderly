@@ -92,7 +92,6 @@ export const getContracts = async (
 
       const visited: Record<string, boolean> = {};
       await resolveDependenciesTemp(hre, data, resolvedFile, metadata, visited);
-      logger.info("Metadata:", metadata);
     }   
   }
 
@@ -127,16 +126,12 @@ export const resolveDependenciesTemp = async (
   visited: Record<string, boolean>
 ): Promise<void> => {
   const fullyQualifiedNames = await hre.artifacts.getAllFullyQualifiedNames();
-  logger.info("Fully qualified names:", fullyQualifiedNames);
   for (const dependencyFile of dependencyGraph.getDependencies(file)) {
-    logger.info("Dependency file:", dependencyFile.sourceName);
     for (const contractName of fullyQualifiedNames) {
       const artifact: Artifact = hre.artifacts.readArtifactSync(contractName);
-      logger.info("Artifact:", artifact.sourceName);
       if (visited[contractName] || artifact.sourceName !== dependencyFile.sourceName) {
         continue;
       }
-      logger.info("Artifact passed:", contractName);
       visited[contractName] = true;
       metadata.sources[artifact.sourceName] = {
         contractName: artifact.contractName,
