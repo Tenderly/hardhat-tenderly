@@ -16,7 +16,7 @@ export function getConfig(): TenderlyConfig {
     const fileData = fs.readFileSync(configFilePath);
 
     const tenderlyConfig = yaml.load(fileData.toString()) as TenderlyConfig;
-    
+
     const logCompliantTenderlyConfig = convertToLogCompliantTenderlyConfig(tenderlyConfig);
     logger.trace("Checking config:", logCompliantTenderlyConfig);
 
@@ -36,7 +36,7 @@ export function getConfig(): TenderlyConfig {
 
 export function writeConfig(config: TenderlyConfig): void {
   logger.trace(`Writing tenderly config to a file @ ${configDir}/${configFilePath}`);
-  
+
   const logCompliantTenderlyConfig = convertToLogCompliantTenderlyConfig(config);
   logger.trace("Checking config:", logCompliantTenderlyConfig);
 

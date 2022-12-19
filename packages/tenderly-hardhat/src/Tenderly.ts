@@ -1,22 +1,21 @@
 import { sep } from "path";
 import * as fs from "fs-extra";
 import { HardhatPluginError } from "hardhat/plugins";
-import { CompilationJob, HardhatRuntimeEnvironment } from "hardhat/types";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { TenderlyService } from "tenderly";
-import {
-  TenderlyArtifact,
-  TenderlyContractUploadRequest,
-  TenderlyForkContractUploadRequest,
-  TenderlyVerificationContract,
-  TenderlyVerifyContractsRequest,
-  TenderlyVerifyContractsSource
-} from "tenderly/types";
+import { TenderlyArtifact, TenderlyContractUploadRequest, TenderlyForkContractUploadRequest } from "tenderly/types";
 import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";
 import { logger } from "./utils/logger";
 
 import { ContractByName, Metadata } from "./tenderly/types";
 import { CONTRACTS_NOT_DETECTED, NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG } from "./tenderly/errors";
-import { extractCompilerVersion, getCompilerDataFromContracts, getContracts, resolveDependencies } from "./utils/util";
+import {
+  extractCompilerVersion,
+  getCompilerDataFromContracts,
+  getContracts,
+  makeVerifyContractsRequest,
+  resolveDependencies,
+} from "./utils/util";
 import { DEFAULT_CHAIN_ID, PLUGIN_NAME } from "./constants";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 
@@ -53,7 +52,7 @@ export class Tenderly {
 
     const flatContracts: ContractByName[] = contracts.reduce((accumulator, value) => accumulator.concat(value), []);
 
-    const requestData = await this._filterContracts(flatContracts);
+    const requestData = await makeVerifyContractsRequest(this.env, flatContracts);
 
     if (requestData === null) {
       logger.error("Verification failed due to bad processing of the data in /artifacts directory.");
@@ -117,7 +116,7 @@ export class Tenderly {
 
     const flatContracts: ContractByName[] = contracts.reduce((accumulator, value) => accumulator.concat(value), []);
 
-    const requestData = await this._filterContracts(flatContracts);
+    const requestData = await makeVerifyContractsRequest(this.env, flatContracts);
 
     if (this.env.config.tenderly.project === undefined) {
       logger.error(
@@ -246,17 +245,16 @@ export class Tenderly {
     });
   }
 
-  // TODO(dusan) This whole function should become _makeVerifyContractsRequest and _makeVerifyContractsRequest should become getCompilationJob, after which the processing should be done newly former _makeVerifyContractsRequest
-  private async _filterContracts(flatContracts: ContractByName[]): Promise<TenderlyVerifyContractsRequest | null> {
+  private async _filterContracts(flatContracts: ContractByName[]): Promise<TenderlyContractUploadRequest | null> {
     logger.info("Processing data needed for verification.");
 
     let contract: ContractByName;
-    let requestData: TenderlyVerifyContractsRequest;
+    let requestData: TenderlyContractUploadRequest;
     try {
-      requestData = await this._makeVerifyContractsRequest(flatContracts);
+      requestData = await this._getContractData(flatContracts);
       logger.silly("Processed request data:", requestData);
     } catch (e) {
-      logger.error("Error while trying to make VerifyContractsRequest.", e);
+      logger.error("Error caught while trying to process contracts by name: ", e);
       return null;
     }
 
@@ -305,47 +303,17 @@ export class Tenderly {
     return requestData;
   }
 
-  private async _makeVerifyContractsRequest(flatContracts: ContractByName[]): Promise<TenderlyVerifyContractsRequest> {
-    logger.trace("Making VerifyContractsRequest.")
+  private async _getContractData(flatContracts: ContractByName[]): Promise<TenderlyContractUploadRequest> {
+    const contracts = await getContracts(this.env, flatContracts);
 
-    const contracts: TenderlyVerificationContract[] = [];
-    for (const flatContract of flatContracts) {
-      logger.info("Processing contract:", flatContract.name);
-
-      let job: CompilationJob
-      try {
-        job = await getCompilationJob(this.env, flatContract.name);
-      } catch (err) {
-        // TODO(dusan): See how to wrap errors, don't return the like this
-        logger.error(`Error while trying to get compilation job for contract '${flatContract.name}'. The provided contract probably doesn't exist or is mistyped.`);
-        throw err;
-      }
-     
-      contracts.push({
-        contractToVerify: flatContract.name,
-        sources: await this._extractSources(job),
-        compiler: job.getSolcConfig(),
-        networks: undefined,
-      });
+    const config = getCompilerDataFromContracts(contracts, flatContracts, this.env.config);
+    if (config === undefined) {
+      logger.error(NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG);
     }
 
     return {
-      contracts
+      contracts,
+      config: config!,
     };
-  }
-
-  private async _extractSources(job: CompilationJob): Promise<Record<string, TenderlyVerifyContractsSource>> {
-    const sources: Record<string, TenderlyVerifyContractsSource> = {};
-    logger.info("Extracting sources from compilation job.");
-
-    for (const file of job.getResolvedFiles()) {
-      const name = file.sourceName.split("/").slice(-1)[0].split(".")[0];
-      sources[file.sourceName] = {
-        name,
-        code: file.content.rawContent,
-      }
-    }
-
-    return sources;
   }
 }

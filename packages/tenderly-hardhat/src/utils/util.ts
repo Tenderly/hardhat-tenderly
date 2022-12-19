@@ -5,52 +5,112 @@ import {
   TenderlyContract,
   TenderlyContractConfig,
   TenderlyVerificationContract,
+  TenderlyVerifyContractsRequest,
   TenderlyVerifyContractsSource,
 } from "tenderly/types";
 
 import { CompilerConfiguration } from "tenderly/internal/core/types/Compiler";
+import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";
 import { PLUGIN_NAME } from "../constants";
 import { CONTRACTS_NOT_DETECTED } from "../tenderly/errors";
 import { ContractByName, Metadata } from "../tenderly/types";
 import { logger } from "./logger";
 
-// TODO(dusan) This function should be deleted since we have getCompilationJob
-// export const fillCompilerConfigurationInContracts = async (
+export const makeVerifyContractsRequest = async (
+  hre: HardhatRuntimeEnvironment,
+  flatContracts: ContractByName[]
+): Promise<TenderlyVerifyContractsRequest | null> => {
+  return _makeVerifyContractsRequest(hre, flatContracts);
+};
+
+// TODO(dusan): Make a logic here for fork verification
+// export const makeForkVerifyContractsRequest = async (
 //   hre: HardhatRuntimeEnvironment,
-//   contracts: TenderlyVerificationContract[]
-// ): Promise<TenderlyVerificationContract[]> => {
-//   logger.debug("Filling compiler data in verification contracts...");
-//   const hhConfig: HardhatConfig = hre.config;
-//
-//   for (const contract of contracts) {
-//     let contractCompilerConfig: TenderlyContractConfig | undefined;
-//     for (const [sourcePath, _] of Object.entries(contract.sources)) {
-//       const sourceCompilerConfig: TenderlyContractConfig = newCompilerConfig(
-//         hhConfig,
-//         sourcePath,
-//         extractCompilerVersion(hhConfig, sourcePath, await _getVersionPragma(hre, sourcePath))
-//       );
-//       if (
-//         contractCompilerConfig !== undefined &&
-//         contractCompilerConfig !== null &&
-//         !compareConfigs(sourceCompilerConfig, contractCompilerConfig)
-//       ) {
-//         logger.error(`Error in ${PLUGIN_NAME}: Different compiler versions provided in same request`);
-//         throw new Error("Compiler version mismatch");
-//       } else {
-//         contractCompilerConfig = sourceCompilerConfig;
-//       }
-//     }
-//
-//     // converting to match api request format
-//     contract.compiler = _convertCompilerConfiguration(contractCompilerConfig!);
-//
-//     logger.silly("Obtained compiler configuration is:", contract.compiler);
+//   flatContracts: ContractByName[],
+//   txRoot: string
+// ): Promise<TenderlyForkContractUploadRequest | null> => {
+//   const request = await _makeVerifyContractsRequest(hre, flatContracts);
+//   return {
+//     ...request,
+//     root: txRoot,
 //   }
-//   logger.debug("Compiler data has been obtained.");
-//
-//   return contracts;
-// };
+// }
+
+async function _makeVerifyContractsRequest(
+  hre: HardhatRuntimeEnvironment,
+  flatContracts: ContractByName[]
+): Promise<TenderlyVerifyContractsRequest | null> {
+  logger.info("Processing data needed for verification.");
+
+  const contracts: TenderlyVerificationContract[] = [];
+  for (const flatContract of flatContracts) {
+    logger.info("Processing contract:", flatContract.name);
+
+    let job: CompilationJob;
+    try {
+      job = await getCompilationJob(hre, flatContract.name);
+    } catch (err) {
+      // TODO(dusan): See how to wrap errors, don't return errors like this
+      logger.error(
+        `Error while trying to get compilation job for contract '${flatContract.name}'. The provided contract probably doesn't exist or is mistyped.`
+      );
+      throw err;
+    }
+
+    const network = hre.hardhatArguments.network;
+    if (network === undefined) {
+      logger.error(
+        `Error in ${PLUGIN_NAME}: Please provide a network via the hardhat --network argument or directly in the contract`
+      );
+      return null;
+    }
+    logger.trace("Found network is:", network);
+
+    let chainId: string = NETWORK_NAME_CHAIN_ID_MAP[network.toLowerCase()];
+    if (hre.config.networks[network].chainId !== undefined) {
+      chainId = hre.config.networks[network].chainId!.toString();
+    }
+    logger.trace(`ChainID for network '${network}' is ${chainId}`);
+
+    if (chainId === undefined) {
+      logger.error(
+        `Error in ${PLUGIN_NAME}: Couldn't identify network. Please provide a chainId in the network config object`
+      );
+      return null;
+    }
+
+    contracts.push({
+      contractToVerify: flatContract.name,
+      sources: await extractSources(job),
+      compiler: job.getSolcConfig(),
+      networks: {
+        [chainId]: {
+          address: flatContract.address,
+          links: flatContract.libraries,
+        },
+      },
+    });
+  }
+
+  return {
+    contracts,
+  };
+}
+
+async function extractSources(job: CompilationJob): Promise<Record<string, TenderlyVerifyContractsSource>> {
+  const sources: Record<string, TenderlyVerifyContractsSource> = {};
+  logger.info("Extracting sources from compilation job.");
+
+  for (const file of job.getResolvedFiles()) {
+    const name = file.sourceName.split("/").slice(-1)[0].split(".")[0];
+    sources[file.sourceName] = {
+      name,
+      code: file.content.rawContent,
+    };
+  }
+
+  return sources;
+}
 
 async function _getVersionPragma(hre: HardhatRuntimeEnvironment, sourcePath: string): Promise<string | undefined> {
   const sourcePaths = await hre.run("compile:solidity:get-source-paths");
@@ -214,70 +274,6 @@ export const getContracts = async (
 
   logger.silly("Finished processing contracts from the artifacts/ folder:", requestContracts);
 
-
-  logger.silly("Finished processing contracts from the artifacts/ folder:", requestContracts);
-
-  return requestContracts;
-};
-
-export const getVerificationContracts = async (
-  hre: HardhatRuntimeEnvironment,
-  flatContracts: ContractByName[]
-): Promise<TenderlyVerificationContract[]> => {
-  logger.debug("Processing contracts from the artifacts/ folder.");
-
-  const sourcePaths = await hre.run("compile:solidity:get-source-paths");
-  const sourceNames = await hre.run("compile:solidity:get-source-names", {
-    sourcePaths,
-  });
-  const data = await hre.run("compile:solidity:get-dependency-graph", {
-    sourceNames,
-  });
-  if (data.length === 0) {
-    throw new HardhatPluginError(PLUGIN_NAME, CONTRACTS_NOT_DETECTED);
-  }
-
-  let contract: ContractByName;
-  const requestContracts: TenderlyVerificationContract[] = [];
-
-  data._resolvedFiles.forEach((resolvedFile: any, _: any) => {
-    const sourcePath: string = resolvedFile.sourceName;
-    const name = sourcePath.split("/").slice(-1)[0].split(".")[0];
-    const sources: Record<string, TenderlyVerifyContractsSource> = {};
-
-    for (contract of flatContracts) {
-      if (contract.name !== name) {
-        continue;
-      }
-      logger.trace("Currently processing:", {
-        file: sourcePath,
-        contractName: contract.name,
-      });
-
-      sources[sourcePath] = {
-        name: contract.name,
-        code: resolvedFile.content.rawContent,
-      };
-
-      if (
-        sources[sourcePath].code === undefined ||
-        sources[sourcePath].code === null ||
-        sources[sourcePath].code === ""
-      ) {
-        logger.error("Metadata source content is empty!");
-      }
-
-      const visited: Record<string, boolean> = {};
-      resolveDependenciesWithSources(data, sourcePath, sources, visited);
-
-      const contractToPush: TenderlyVerificationContract = {
-        contractToVerify: contract.name,
-        sources,
-      };
-      requestContracts.push(contractToPush);
-    }
-  });
-
   logger.silly("Finished processing contracts from the artifacts/ folder:", requestContracts);
 
   return requestContracts;
@@ -304,29 +300,6 @@ export const resolveDependencies = (
   });
 };
 
-export const resolveDependenciesWithSources = (
-  dependencyData: any,
-  sourcePath: string,
-  sources: Record<string, TenderlyVerifyContractsSource>,
-  visited: Record<string, boolean>
-): void => {
-  if (visited[sourcePath]) {
-    return;
-  }
-
-  visited[sourcePath] = true;
-
-  dependencyData._dependenciesPerFile.get(sourcePath).forEach((resolvedDependency: any, _: any) => {
-    resolveDependenciesWithSources(dependencyData, resolvedDependency.sourceName, sources, visited);
-
-    const name = resolvedDependency.sourceName.split("/").slice(-1)[0].split(".")[0];
-    sources[resolvedDependency.sourceName] = {
-      name,
-      code: resolvedDependency.content.rawContent,
-    };
-  });
-};
-
 export const compareConfigs = (originalConfig: TenderlyContractConfig, newConfig: TenderlyContractConfig): boolean => {
   if (originalConfig.compiler_version !== newConfig.compiler_version) {
     return false;
@@ -345,27 +318,27 @@ export const compareConfigs = (originalConfig: TenderlyContractConfig, newConfig
 
 export const getCompilationJob = async (
   hre: HardhatRuntimeEnvironment,
-  contractName: string,
+  contractName: string
 ): Promise<CompilationJob> => {
   logger.trace("Getting compilation job for contract:", contractName);
-  
-  const dependencyGraph: DependencyGraph = await _getDependencyGraph(hre);
-  
+
+  const dependencyGraph: DependencyGraph = await getDependencyGraph(hre);
+
+  const artifact = hre.artifacts.readArtifactSync(contractName);
   const file = dependencyGraph.getResolvedFiles().find((resolvedFile) => {
-    const name = resolvedFile.sourceName.split("/").slice(-1)[0].split(".")[0];
-    return name === contractName;
+    return resolvedFile.sourceName === artifact.sourceName;
   });
 
-  return await hre.run("compile:solidity:get-compilation-job-for-file", {
+  return hre.run("compile:solidity:get-compilation-job-for-file", {
     dependencyGraph,
-    file
+    file,
   });
-}
+};
 
 // TODO(dusan) This function should be deleted since we have getCompilationJob
 export const getCompilerDataFromHardhat = async (
   hre: HardhatRuntimeEnvironment,
-  contractName: string,
+  contractName: string
 ): Promise<TenderlyContractConfig> => {
   const job: CompilationJob = await getCompilationJob(hre, contractName);
   const hhConfig: SolcConfig = job.getSolcConfig();
@@ -375,17 +348,17 @@ export const getCompilerDataFromHardhat = async (
     optimizations_used: hhConfig?.settings?.optimizer?.enabled,
     optimizations_count: hhConfig?.settings?.optimizer?.runs,
     evm_version: hhConfig?.settings?.evmVersion,
-  }
+  };
   if (hhConfig?.settings?.debug?.revertStrings) {
     tenderlyConfig.debug = {
-      revertStrings: hhConfig.settings.debug.revertStrings
-    }
+      revertStrings: hhConfig.settings.debug.revertStrings,
+    };
   }
 
   return tenderlyConfig;
-}
+};
 
-async function _getDependencyGraph(hre: HardhatRuntimeEnvironment): Promise<DependencyGraph> {
+async function getDependencyGraph(hre: HardhatRuntimeEnvironment): Promise<DependencyGraph> {
   const sourcePaths = await hre.run("compile:solidity:get-source-paths");
   const sourceNames: string[] = await hre.run("compile:solidity:get-source-names", {
     sourcePaths,

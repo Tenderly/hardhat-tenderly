@@ -6,12 +6,12 @@ import { TenderlyForkContractUploadRequest } from "tenderly/types";
 import { getConfig, writeConfig } from "tenderly/utils/config";
 import { TENDERLY_JSON_RPC_BASE_URL } from "tenderly/common/constants";
 
+import { convertToLogCompliantForkInitializeResponse } from "tenderly/utils/log-compliance";
 import { PLUGIN_NAME } from "./constants";
 import { ContractByName } from "./tenderly/types";
 import { NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG } from "./tenderly/errors";
-import {getCompilerDataFromContracts, getCompilerDataFromHardhat, getContracts} from "./utils/util";
+import { getCompilerDataFromHardhat, getContracts } from "./utils/util";
 import { logger } from "./utils/logger";
-import { convertToLogCompliantForkInitializeResponse } from "tenderly/utils/log-compliance";
 
 export class TenderlyNetwork {
   public host: string;
@@ -244,7 +244,7 @@ export class TenderlyNetwork {
     }
 
     const solcConfig = await getCompilerDataFromHardhat(this.env, contracts[0].contractName);
-    
+
     if (solcConfig === undefined) {
       logger.error(NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG);
     }

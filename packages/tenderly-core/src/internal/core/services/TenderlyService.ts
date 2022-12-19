@@ -1,31 +1,33 @@
-import { TENDERLY_DASHBOARD_BASE_URL, CHAIN_ID_NETWORK_NAME_MAP } from "../../../common/constants";
+import { CHAIN_ID_NETWORK_NAME_MAP, TENDERLY_DASHBOARD_BASE_URL } from "../../../common/constants";
 import {
+  ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG,
   API_VERIFICATION_REQUEST_ERR_MSG,
   BYTECODE_MISMATCH_ERR_MSG,
+  LATEST_BLOCK_NUMBER_FETCH_FAILED_ERR_MSG,
+  NETWORK_FETCH_FAILED_ERR_MSG,
   NO_NEW_CONTRACTS_VERIFIED_ERR_MSG,
   NO_VERIFIABLE_CONTRACTS_ERR_MSG,
-  NETWORK_FETCH_FAILED_ERR_MSG,
-  LATEST_BLOCK_NUMBER_FETCH_FAILED_ERR_MSG,
-  ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG,
   PRINCIPAL_FETCH_FAILED_ERR_MSG,
   PROJECTS_FETCH_FAILED_ERR_MSG,
 } from "../common/errors";
 import {
+  ContractResponse,
   Principal,
   Project,
-  TenderlyNetwork,
-  ContractResponse,
   TenderlyContractUploadRequest,
-  TenderlyForkContractUploadRequest, TenderlyVerifyContractsRequest, VerifyContractsResponse,
+  TenderlyForkContractUploadRequest,
+  TenderlyNetwork,
+  TenderlyVerifyContractsRequest,
 } from "../types";
 import { logger } from "../../../utils/logger";
-import { TenderlyApiService } from "./TenderlyApiService";
 import {
-  convertToLogCompliantApiError, convertToLogCompliantForkVerificationResponse,
+  convertToLogCompliantApiError,
+  convertToLogCompliantForkVerificationResponse,
   convertToLogCompliantNetworks,
   convertToLogCompliantProjects,
-  convertToLogCompliantVerificationResponse
+  convertToLogCompliantVerificationResponse,
 } from "../../../utils/log-compliance";
+import { TenderlyApiService } from "./TenderlyApiService";
 
 export class TenderlyService {
   private pluginName: string;
@@ -108,26 +110,32 @@ export class TenderlyService {
         );
         return;
       }
-      const logCompliantVerificationResponse = convertToLogCompliantVerificationResponse(res.data);
-      logger.trace("Verification response:", logCompliantVerificationResponse);
-      
-      if (logCompliantVerificationResponse.compilation_errors) {
-        logger.error("There have been compilation errors while verifying contracts.", logCompliantVerificationResponse.compilation_errors);
-        return;
-      }
-      
-      if (!logCompliantVerificationResponse.results) {
-        logger.error("There has been an error while verifying contracts, no verified contracts nor bytecode mismatch errors are returned.");
+      const response = convertToLogCompliantVerificationResponse(res.data);
+      logger.trace("Verification response:", response);
+
+      // TODO(dusan) clean this up so it doesn't look like a mess
+      if (response.compilation_errors !== undefined && response.compilation_errors !== null) {
+        logger.error("There have been compilation errors while verifying contracts.", response.compilation_errors);
         return;
       }
 
-      if (logCompliantVerificationResponse.results.bytecode_mismatch_errors) {
-        for (const bytecodeMismatchError of logCompliantVerificationResponse.results.bytecode_mismatch_errors) {
+      if (response.results === undefined || response.results === null) {
+        logger.error(
+          "There has been an error while verifying contracts, no verified contracts nor bytecode mismatch errors are returned."
+        );
+        return;
+      }
+
+      if (
+        response.results.bytecode_mismatch_errors !== undefined &&
+        response.results.bytecode_mismatch_errors !== null
+      ) {
+        for (const bytecodeMismatchError of response.results.bytecode_mismatch_errors) {
           logger.error("There has been a bytecode mismatch error while verifying contract.", bytecodeMismatchError);
         }
       }
-      if (logCompliantVerificationResponse.results.verified_contracts) {
-        for (const verifiedContract of logCompliantVerificationResponse.results.verified_contracts) {
+      if (response.results.verified_contracts !== undefined && response.results.verified_contracts !== null) {
+        for (const verifiedContract of response.results.verified_contracts) {
           const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/contract/${
             CHAIN_ID_NETWORK_NAME_MAP[verifiedContract.network_id]
           }/${verifiedContract.address}`;

@@ -1,10 +1,12 @@
 import {
   ApiContract,
   BytecodeMismatchError,
-  ContractResponse, VerificationResult, VerifyContractsResponse,
+  ContractResponse,
+  VerificationResult,
+  VerifyContractsResponse,
+  CompilationError,
 } from "../internal/core/types";
 import { TenderlyConfig } from "../types";
-import {CompilationError} from "../internal/core/types/Compiler";
 
 export function convertToLogCompliantApiError(err: any) {
   // api error
@@ -33,11 +35,11 @@ export function convertToLogCompliantForkVerificationResponse(res: ContractRespo
   return {
     contracts: logCompliantContracts,
     bytecode_mismatch_errors: logCompliantBytecodeMismatchErrors,
-  }
+  };
 }
 
 export function convertToLogCompliantContracts(contracts: ApiContract[]) {
-  if (!contracts) {
+  if (contracts === undefined || contracts === null) {
     return undefined;
   }
 
@@ -75,7 +77,7 @@ export function convertToLogCompliantContracts(contracts: ApiContract[]) {
 }
 
 export function convertToLogCompliantBytecodeMismatchErrors(bytecodeMismatchErrors: BytecodeMismatchError[]) {
-  if (!bytecodeMismatchErrors) {
+  if (bytecodeMismatchErrors === undefined || bytecodeMismatchErrors === null) {
     return undefined;
   }
 
@@ -99,19 +101,19 @@ export function convertToLogCompliantVerificationResponse(res: VerifyContractsRe
   return {
     results: logCompliantVerificationResults,
     compilation_errors: logCompliantCompilationErrors,
-  }
+  };
 }
 
 function convertToLogCompliantVerificationResults(results: VerificationResult[]) {
-  if (!results) {
+  if (results === undefined || results === null) {
     return undefined;
   }
 
   const logCompliantVerifiedContracts = [];
   const logCompliantBytecodeMismatchErrors = [];
-  
+
   for (const res of results) {
-    if (res.bytecode_mismatch_error) {
+    if (res.bytecode_mismatch_error !== undefined && res.bytecode_mismatch_error !== null) {
       logCompliantBytecodeMismatchErrors.push({
         contract_id: res.bytecode_mismatch_error.contract_id,
         expected: res.bytecode_mismatch_error.expected,
@@ -149,20 +151,20 @@ function convertToLogCompliantVerificationResults(results: VerificationResult[])
       });
     }
   }
-  
+
   return {
     verified_contracts: logCompliantVerifiedContracts,
     bytecode_mismatch_errors: logCompliantBytecodeMismatchErrors,
-  }
+  };
 }
 
-function convertToLogCompliantCompilationErrors(compilation_errors: CompilationError[]) {
-  if (!compilation_errors) {
+function convertToLogCompliantCompilationErrors(compilationErrors: CompilationError[]) {
+  if (compilationErrors === undefined || compilationErrors === null) {
     return undefined;
   }
 
   const logCompliantCompilationErrors = [];
-  for (const err of compilation_errors) {
+  for (const err of compilationErrors) {
     logCompliantCompilationErrors.push({
       source_location: err.source_location,
       error_type: err.error_type,
@@ -176,7 +178,7 @@ function convertToLogCompliantCompilationErrors(compilation_errors: CompilationE
 }
 
 export function convertToLogCompliantProjects(projects: any[]) {
-  if (!projects) {
+  if (projects === undefined || projects === null) {
     return undefined;
   }
 
@@ -202,7 +204,7 @@ export function convertToLogCompliantProjects(projects: any[]) {
 }
 
 export function convertToLogCompliantNetworks(networks: any[]) {
-  if (!networks) {
+  if (networks === undefined || networks === null) {
     return undefined;
   }
 
