@@ -1,13 +1,10 @@
 import { task } from "hardhat/config";
 import { HardhatPluginError } from "hardhat/plugins";
-import { TenderlyService } from "tenderly";
 
+import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { logger } from "../utils/logger";
 import { PLUGIN_NAME } from "../constants";
-import { newCompilerConfig } from "../utils/util";
-import { extractContractData } from "./common";
-
-const tenderlyService = new TenderlyService(PLUGIN_NAME);
+import { ContractByName } from "../tenderly/types";
 
 task("tenderly:verify", "Verifies contracts on Tenderly")
   .addOptionalVariadicPositionalParam(
@@ -16,19 +13,18 @@ task("tenderly:verify", "Verifies contracts on Tenderly")
   )
   .setAction(verifyContract);
 
-async function verifyContract({ contracts }: any, { config, hardhatArguments, run }: any) {
+async function verifyContract({ contracts }: any, hre: HardhatRuntimeEnvironment) {
   logger.info("Public verification hardhat task has been invoked.");
+
   if (contracts === undefined) {
-    throw new HardhatPluginError(
-      PLUGIN_NAME,
-      `At least one contract must be provided (ContractName=Address). Run --help for information.`
-    );
+    throw new HardhatPluginError(PLUGIN_NAME, `At least one contract must be provided (ContractName=Address)`);
   }
 
-  const requestContracts = await extractContractData(contracts, hardhatArguments.network, config, run);
+  const formattedContracts: ContractByName[] = [];
+  for (const contract of contracts) {
+    const [name, address] = contract.split("=");
+    formattedContracts.push({ name, address });
+  }
 
-  await tenderlyService.verifyContracts({
-    config: newCompilerConfig(config),
-    contracts: requestContracts,
-  });
+  await hre.tenderly.verify(...formattedContracts);
 }

@@ -1,13 +1,10 @@
 import { HardhatPluginError } from "hardhat/plugins";
 import { task } from "hardhat/config";
-import { TenderlyService } from "tenderly";
 
+import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { logger } from "../utils/logger";
 import { PLUGIN_NAME } from "../constants";
-import { newCompilerConfig } from "../utils/util";
-import { extractContractData } from "./common";
-
-const tenderlyService = new TenderlyService(PLUGIN_NAME);
+import { ContractByName } from "../tenderly/types";
 
 task("tenderly:push", "Privately pushes contracts to Tenderly")
   .addOptionalVariadicPositionalParam(
@@ -16,36 +13,18 @@ task("tenderly:push", "Privately pushes contracts to Tenderly")
   )
   .setAction(pushContracts);
 
-async function pushContracts({ contracts }: any, { config, hardhatArguments, run }: any) {
+async function pushContracts({ contracts }: any, hre: HardhatRuntimeEnvironment) {
   logger.info("Private verification hardhat task has been invoked.");
 
   if (contracts === undefined) {
     throw new HardhatPluginError(PLUGIN_NAME, `At least one contract must be provided (ContractName=Address)`);
   }
 
-  if (config.tenderly.project === undefined) {
-    throw new HardhatPluginError(
-      PLUGIN_NAME,
-      `Please provide the project field in the tenderly object in hardhat.config.js`
-    );
+  const formattedContracts: ContractByName[] = [];
+  for (const contract of contracts) {
+    const [name, address] = contract.split("=");
+    formattedContracts.push({ name, address });
   }
 
-  if (config.tenderly.username === undefined) {
-    throw new HardhatPluginError(
-      PLUGIN_NAME,
-      `Please provide the username field in the tenderly object in hardhat.config.js`
-    );
-  }
-
-  const requestContracts = await extractContractData(contracts, hardhatArguments.network, config, run);
-  const solcConfig = newCompilerConfig(config);
-
-  await tenderlyService.pushContracts(
-    {
-      config: solcConfig,
-      contracts: requestContracts,
-    },
-    config.tenderly.project,
-    config.tenderly.username
-  );
+  await hre.tenderly.verify(...formattedContracts);
 }
