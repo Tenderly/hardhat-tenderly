@@ -59,7 +59,7 @@ export class Tenderly {
       return;
     }
 
-    await this.tenderlyService.verifyContracts(requestData);
+    await this.tenderlyService.verifyContractsMultiCompiler(requestData);
   }
 
   public async verifyAPI(request: TenderlyContractUploadRequest): Promise<void> {
@@ -137,7 +137,7 @@ export class Tenderly {
       return;
     }
 
-    await this.tenderlyService.pushContracts(
+    await this.tenderlyService.pushContractsMultiCompiler(
       requestData,
       this.env.config.tenderly.project,
       this.env.config.tenderly.username
@@ -272,7 +272,7 @@ export class Tenderly {
       logger.trace("Found network is:", network);
 
       const index = requestData.contracts.findIndex(
-        (requestContract) => requestContract.contractToVerify === contract.name
+        (requestContract) => requestContract.contractName === contract.name
       );
       if (index === -1) {
         logger.error(`Contract '${contract.name}' was not found among the contracts in /artifacts.`);

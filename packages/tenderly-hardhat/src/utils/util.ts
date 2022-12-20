@@ -9,7 +9,6 @@ import {
   TenderlyVerifyContractsSource,
 } from "tenderly/types";
 
-import { CompilerConfiguration } from "tenderly/internal/core/types/Compiler";
 import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";
 import { PLUGIN_NAME } from "../constants";
 import { CONTRACTS_NOT_DETECTED } from "../tenderly/errors";
@@ -57,6 +56,7 @@ async function _makeVerifyContractsRequest(
       throw err;
     }
 
+    // TODO(dusan): Should I wrap this into a function
     const network = hre.hardhatArguments.network;
     if (network === undefined) {
       logger.error(
@@ -110,54 +110,6 @@ async function extractSources(job: CompilationJob): Promise<Record<string, Tende
   }
 
   return sources;
-}
-
-async function _getVersionPragma(hre: HardhatRuntimeEnvironment, sourcePath: string): Promise<string | undefined> {
-  const sourcePaths = await hre.run("compile:solidity:get-source-paths");
-  const sourceNames = await hre.run("compile:solidity:get-source-names", {
-    sourcePaths,
-  });
-  const data = await hre.run("compile:solidity:get-dependency-graph", {
-    sourceNames,
-  });
-
-  data._resolvedFiles.forEach((resolvedFile: any, _: any) => {
-    if (resolvedFile.sourceName === sourcePath) {
-      return resolvedFile.content.versionPragmas[0];
-    }
-  });
-
-  return undefined;
-}
-
-function _convertCompilerConfiguration(config: TenderlyContractConfig): CompilerConfiguration {
-  const convertedConfig: CompilerConfiguration = {};
-  if (config?.compiler_version !== undefined) {
-    convertedConfig.version = config.compiler_version;
-  }
-  if (config?.evm_version !== undefined) {
-    if (convertedConfig?.settings === undefined) {
-      convertedConfig.settings = {};
-    }
-    convertedConfig.settings.evmVersion = config.evm_version;
-  }
-  if (config?.optimizations_used !== undefined) {
-    if (convertedConfig?.settings === undefined) {
-      convertedConfig.settings = {};
-    }
-    convertedConfig.settings.optimizer = {
-      runs: config.optimizations_count,
-    };
-  }
-  if (config?.debug !== undefined && config.debug?.revertStrings !== undefined) {
-    if (convertedConfig?.settings === undefined) {
-      convertedConfig.settings = {};
-    }
-    convertedConfig.settings.debug = {
-      revertString: config.debug?.revertStrings,
-    };
-  }
-  return convertedConfig;
 }
 
 export const getCompilerDataFromContracts = (

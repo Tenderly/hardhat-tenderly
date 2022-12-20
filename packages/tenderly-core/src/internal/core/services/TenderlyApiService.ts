@@ -11,7 +11,7 @@ export class TenderlyApiService {
     const tdlyConfig = getConfig();
     const params = {
       baseURL: TENDERLY_API_BASE_URL,
-      accessKey: tdlyConfig.access_key,
+      headers: { "x-access-key": tdlyConfig.access_key },
     };
 
     logger.debug("Configured instance with parameters:", {
