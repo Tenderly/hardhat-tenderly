@@ -89,6 +89,118 @@ export class TenderlyService {
     return null;
   }
 
+  public async verifyContracts(request: TenderlyContractUploadRequest): Promise<void> {
+    logger.debug("Verifying contracts publicly.");
+
+    let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
+    if (TenderlyApiService.isAuthenticated()) {
+      tenderlyApi = TenderlyApiService.configureInstance();
+    }
+
+    try {
+      if (request.contracts.length === 0) {
+        logger.error(NO_VERIFIABLE_CONTRACTS_ERR_MSG);
+        return;
+      }
+
+      const res = await tenderlyApi.post("/api/v1/public/verify-contracts", { ...request });
+      if (res.data === undefined || res.data === null) {
+        logger.error(
+          "There was an error while publicly verifying contracts on Tenderly. Obtained response is invalid."
+        );
+        return;
+      }
+      const logCompliantVerificationResponse = convertToLogCompliantVerificationResponse(res.data);
+      logger.trace("Verification response:", logCompliantVerificationResponse);
+
+      const responseData: ContractResponse = res.data;
+      if (responseData.bytecode_mismatch_errors !== null) {
+        logger.error(`Error in ${this.pluginName}: ${BYTECODE_MISMATCH_ERR_MSG}`);
+        return;
+      }
+
+      if (responseData.contracts === undefined || responseData.contracts === null) {
+        logger.error("There was an error during public verification. There are no returned contracts.");
+        return;
+      }
+
+      if (responseData.contracts.length === 0) {
+        let addresses = "";
+        for (const cont of request.contracts) {
+          addresses += `${cont.contractName}, `;
+        }
+
+        logger.error(`Error in ${this.pluginName}: ${NO_NEW_CONTRACTS_VERIFIED_ERR_MSG}`, addresses);
+        return;
+      }
+
+      console.log("Smart Contracts successfully verified");
+      console.group();
+
+      for (const contract of responseData.contracts) {
+        const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/contract/${
+          CHAIN_ID_NETWORK_NAME_MAP[contract.network_id]
+        }/${contract.address}`;
+        console.log(`Contract ${contract.address} verified. You can view the contract at ${contractLink}`);
+      }
+      console.groupEnd();
+    } catch (err) {
+      const logCompliantApiError = convertToLogCompliantApiError(err);
+      logger.error(logCompliantApiError);
+      logger.error(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
+    }
+  }
+
+  public async pushContracts(
+    request: TenderlyContractUploadRequest,
+    tenderlyProject: string,
+    username: string
+  ): Promise<void> {
+    logger.debug("Pushing contracts onto Tenderly.");
+    if (!TenderlyApiService.isAuthenticated()) {
+      logger.error(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
+      return;
+    }
+
+    const tenderlyApi = TenderlyApiService.configureInstance();
+    try {
+      const res = await tenderlyApi.post(`/api/v1/account/${username}/project/${tenderlyProject}/contracts`, {
+        ...request,
+      });
+      if (res.data === undefined || res.data === null) {
+        logger.error("There was an error while pushing contracts to Tenderly. Obtained response is invalid.");
+        return;
+      }
+      const logCompliantVerificationResponse = convertToLogCompliantVerificationResponse(res.data);
+      logger.trace("Verification response:", logCompliantVerificationResponse);
+
+      const responseData: ContractResponse = res.data;
+      if (responseData.bytecode_mismatch_errors !== null) {
+        logger.error(`Error in ${this.pluginName}: ${BYTECODE_MISMATCH_ERR_MSG}`);
+        return;
+      }
+
+      if (responseData.contracts.length === 0) {
+        let addresses = "";
+        for (const cont of request.contracts) {
+          addresses += `${cont.contractName}, `;
+        }
+
+        logger.error(`Error in ${this.pluginName}: ${NO_NEW_CONTRACTS_VERIFIED_ERR_MSG}`, addresses);
+        return;
+      }
+
+      const dashLink = `${TENDERLY_DASHBOARD_BASE_URL}/${username}/${tenderlyProject}/contracts`;
+      console.log(
+        `Successfully privately verified Smart Contracts for project ${tenderlyProject}. You can view your contracts at ${dashLink}`
+      );
+    } catch (err) {
+      const logCompliantApiError = convertToLogCompliantApiError(err);
+      logger.error(logCompliantApiError);
+      logger.error(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
+    }
+  }
+
   public async verifyContractsMultiCompiler(request: TenderlyVerifyContractsRequest): Promise<void> {
     logger.debug("Publicly verifying contracts on tenderly. (Multi compiler version)");
 
@@ -262,118 +374,6 @@ export class TenderlyService {
         console.log(`Contract at ${contract.address} verified.`);
       }
       console.groupEnd();
-    } catch (err) {
-      const logCompliantApiError = convertToLogCompliantApiError(err);
-      logger.error(logCompliantApiError);
-      logger.error(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
-    }
-  }
-
-  public async verifyContracts(request: TenderlyContractUploadRequest): Promise<void> {
-    logger.debug("Verifying contracts publicly.");
-
-    let tenderlyApi = TenderlyApiService.configureAnonymousInstance();
-    if (TenderlyApiService.isAuthenticated()) {
-      tenderlyApi = TenderlyApiService.configureInstance();
-    }
-
-    try {
-      if (request.contracts.length === 0) {
-        logger.error(NO_VERIFIABLE_CONTRACTS_ERR_MSG);
-        return;
-      }
-
-      const res = await tenderlyApi.post("/api/v1/public/verify-contracts", { ...request });
-      if (res.data === undefined || res.data === null) {
-        logger.error(
-          "There was an error while publicly verifying contracts on Tenderly. Obtained response is invalid."
-        );
-        return;
-      }
-      const logCompliantVerificationResponse = convertToLogCompliantVerificationResponse(res.data);
-      logger.trace("Verification response:", logCompliantVerificationResponse);
-
-      const responseData: ContractResponse = res.data;
-      if (responseData.bytecode_mismatch_errors !== null) {
-        logger.error(`Error in ${this.pluginName}: ${BYTECODE_MISMATCH_ERR_MSG}`);
-        return;
-      }
-
-      if (responseData.contracts === undefined || responseData.contracts === null) {
-        logger.error("There was an error during public verification. There are no returned contracts.");
-        return;
-      }
-
-      if (responseData.contracts.length === 0) {
-        let addresses = "";
-        for (const cont of request.contracts) {
-          addresses += `${cont.contractName}, `;
-        }
-
-        logger.error(`Error in ${this.pluginName}: ${NO_NEW_CONTRACTS_VERIFIED_ERR_MSG}`, addresses);
-        return;
-      }
-
-      console.log("Smart Contracts successfully verified");
-      console.group();
-
-      for (const contract of responseData.contracts) {
-        const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/contract/${
-          CHAIN_ID_NETWORK_NAME_MAP[contract.network_id]
-        }/${contract.address}`;
-        console.log(`Contract ${contract.address} verified. You can view the contract at ${contractLink}`);
-      }
-      console.groupEnd();
-    } catch (err) {
-      const logCompliantApiError = convertToLogCompliantApiError(err);
-      logger.error(logCompliantApiError);
-      logger.error(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
-    }
-  }
-
-  public async pushContracts(
-    request: TenderlyContractUploadRequest,
-    tenderlyProject: string,
-    username: string
-  ): Promise<void> {
-    logger.debug("Pushing contracts onto Tenderly.");
-    if (!TenderlyApiService.isAuthenticated()) {
-      logger.error(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
-      return;
-    }
-
-    const tenderlyApi = TenderlyApiService.configureInstance();
-    try {
-      const res = await tenderlyApi.post(`/api/v1/account/${username}/project/${tenderlyProject}/contracts`, {
-        ...request,
-      });
-      if (res.data === undefined || res.data === null) {
-        logger.error("There was an error while pushing contracts to Tenderly. Obtained response is invalid.");
-        return;
-      }
-      const logCompliantVerificationResponse = convertToLogCompliantVerificationResponse(res.data);
-      logger.trace("Verification response:", logCompliantVerificationResponse);
-
-      const responseData: ContractResponse = res.data;
-      if (responseData.bytecode_mismatch_errors !== null) {
-        logger.error(`Error in ${this.pluginName}: ${BYTECODE_MISMATCH_ERR_MSG}`);
-        return;
-      }
-
-      if (responseData.contracts.length === 0) {
-        let addresses = "";
-        for (const cont of request.contracts) {
-          addresses += `${cont.contractName}, `;
-        }
-
-        logger.error(`Error in ${this.pluginName}: ${NO_NEW_CONTRACTS_VERIFIED_ERR_MSG}`, addresses);
-        return;
-      }
-
-      const dashLink = `${TENDERLY_DASHBOARD_BASE_URL}/${username}/${tenderlyProject}/contracts`;
-      console.log(
-        `Successfully privately verified Smart Contracts for project ${tenderlyProject}. You can view your contracts at ${dashLink}`
-      );
     } catch (err) {
       const logCompliantApiError = convertToLogCompliantApiError(err);
       logger.error(logCompliantApiError);
