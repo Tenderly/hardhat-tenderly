@@ -7,7 +7,7 @@ export interface ContractResponse {
 
 export interface VerificationResult {
   bytecode_mismatch_error: BytecodeMismatchError;
-  verified_contract: any; // TODO(dusan) document this, it shouldn't be any type
+  verified_contract: any;
 }
 
 export interface VerifyContractsResponse {
