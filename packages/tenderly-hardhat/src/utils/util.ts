@@ -4,12 +4,20 @@ import { CompilationJob, DependencyGraph, HardhatRuntimeEnvironment, SolcConfig 
 import {
   TenderlyContract,
   TenderlyContractConfig,
+  TenderlyForkContractUploadRequest,
   TenderlyVerificationContract,
   TenderlyVerifyContractsRequest,
   TenderlyVerifyContractsSource,
 } from "tenderly/types";
 
 import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";
+import {
+  TASK_COMPILE_SOLIDITY_GET_COMPILATION_JOB_FOR_FILE,
+  TASK_COMPILE_SOLIDITY_GET_DEPENDENCY_GRAPH,
+  TASK_COMPILE_SOLIDITY_GET_SOURCE_NAMES,
+  TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS,
+  TASK_COMPILE_SOLIDITY_MERGE_COMPILATION_JOBS,
+} from "hardhat/builtin-tasks/task-names";
 import { PLUGIN_NAME } from "../constants";
 import { CONTRACTS_NOT_DETECTED } from "../tenderly/errors";
 import { ContractByName, Metadata } from "../tenderly/types";
@@ -22,22 +30,32 @@ export const makeVerifyContractsRequest = async (
   return _makeVerifyContractsRequest(hre, flatContracts);
 };
 
-// TODO(dusan): Make a logic here for fork verification
-// export const makeForkVerifyContractsRequest = async (
-//   hre: HardhatRuntimeEnvironment,
-//   flatContracts: ContractByName[],
-//   txRoot: string
-// ): Promise<TenderlyForkContractUploadRequest | null> => {
-//   const request = await _makeVerifyContractsRequest(hre, flatContracts);
-//   return {
-//     ...request,
-//     root: txRoot,
-//   }
-// }
+// TODO(dusan): This function is implemented because there were updates on private and public verifications
+// but fork verification remained the same. That is, the request formats for private/public and fork verifications differ.
+// Hence, this function extracts the same data as private/public verifications, but then converts it into a suitable format
+// for fork verification.
+export const makeForkVerifyContractsRequest = async (
+  hre: HardhatRuntimeEnvironment,
+  flatContracts: ContractByName[],
+  txRoot: string,
+  forkId: string
+): Promise<TenderlyForkContractUploadRequest | null> => {
+  const request = await _makeVerifyContractsRequest(hre, flatContracts, forkId);
+  const forkRequest: TenderlyForkContractUploadRequest = await _convertToForkRequest(
+    hre,
+    request as TenderlyVerifyContractsRequest
+  );
+
+  return {
+    ...forkRequest,
+    root: txRoot,
+  };
+};
 
 async function _makeVerifyContractsRequest(
   hre: HardhatRuntimeEnvironment,
-  flatContracts: ContractByName[]
+  flatContracts: ContractByName[],
+  forkId?: string
 ): Promise<TenderlyVerifyContractsRequest | null> {
   logger.info("Processing data needed for verification.");
 
@@ -56,7 +74,6 @@ async function _makeVerifyContractsRequest(
       throw err;
     }
 
-    // TODO(dusan): Should I wrap this into a function
     const network = hre.hardhatArguments.network;
     if (network === undefined) {
       logger.error(
@@ -70,7 +87,10 @@ async function _makeVerifyContractsRequest(
     if (hre.config.networks[network].chainId !== undefined) {
       chainId = hre.config.networks[network].chainId!.toString();
     }
-    logger.trace(`ChainID for network '${network}' is ${chainId}`);
+    if (chainId === undefined && network === "tenderly" && forkId !== undefined) {
+      chainId = forkId;
+    }
+    logger.trace(`ChainId for network '${network}' is ${chainId}`);
 
     if (chainId === undefined) {
       logger.error(
@@ -81,6 +101,7 @@ async function _makeVerifyContractsRequest(
 
     contracts.push({
       contractToVerify: flatContract.name,
+      // TODO(dusan) this can be done with TASK_COMPILE_SOLIDITY_GET_COMPILER_INPUT hardhat task
       sources: await extractSources(job),
       compiler: job.getSolcConfig(),
       networks: {
@@ -91,6 +112,7 @@ async function _makeVerifyContractsRequest(
       },
     });
   }
+  // TODO(dusan) see about merging compilation jobs?
 
   return {
     contracts,
@@ -110,6 +132,87 @@ async function extractSources(job: CompilationJob): Promise<Record<string, Tende
   }
 
   return sources;
+}
+
+// TODO(dusan): This function shouldn't be here. Fork verification should have the same request format as private or public verification
+async function _convertToForkRequest(
+  hre: HardhatRuntimeEnvironment,
+  request: TenderlyVerifyContractsRequest
+): Promise<TenderlyForkContractUploadRequest> {
+  const forkRequest: TenderlyForkContractUploadRequest = { config: {}, contracts: [], root: "" };
+
+  // Merge all compilation jobs to see if they can all fit into one request, if not, throw an error because fork verification doesn't support multiple compiler version.
+  const compilationJobs: CompilationJob[] = [];
+  for (const contract of request.contracts) {
+    compilationJobs.push(await getCompilationJob(hre, contract.contractToVerify));
+  }
+  const mergedJob: CompilationJob[] = await hre.run(TASK_COMPILE_SOLIDITY_MERGE_COMPILATION_JOBS, { compilationJobs });
+  if (mergedJob.length > 1) {
+    throw new Error(
+      "The provided contracts must be compiled with the same compiler configuration. At this point, hardhat-tenderly plugin doesn't support multi compiler verification on FORKS. Private and public verification support multi compiler verification."
+    );
+  }
+
+  for (const contract of request.contracts) {
+    for (const [sourcePath, source] of Object.entries(contract.sources)) {
+      const forkContract: TenderlyContract = {
+        compiler: undefined,
+        contractName: source.name,
+        networks: undefined,
+        source: source.code,
+        sourcePath,
+      };
+      if (
+        forkContract.contractName === contract.contractToVerify ||
+        `${forkContract.sourcePath}:${forkContract.contractName}` === contract.contractToVerify
+      ) {
+        forkContract.networks = contract.networks;
+      }
+      forkRequest.contracts.push(forkContract);
+    }
+  }
+
+  forkRequest.config = {};
+  forkRequest.config.compiler_version = request.contracts[0].compiler?.version;
+  forkRequest.config.optimizations_used = request.contracts[0].compiler?.settings?.optimizer?.enabled;
+  forkRequest.config.optimizations_count = request.contracts[0].compiler?.settings?.optimizer?.runs;
+  forkRequest.config.evm_version = request.contracts[0].compiler?.settings?.evmVersion;
+  if (request.contracts[0].compiler?.settings?.debug?.revertStrings) {
+    forkRequest.config.debug = {
+      revertStrings: request.contracts[0].compiler?.settings?.debug?.revertStrings,
+    };
+  }
+
+  return forkRequest;
+}
+
+export const getCompilationJob = async (
+  hre: HardhatRuntimeEnvironment,
+  contractName: string
+): Promise<CompilationJob> => {
+  logger.trace("Getting compilation job for contract:", contractName);
+
+  const dependencyGraph: DependencyGraph = await getDependencyGraph(hre);
+
+  const artifact = hre.artifacts.readArtifactSync(contractName);
+  const file = dependencyGraph.getResolvedFiles().find((resolvedFile) => {
+    return resolvedFile.sourceName === artifact.sourceName;
+  });
+
+  return hre.run(TASK_COMPILE_SOLIDITY_GET_COMPILATION_JOB_FOR_FILE, {
+    dependencyGraph,
+    file,
+  });
+};
+
+async function getDependencyGraph(hre: HardhatRuntimeEnvironment): Promise<DependencyGraph> {
+  const sourcePaths = await hre.run(TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS);
+  const sourceNames: string[] = await hre.run(TASK_COMPILE_SOLIDITY_GET_SOURCE_NAMES, {
+    sourcePaths,
+  });
+  return hre.run(TASK_COMPILE_SOLIDITY_GET_DEPENDENCY_GRAPH, {
+    sourceNames,
+  });
 }
 
 export const getCompilerDataFromContracts = (
@@ -267,58 +370,6 @@ export const compareConfigs = (originalConfig: TenderlyContractConfig, newConfig
   }
   return true;
 };
-
-export const getCompilationJob = async (
-  hre: HardhatRuntimeEnvironment,
-  contractName: string
-): Promise<CompilationJob> => {
-  logger.trace("Getting compilation job for contract:", contractName);
-
-  const dependencyGraph: DependencyGraph = await getDependencyGraph(hre);
-
-  const artifact = hre.artifacts.readArtifactSync(contractName);
-  const file = dependencyGraph.getResolvedFiles().find((resolvedFile) => {
-    return resolvedFile.sourceName === artifact.sourceName;
-  });
-
-  return hre.run("compile:solidity:get-compilation-job-for-file", {
-    dependencyGraph,
-    file,
-  });
-};
-
-// TODO(dusan) This function should be deleted since we have getCompilationJob
-export const getCompilerDataFromHardhat = async (
-  hre: HardhatRuntimeEnvironment,
-  contractName: string
-): Promise<TenderlyContractConfig> => {
-  const job: CompilationJob = await getCompilationJob(hre, contractName);
-  const hhConfig: SolcConfig = job.getSolcConfig();
-
-  const tenderlyConfig: TenderlyContractConfig = {
-    compiler_version: hhConfig?.version,
-    optimizations_used: hhConfig?.settings?.optimizer?.enabled,
-    optimizations_count: hhConfig?.settings?.optimizer?.runs,
-    evm_version: hhConfig?.settings?.evmVersion,
-  };
-  if (hhConfig?.settings?.debug?.revertStrings) {
-    tenderlyConfig.debug = {
-      revertStrings: hhConfig.settings.debug.revertStrings,
-    };
-  }
-
-  return tenderlyConfig;
-};
-
-async function getDependencyGraph(hre: HardhatRuntimeEnvironment): Promise<DependencyGraph> {
-  const sourcePaths = await hre.run("compile:solidity:get-source-paths");
-  const sourceNames: string[] = await hre.run("compile:solidity:get-source-names", {
-    sourcePaths,
-  });
-  return hre.run("compile:solidity:get-dependency-graph", {
-    sourceNames,
-  });
-}
 
 export const newCompilerConfig = (
   config: HardhatConfig,

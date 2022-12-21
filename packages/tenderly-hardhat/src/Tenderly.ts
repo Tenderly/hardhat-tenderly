@@ -80,19 +80,6 @@ export class Tenderly {
     return this.tenderlyService.verifyContractsMultiCompiler(requestData);
   }
 
-  public async verifyAPI(request: TenderlyContractUploadRequest): Promise<void> {
-    logger.info("Invoked public verification through API request.");
-
-    if (this.env.network.name === "tenderly") {
-      logger.error(
-        `Error in ${PLUGIN_NAME}: Network parameter is set to 'tenderly' and verifyAPI() is not available for fork deployments, please use verifyForkAPI().`
-      );
-      return;
-    }
-
-    await this.tenderlyService.verifyContracts(request);
-  }
-
   public async verifyMultiCompilerAPI(request: TenderlyVerifyContractsRequest): Promise<void> {
     logger.info("Invoked verification (multi compiler version) through API.");
     logger.trace("Request data:", request);
@@ -159,8 +146,34 @@ export class Tenderly {
     return this.tenderlyNetwork;
   }
 
+  private _getVerificationType(): string {
+    if (this.env.network.name === "tenderly") {
+      return "fork";
+    }
+
+    const priv = this.env.config.tenderly?.privateVerification;
+    if (priv !== undefined && priv && this.env.network.name !== "tenderly") {
+      return "private";
+    }
+
+    return "public";
+  }
+
   public async push(...contracts: any[]): Promise<void> {
     return this.verify(...contracts);
+  }
+
+  public async verifyAPI(request: TenderlyContractUploadRequest): Promise<void> {
+    logger.info("Invoked public verification through API request.");
+
+    if (this.env.network.name === "tenderly") {
+      logger.error(
+        `Error in ${PLUGIN_NAME}: Network parameter is set to 'tenderly' and verifyAPI() is not available for fork deployments, please use verifyForkAPI().`
+      );
+      return;
+    }
+
+    await this.tenderlyService.verifyContracts(request);
   }
 
   public async pushAPI(
@@ -178,19 +191,6 @@ export class Tenderly {
     }
 
     await this.tenderlyService.pushContracts(request, tenderlyProject, username);
-  }
-
-  private _getVerificationType(): string {
-    if (this.env.network.name === "tenderly") {
-      return "fork";
-    }
-
-    const priv = this.env.config.tenderly?.privateVerification;
-    if (priv !== undefined && priv && this.env.network.name !== "tenderly") {
-      return "private";
-    }
-
-    return "public";
   }
 
   public async persistArtifacts(...contracts: ContractByName[]) {
