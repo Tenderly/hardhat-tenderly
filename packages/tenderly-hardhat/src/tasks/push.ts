@@ -1,12 +1,8 @@
-import { HardhatPluginError } from "hardhat/plugins";
 import { task } from "hardhat/config";
 
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { logger } from "../utils/logger";
-import { PLUGIN_NAME } from "../constants";
-import { ContractByName } from "../tenderly/types";
 
-task("tenderly:push", "Privately pushes contracts to Tenderly")
+task("tenderly:push", "Verifies contracts on Tenderly based on the configuration in hardhat.config.js.")
   .addOptionalVariadicPositionalParam(
     "contracts",
     "Addresses and names of contracts that will be verified formatted ContractName=Address"
@@ -14,17 +10,5 @@ task("tenderly:push", "Privately pushes contracts to Tenderly")
   .setAction(pushContracts);
 
 async function pushContracts({ contracts }: any, hre: HardhatRuntimeEnvironment) {
-  logger.info("Private verification hardhat task has been invoked.");
-
-  if (contracts === undefined) {
-    throw new HardhatPluginError(PLUGIN_NAME, `At least one contract must be provided (ContractName=Address)`);
-  }
-
-  const formattedContracts: ContractByName[] = [];
-  for (const contract of contracts) {
-    const [name, address] = contract.split("=");
-    formattedContracts.push({ name, address });
-  }
-
-  await hre.tenderly.verify(...formattedContracts);
+  await hre.run("tenderly:verify", { contracts });
 }

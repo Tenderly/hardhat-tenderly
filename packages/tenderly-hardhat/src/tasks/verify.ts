@@ -6,7 +6,7 @@ import { logger } from "../utils/logger";
 import { PLUGIN_NAME } from "../constants";
 import { ContractByName } from "../tenderly/types";
 
-task("tenderly:verify", "Verifies contracts on Tenderly")
+task("tenderly:verify", "Verifies contracts on Tenderly based on the configuration in hardhat.config.js.")
   .addOptionalVariadicPositionalParam(
     "contracts",
     "Addresses and names of contracts that will be verified formatted ContractName=Address"
@@ -14,7 +14,7 @@ task("tenderly:verify", "Verifies contracts on Tenderly")
   .setAction(verifyContract);
 
 async function verifyContract({ contracts }: any, hre: HardhatRuntimeEnvironment) {
-  logger.info("Public verification hardhat task has been invoked.");
+  logger.info("Verification via tenderly:push hardhat task is invoked.");
 
   if (contracts === undefined) {
     throw new HardhatPluginError(PLUGIN_NAME, `At least one contract must be provided (ContractName=Address)`);
