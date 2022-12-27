@@ -21,7 +21,7 @@ import {
   makeVerifyContractsRequest,
   resolveDependencies,
 } from "./utils/util";
-import { DEFAULT_CHAIN_ID, PLUGIN_NAME } from "./constants";
+import { DEFAULT_CHAIN_ID, PLUGIN_NAME, VERIFICATION_TYPES } from "./constants";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 
 export class Tenderly {
@@ -43,7 +43,7 @@ export class Tenderly {
     logger.info("Verification invoked.");
 
     const verificationType = this._getVerificationType();
-    if (verificationType === "fork") {
+    if (verificationType === VERIFICATION_TYPES.FORK) {
       logger.info("Network parameter is set to 'tenderly', redirecting to fork verification.");
       return this.tenderlyNetwork.verify(contracts);
     }
@@ -55,7 +55,7 @@ export class Tenderly {
       return;
     }
 
-    if (verificationType === "private") {
+    if (verificationType === VERIFICATION_TYPES.PRIVATE) {
       logger.info("Private verification flag is set to true, redirecting to private verification.");
       if (this.env.config.tenderly?.project === undefined) {
         logger.error(
@@ -85,12 +85,12 @@ export class Tenderly {
     logger.trace("Request data:", request);
 
     switch (this._getVerificationType()) {
-      case "fork":
+      case VERIFICATION_TYPES.FORK:
         logger.error(
           `Error in ${PLUGIN_NAME}: Network parameter is set to 'tenderly' and verifyMultiCompilerAPI() is not available for fork deployments, please use verifyForkAPI().`
         );
         break;
-      case "private":
+      case VERIFICATION_TYPES.PRIVATE:
         if (this.env.config.tenderly?.project === undefined) {
           logger.error(
             `Error in ${PLUGIN_NAME}: Please provide the project field in the tenderly object in hardhat.config.js`
@@ -111,7 +111,7 @@ export class Tenderly {
           this.env.config.tenderly.username
         );
         break;
-      case "public":
+      case VERIFICATION_TYPES.PUBLIC:
         logger.info("Publicly verifying contracts.");
         await this.tenderlyService.verifyContractsMultiCompiler(request);
         break;
@@ -148,15 +148,15 @@ export class Tenderly {
 
   private _getVerificationType(): string {
     if (this.env.network.name === "tenderly") {
-      return "fork";
+      return VERIFICATION_TYPES.FORK;
     }
 
     const priv = this.env.config.tenderly?.privateVerification;
     if (priv !== undefined && priv && this.env.network.name !== "tenderly") {
-      return "private";
+      return VERIFICATION_TYPES.PRIVATE;
     }
 
-    return "public";
+    return VERIFICATION_TYPES.PUBLIC;
   }
 
   public async push(...contracts: any[]): Promise<void> {
