@@ -124,14 +124,18 @@ async function extractSources(job: CompilationJob): Promise<Record<string, Tende
   logger.info("Extracting sources from compilation job.");
 
   for (const file of job.getResolvedFiles()) {
-    const name = file.sourceName.split("/").slice(-1)[0].split(".")[0];
+    const fileName = extractFileName(file.sourceName);
     sources[file.sourceName] = {
-      name,
+      name: fileName,
       code: file.content.rawContent,
     };
   }
 
   return sources;
+}
+
+function extractFileName(sourceName: string): string {
+  return sourceName.split("/").slice(-1)[0].split(".")[0];
 }
 
 // TODO(dusan): This function shouldn't be here. Fork verification should have the same request format as private or public verification
