@@ -10,9 +10,9 @@ task("tenderly:push", "Verifies contracts on Tenderly based on the configuration
   .setAction(pushContracts);
 
 async function pushContracts({ contracts }: any, hre: HardhatRuntimeEnvironment) {
-  new ColorLog("THIS FUNCTION IS DEPRECATED. PLEASE USE 'tenderly:verify' TASK.")
-    .prependColor(ColorLog.BG.RED)
-    .prependColor(ColorLog.TEXT.BLACK)
+  new ColorLog("THIS TASK IS DEPRECATED. PLEASE USE 'tenderly:verify' TASK.")
+    // .prependColor(ColorLog.BG.RED)
+    .prependColor(ColorLog.TEXT.RED)
     .appendCommand(ColorLog.RESET_COLOR_CMD)
     .log();
 
