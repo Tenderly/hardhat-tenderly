@@ -14,7 +14,7 @@ task("tenderly:verify", "Verifies contracts on Tenderly based on the configurati
   .setAction(verifyContract);
 
 async function verifyContract({ contracts }: any, hre: HardhatRuntimeEnvironment) {
-  logger.info("Verification via tenderly:push hardhat task is invoked.");
+  logger.info("Verification via tenderly:verify hardhat task is invoked.");
 
   if (contracts === undefined) {
     throw new HardhatPluginError(PLUGIN_NAME, `At least one contract must be provided (ContractName=Address)`);
