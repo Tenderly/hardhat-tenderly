@@ -22,6 +22,7 @@ async function pushContracts({ contracts }: any, hre: HardhatRuntimeEnvironment)
 
 // This is just nice behavior instead of hard-coding.
 // If we ever need to use colorful logs, look up Chalk.js or Colors.js.
+// I didn't want to add a dependency because this is the only use case.
 class ColorLog {
   public static BG = {
     YELLOW: "\x1b[43m",
