@@ -69,7 +69,7 @@ async function _makeVerifyContractsRequest(
     } catch (err) {
       // TODO(dusan): See how to wrap errors, don't return errors like this
       logger.error(
-        `Error while trying to get compilation job for contract '${flatContract.name}'. The provided contract probably doesn't exist or is mistyped.`
+        `Error while trying to get compilation job for contract '${flatContract.name}'. The provided contract name probably doesn't exist or is mistyped.`
       );
       throw err;
     }
