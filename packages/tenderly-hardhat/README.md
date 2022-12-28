@@ -10,10 +10,15 @@ This repo will make it possible to verify your contracts with ease, so you can f
 
 You can read about hardhat-tenderly's verification features in detail [here](https://docs.tenderly.co/monitoring/smart-contract-verification/verifying-contracts-using-the-tenderly-hardhat-plugin).
 
-Here's a brief description. There are three ways to verify your contracts: 
-- <b>Private verification</b> - only you or people who share the project with you may see the source code of the contract and interact with it.
-- <b>Public verification</b> - anyone can see the source code of the contract and interact with it.
-- <b>Fork verification</b> - verify deployed contract on a [tenderly fork](https://docs.tenderly.co/simulations-and-forks/how-to-create-a-fork).
+Here's a brief description. There are three modes you can configure to verify your contracts and these are called **Verification Modes**: 
+- **Private verification mode** - Only you or people who share the project with you may see the source code of the contract and interact with it.
+- **Public verification mode** - Anyone can see the source code of the contract and interact with it.
+- **Fork verification mode** - Verify deployed contract on a [tenderly fork](https://docs.tenderly.co/simulations-and-forks/how-to-create-a-fork).
+
+Also, there are three ways of how you can actually do the verification based on the mode you configured in verification modes. These ways are called **Verification Approaches**:
+- **Automatic verification approach** - The plugin will automatically verify your contracts after each deployment.
+- **Manual verification approach** - You will have to manually verify the contracts via plugin method calls.
+- **Task verification approach** - Verify your contracts via `tenderly:verify` hardhat task.
 
 ## Installation
 
@@ -46,11 +51,11 @@ To install `tenderly cli`, follow the installation steps at [tenderly-cli](https
 tenderly login --authentication-method access-key --access-key {your_access_key} --force
 ```
 
-Access key can be found under <b>Settings->Authorization->Generate new access key</b> in your [Tenderly dashboard](https://dashboard.tenderly.co).
+Access key can be found under **Settings->Authorization->Generate new access key** in your [Tenderly dashboard](https://dashboard.tenderly.co).
 
 
-# Verification types
-This section explains three ways of configuring how you want to verify your contracts. 
+# Verification Modes
+This section explains three modes you can configure to verify your contracts. 
 
 First, you need to add the `tenderly` field inside the `HardhatConfig` structure in `hardhat.config.ts`:
 ```ts
@@ -69,14 +74,14 @@ module.exports = {
 }
 ```
 
-### Private verification
-In order to configure private verification, set `privateVerification` to `true` inside the `tenderly` field inside `hardhat.config.ts`. 
-Also, the `--network` flag must NOT be set to `tenderly` when running `npx hardhat run` command, or fork verification will be tempted. 
-### Public verification
-In order to configure public verification, set `privateVerification` to `false` inside the `tenderly` field inside `hardhat.config.ts`.
-Also, the `--network` flag must NOT be set to `tenderly` when running `npx hardhat run` command, or fork verification will be tempted. 
-### Fork verification
-In order to configure fork verification, set `privateVerification` to `false` inside the `tenderly` field inside `hardhat.config.ts`.
+### Private verification mode
+In order to configure private verification mode, set `privateVerification` to `true` inside the `tenderly` field inside `hardhat.config.ts`. 
+Also, the `--network` flag must NOT be set to `tenderly` when running `npx hardhat run` command, or fork verification mode will be configured. 
+### Public verification mode
+In order to configure public verification mode, set `privateVerification` to `false` inside the `tenderly` field inside `hardhat.config.ts`.
+Also, the `--network` flag must NOT be set to `tenderly` when running `npx hardhat run` command, or fork verification mode will be configured. 
+### Fork verification mode
+In order to configure fork verification mode, set `privateVerification` to `false` inside the `tenderly` field inside `hardhat.config.ts`.
 To configure the fork you want to verify the contracts on, set the `tenderly` network inside `HardhatConfig` structure in `hardhat.config.ts`:
 ```ts
 module.exports = {
@@ -84,12 +89,19 @@ module.exports = {
     ...
   },
   networks: {
+    ... // other networks 
+    sepolia: {
+      url: "https://sepolia.gateway.tenderly.co/...",
+      accounts: ["0x..."],
+    },
     ...,
+    // -------- CONFIGURE FORK HERE -----------
     tenderly: {
       url: "https://rpc.tenderly.co/fork/...",
       accounts: ["0x..."]
     }
-  },
+    // ----------------------------------------
+},
   tenderly: { // as before
     username: "tenderly",
     project: "project",
@@ -97,18 +109,19 @@ module.exports = {
   }
 }
 ```
-As `url`, provide the fork url that you can find on the dashboard in the info tab of the particular fork you want to verify your contracts on.
-`accounts` field should be your private key or mnemonic as with every other network.
-Also, the `--network` flag MUST be set to `tenderly` when running `npx hardhat run` command in order to invoke fork verification.
+Parameters:
+- `url` is the fork rpc url that you can find on the dashboard in the info tab of the particular fork you want to verify your contracts on.
+- `accounts` field should be your private key or mnemonic as with every other network.
+- Also, the `--network` flag MUST be set to `tenderly` when running `npx hardhat run` command in order to configure fork verification mode.
 
-# Verification options
+# Verification Approaches
 This section explains the steps you take to actually verify your contracts.
-You can verify your contracts <b>Automatically</b>, <b>Manually</b> or via <b>Task</b>.
+You can verify your contracts **Automatically**, **Manually** or via **Task**.
 
-For every of these three options, you can configure what type of verification you want to execute. Either <b>Private</b>, <b>Public</b> or <b>Fork</b> verification. See how to configure these types in <Verification types> section above.
+For every of these three approaches, you can configure the mode of verification. Either **Private**, **Public** or **Fork** verification mode. See how to configure these modes in **Verification Modes** section above.
 
-## Automatic verification (Recommended)
-This will automatically verify the contract after deployment. Precisely, when you call the `deployed()` function as in:
+## Automatic verification approach (Recommended)
+This approach will automatically verify the contract after deployment. Precisely, when you call the `deployed()` function as in:
 ```typescript
 const Greeter = await ethers.getContractFactory("Greeter");
 const greeter = await Greeter.deploy("Hello, Hardhat!");
@@ -127,13 +140,13 @@ tdly.setup({
 });
 ```
 
-## Manual verification
+## Manual verification approach
 This plugin extends the `HardhatRuntimeEnvironment` by adding a `tenderly` field whose type is `Tenderly`.
 
-This field has the `verify` method, and you can use it to trigger manual contract verification.
+With this approach, you can use `tenderly.verify` to trigger manual contract verification.
 The same method is called when verifying contracts automatically.
 
-This is an example on how you can call it from your scripts (using ethers to deploy a contract):
+This is an example on how you can call it from your deploy script:
 
 ```ts
 import { ethers, tenderly } from "hardhat";
@@ -146,6 +159,10 @@ await greeter.deployed();
 await tenderly.verify({
   name: "Greeter",
   address: greeter.address,
+  libraries: {
+      LibraryName1: "0x...",
+      LibraryName2: "0x..."
+  }
 });
 ```
 
@@ -156,22 +173,25 @@ const contracts = [
   {
     name: "Greeter",
     address: "0x...",
+    libraries: { ... }
   },
   {
     name: "Greeter2",
     address: "0x...",
+    libraries: { ... }
   },
 ];
 ```
 
-## Verification via Task
+## Task verification approach
 This plugin implements the concept of `hardhat task` to verify your contracts.
 The task, `tenderly:verify`, is invoked as:
 ```bash
 npx hardhat tenderly:verify Greeter=0x... --network {network_name}
 ```
+For more information on how to use `tenderly:verify` task, run `npx hardhat help tenderly:verify` command.
 
-## More verification options
+## More verification approaches
 You can also verify your contracts via exposed API calls. Although this is not recommended, you can fill the request and call some of the following methods:
 - `verifyMultiCompilerAPI(request: TenderlyVerifyContractsRequest)`
 - `verifyForkAPI(request: TenderlyForkContractUploadRequest)`
