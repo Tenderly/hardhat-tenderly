@@ -1,4 +1,4 @@
-import { TenderlyContract, TenderlyContractConfig, TenderlyVerificationContract } from "./Contract";
+import { AddContractData, TenderlyContract, TenderlyContractConfig, TenderlyVerificationContract } from "./Contract";
 
 export interface TenderlyContractUploadRequest {
   config: TenderlyContractConfig;
@@ -15,4 +15,8 @@ export interface TenderlyForkContractUploadRequest {
   contracts: TenderlyContract[];
   tag?: string;
   root: string;
+}
+
+export interface TenderlyBulkAddRequest {
+  contracts: AddContractData[];
 }

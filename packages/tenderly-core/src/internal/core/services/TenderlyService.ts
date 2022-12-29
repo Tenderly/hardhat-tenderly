@@ -1,11 +1,13 @@
 import { CHAIN_ID_NETWORK_NAME_MAP, TENDERLY_DASHBOARD_BASE_URL } from "../../../common/constants";
 import {
   ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG,
+  API_BULK_ADD_REQUEST_ERR_MSG,
   API_VERIFICATION_REQUEST_ERR_MSG,
   BYTECODE_MISMATCH_ERR_MSG,
   LATEST_BLOCK_NUMBER_FETCH_FAILED_ERR_MSG,
   NETWORK_FETCH_FAILED_ERR_MSG,
   NO_NEW_CONTRACTS_VERIFIED_ERR_MSG,
+  NO_PROVIDED_CONTRACTS_ERR_MSG,
   NO_VERIFIABLE_CONTRACTS_ERR_MSG,
   PRINCIPAL_FETCH_FAILED_ERR_MSG,
   PROJECTS_FETCH_FAILED_ERR_MSG,
@@ -14,6 +16,7 @@ import {
   ContractResponse,
   Principal,
   Project,
+  TenderlyBulkAddRequest,
   TenderlyContractUploadRequest,
   TenderlyForkContractUploadRequest,
   TenderlyNetwork,
@@ -313,13 +316,24 @@ export class TenderlyService {
         }
       }
       if (response.results.verified_contracts !== undefined && response.results.verified_contracts !== null) {
+        const bulkAddRequest: TenderlyBulkAddRequest = { contracts: [] };
+        for (const verifiedContract of response.results.verified_contracts) {
+          bulkAddRequest.contracts.push({
+            network_id: verifiedContract.network_id,
+            address: verifiedContract.address,
+            display_name: verifiedContract.contract_name,
+            unverified: false,
+          });
+        }
+        await this.bulkAdd(username, tenderlyProject, bulkAddRequest);
+
         for (const verifiedContract of response.results.verified_contracts) {
           const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/${username}/${tenderlyProject}/contract/${
             CHAIN_ID_NETWORK_NAME_MAP[verifiedContract.network_id]
           }/${verifiedContract.address}`;
-          console.log(
-            `Successfully privately verified Smart Contracts for project '${tenderlyProject}'. You can view your contracts at ${contractLink}`
-          );
+          const logMsg = `Contract ${verifiedContract.address} verified. You can view the contract at ${contractLink}`;
+          console.log(logMsg);
+          logger.trace(logMsg);
         }
       }
     } catch (err) {
@@ -378,6 +392,38 @@ export class TenderlyService {
       const logCompliantApiError = convertToLogCompliantApiError(err);
       logger.error(logCompliantApiError);
       logger.error(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
+    }
+  }
+
+  public async bulkAdd(
+    username: string, 
+    project: string, 
+    request: TenderlyBulkAddRequest
+  ): Promise<void> {
+    logger.debug("Bulk adding contracts to project:", project);
+    if (!TenderlyApiService.isAuthenticated()) {
+      logger.error(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
+      return;
+    }
+
+    const tenderlyApi = TenderlyApiService.configureInstance();
+    try {
+      if (request.contracts.length === 0) {
+        logger.error(NO_PROVIDED_CONTRACTS_ERR_MSG);
+        return;
+      }
+
+      const res = await tenderlyApi.post(`/api/v2/accounts/${username}/projects/${project}/contracts`, { ...request });
+      if (res.data === undefined || res.data === null) {
+        logger.error(
+          "There was an error while privately verifying contracts on Tenderly. Obtained response is invalid."
+        );
+        return;
+      }
+    } catch (err) {
+      const logCompliantApiError = convertToLogCompliantApiError(err);
+      logger.error(logCompliantApiError);
+      logger.error(`Error in ${this.pluginName}: ${API_BULK_ADD_REQUEST_ERR_MSG}`);
     }
   }
 
