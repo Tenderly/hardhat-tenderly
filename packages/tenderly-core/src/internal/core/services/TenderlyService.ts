@@ -414,12 +414,11 @@ export class TenderlyService {
       }
 
       const res = await tenderlyApi.post(`/api/v2/accounts/${username}/projects/${project}/contracts`, { ...request });
-      if (res.data === undefined || res.data === null) {
-        logger.error(
-          "There was an error while privately verifying contracts on Tenderly. Obtained response is invalid."
-        );
+      if (res.status !== 204) {
+        logger.error(`There was an error while bulk adding contracts to project. Status is ${res.status}`);
         return;
       }
+      logger.debug(`Added contracts to project '${project}' successfully.`);
     } catch (err) {
       const logCompliantApiError = convertToLogCompliantApiError(err);
       logger.error(logCompliantApiError);
