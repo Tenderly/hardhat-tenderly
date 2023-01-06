@@ -4,7 +4,7 @@ export interface TenderlyContractConfig {
   optimizations_count?: number;
   evm_version?: string;
   debug?: CompilerDebugInput;
-  via_ir?: boolean
+  via_ir?: boolean;
 }
 
 export interface CompilerDebugInput {
