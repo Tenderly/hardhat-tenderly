@@ -1,6 +1,6 @@
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatConfig } from "hardhat/src/types/config";
-import { CompilationJob, DependencyGraph, HardhatRuntimeEnvironment, SolcConfig } from "hardhat/types";
+import { Artifact, CompilationJob, DependencyGraph, HardhatRuntimeEnvironment, SolcConfig } from "hardhat/types";
 import {
   TenderlyContract,
   TenderlyContractConfig,
@@ -18,7 +18,7 @@ import {
   TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS,
   TASK_COMPILE_SOLIDITY_MERGE_COMPILATION_JOBS,
 } from "hardhat/builtin-tasks/task-names";
-import { PLUGIN_NAME } from "../constants";
+import { CONTRACT_NAME_PLACEHOLDER, PLUGIN_NAME } from "../constants";
 import { CONTRACTS_NOT_DETECTED } from "../tenderly/errors";
 import { ContractByName, Metadata } from "../tenderly/types";
 import { logger } from "./logger";
@@ -102,8 +102,8 @@ async function _makeVerifyContractsRequest(
     contracts.push({
       contractToVerify: flatContract.name,
       // TODO(dusan) this can be done with TASK_COMPILE_SOLIDITY_GET_COMPILER_INPUT hardhat task
-      sources: await extractSources(job),
-      compiler: job.getSolcConfig(),
+      sources: await extractSources(hre, flatContract.name, job),
+      compiler: await repackConfig(job.getSolcConfig()),
       networks: {
         [chainId]: {
           address: flatContract.address,
@@ -119,14 +119,24 @@ async function _makeVerifyContractsRequest(
   };
 }
 
-async function extractSources(job: CompilationJob): Promise<Record<string, TenderlyVerifyContractsSource>> {
+async function extractSources(
+  hre: HardhatRuntimeEnvironment,
+  contractToVerify: string,
+  job: CompilationJob
+): Promise<Record<string, TenderlyVerifyContractsSource>> {
   const sources: Record<string, TenderlyVerifyContractsSource> = {};
   logger.info("Extracting sources from compilation job.");
 
+  const mainArtifact: Artifact = hre.artifacts.readArtifactSync(contractToVerify);
   for (const file of job.getResolvedFiles()) {
-    const fileName = extractFileName(file.sourceName);
+    let contractName = CONTRACT_NAME_PLACEHOLDER;
+    // Only the contract to verify should have its name extracted since we need to attach a network to it.
+    // Other names aren't important since they are only needed for compilation purposes.
+    if (mainArtifact.sourceName === file.sourceName) {
+      contractName = mainArtifact.contractName;
+    }
     sources[file.sourceName] = {
-      name: fileName,
+      name: contractName,
       code: file.content.rawContent,
     };
   }
@@ -134,8 +144,46 @@ async function extractSources(job: CompilationJob): Promise<Record<string, Tende
   return sources;
 }
 
-function extractFileName(sourceName: string): string {
-  return sourceName.split("/").slice(-1)[0].split(".")[0];
+/* 
+The only difference between SolcConfig and TenderlySolcConfig is in the settings.libraries object.
+
+SolcConfig.settings.libraries is in the format of:
+compiler.settings.libraries = {
+  "contracts/path/Token.sol": {
+    "contracts/library-path/Library.sol": "0x...."
+  }
+}
+
+TenderlySolcConfig.settings.libraries is in the format of:
+compiler.settings.libraries = {
+  "contracts/path/Token.sol": {
+    addresses: {
+      "contracts/library-path/Library.sol": "0x...."
+    }
+  }
+}
+
+The reason for this are the definition limitations of proto messages.
+Proto doesn't allow for a map to have a map as a value like map<string, map<string, string>>.
+So we have to wrap the inner map in an object like map<string, Libraries> where Libraries is a message with a map<string, string> field.
+*/
+async function repackConfig(compiler: SolcConfig): Promise<SolcConfig> {
+  if (!compiler?.settings?.libraries) {
+    return compiler;
+  }
+  const libraries: any = {};
+  for (const [fileName, libVal] of Object.entries(compiler.settings.libraries)) {
+    if (libraries[fileName] === undefined) {
+      libraries[fileName] = { addresses: {} };
+    }
+    for (const [libName, libAddress] of Object.entries(libVal as any)) {
+      libraries[fileName].addresses[libName] = libAddress;
+    }
+  }
+  compiler.settings.libraries = libraries;
+  console.log("Repacked request compiler libraries:", compiler?.settings.libraries);
+
+  return compiler;
 }
 
 // TODO(dusan): This function shouldn't be here. Fork verification should have the same request format as private or public verification
