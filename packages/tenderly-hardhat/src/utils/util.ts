@@ -18,6 +18,7 @@ import {
   TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS,
   TASK_COMPILE_SOLIDITY_MERGE_COMPILATION_JOBS,
 } from "hardhat/builtin-tasks/task-names";
+import { Libraries } from "hardhat-deploy/types";
 import { CONTRACT_NAME_PLACEHOLDER, PLUGIN_NAME } from "../constants";
 import { CONTRACTS_NOT_DETECTED } from "../tenderly/errors";
 import { ContractByName, Metadata } from "../tenderly/types";
@@ -99,11 +100,13 @@ async function _makeVerifyContractsRequest(
       return null;
     }
 
+    const compiler = await insertLibraries(hre, job.getSolcConfig(), flatContract.libraries);
+
     contracts.push({
       contractToVerify: flatContract.name,
       // TODO(dusan) this can be done with TASK_COMPILE_SOLIDITY_GET_COMPILER_INPUT hardhat task
       sources: await extractSources(hre, flatContract.name, job),
-      compiler: await repackConfig(job.getSolcConfig()),
+      compiler: await repackLibraries(compiler),
       networks: {
         [chainId]: {
           address: flatContract.address,
@@ -144,6 +147,34 @@ async function extractSources(
   return sources;
 }
 
+async function insertLibraries(
+  hre: HardhatRuntimeEnvironment,
+  compiler: SolcConfig,
+  libraries: Libraries | undefined | null
+): Promise<SolcConfig> {
+  if (libraries === undefined || libraries === null) {
+    return compiler;
+  }
+
+  if (compiler.settings.libraries !== undefined && compiler.settings.libraries !== null) {
+    throw new Error(
+      `There are multiple definitions of libraries the contract should use. One is defined in the verify request and the other as an compiler config override. Please remove one of them.`
+    );
+  }
+
+  compiler.settings.libraries = {};
+  for (const [libName, libAddress] of Object.entries(libraries)) {
+    const libArtifact: Artifact = hre.artifacts.readArtifactSync(libName);
+    if (compiler.settings.libraries[libArtifact.sourceName] === undefined) {
+      compiler.settings.libraries[libArtifact.sourceName] = {};
+    }
+
+    compiler.settings.libraries[libArtifact.sourceName][libName] = libAddress;
+  }
+
+  return compiler;
+}
+
 /* 
 The only difference between SolcConfig and TenderlySolcConfig is in the settings.libraries object.
 
@@ -167,7 +198,7 @@ The reason for this are the definition limitations of proto messages.
 Proto doesn't allow for a map to have a map as a value like map<string, map<string, string>>.
 So we have to wrap the inner map in an object like map<string, Libraries> where Libraries is a message with a map<string, string> field.
 */
-async function repackConfig(compiler: SolcConfig): Promise<SolcConfig> {
+async function repackLibraries(compiler: SolcConfig): Promise<SolcConfig> {
   if (!compiler?.settings?.libraries) {
     return compiler;
   }
@@ -181,7 +212,6 @@ async function repackConfig(compiler: SolcConfig): Promise<SolcConfig> {
     }
   }
   compiler.settings.libraries = libraries;
-  console.log("Repacked request compiler libraries:", compiler?.settings.libraries);
 
   return compiler;
 }
