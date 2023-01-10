@@ -101,10 +101,3 @@ export interface SourceLocation {
   start: number;
   end: number;
 }
-
-export interface AddContractData {
-  network_id: string;
-  address: string;
-  display_name?: string;
-  unverified?: boolean;
-}

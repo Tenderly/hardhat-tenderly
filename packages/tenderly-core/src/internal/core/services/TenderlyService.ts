@@ -1,13 +1,12 @@
 import { CHAIN_ID_NETWORK_NAME_MAP, TENDERLY_DASHBOARD_BASE_URL } from "../../../common/constants";
 import {
   ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG,
-  API_BULK_ADD_REQUEST_ERR_MSG,
+  API_ADD_CONTRACT_REQUEST_ERR_MSG,
   API_VERIFICATION_REQUEST_ERR_MSG,
   BYTECODE_MISMATCH_ERR_MSG,
   LATEST_BLOCK_NUMBER_FETCH_FAILED_ERR_MSG,
   NETWORK_FETCH_FAILED_ERR_MSG,
   NO_NEW_CONTRACTS_VERIFIED_ERR_MSG,
-  NO_PROVIDED_CONTRACTS_ERR_MSG,
   NO_VERIFIABLE_CONTRACTS_ERR_MSG,
   PRINCIPAL_FETCH_FAILED_ERR_MSG,
   PROJECTS_FETCH_FAILED_ERR_MSG,
@@ -16,7 +15,7 @@ import {
   ContractResponse,
   Principal,
   Project,
-  TenderlyBulkAddRequest,
+  TenderlyAddContractRequest,
   TenderlyContractUploadRequest,
   TenderlyForkContractUploadRequest,
   TenderlyNetwork,
@@ -316,16 +315,14 @@ export class TenderlyService {
         }
       }
       if (response.results.verified_contracts !== undefined && response.results.verified_contracts !== null) {
-        const bulkAddRequest: TenderlyBulkAddRequest = { contracts: [] };
         for (const verifiedContract of response.results.verified_contracts) {
-          bulkAddRequest.contracts.push({
+          await this.addContract(username, tenderlyProject, {
             network_id: verifiedContract.network_id,
             address: verifiedContract.address,
             display_name: verifiedContract.contract_name,
             unverified: false,
           });
         }
-        await this.bulkAdd(username, tenderlyProject, bulkAddRequest);
 
         for (const verifiedContract of response.results.verified_contracts) {
           const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/${username}/${tenderlyProject}/contract/${
@@ -395,10 +392,10 @@ export class TenderlyService {
     }
   }
 
-  public async bulkAdd(
+  public async addContract(
     username: string, 
     project: string, 
-    request: TenderlyBulkAddRequest
+    request: TenderlyAddContractRequest
   ): Promise<void> {
     logger.debug("Bulk adding contracts to project:", project);
     if (!TenderlyApiService.isAuthenticated()) {
@@ -408,21 +405,16 @@ export class TenderlyService {
 
     const tenderlyApi = TenderlyApiService.configureInstance();
     try {
-      if (request.contracts.length === 0) {
-        logger.error(NO_PROVIDED_CONTRACTS_ERR_MSG);
+      const res = await tenderlyApi.post(`/api/v1/account/${username}/project/${project}/address`, { ...request });
+      if (res.status !== 200) {
+        logger.error(`There was an error while adding contracts to project. Status is ${res.status}`);
         return;
       }
-
-      const res = await tenderlyApi.post(`/api/v2/accounts/${username}/projects/${project}/contracts`, { ...request });
-      if (res.status !== 204) {
-        logger.error(`There was an error while bulk adding contracts to project. Status is ${res.status}`);
-        return;
-      }
-      logger.debug(`Added contracts to project '${project}' successfully.`);
+      logger.debug(`Added contract to project '${project}' successfully.`);
     } catch (err) {
       const logCompliantApiError = convertToLogCompliantApiError(err);
       logger.error(logCompliantApiError);
-      logger.error(`Error in ${this.pluginName}: ${API_BULK_ADD_REQUEST_ERR_MSG}`);
+      logger.error(`Error in ${this.pluginName}: ${API_ADD_CONTRACT_REQUEST_ERR_MSG}`);
     }
   }
 
