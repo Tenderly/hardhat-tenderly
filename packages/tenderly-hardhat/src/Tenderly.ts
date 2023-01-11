@@ -3,14 +3,25 @@ import * as fs from "fs-extra";
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { TenderlyService } from "tenderly";
-import { TenderlyArtifact, TenderlyContractUploadRequest, TenderlyForkContractUploadRequest } from "tenderly/types";
+import {
+  TenderlyArtifact,
+  TenderlyContractUploadRequest,
+  TenderlyForkContractUploadRequest,
+  TenderlyVerifyContractsRequest,
+} from "tenderly/types";
 import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";
 import { logger } from "./utils/logger";
 
 import { ContractByName, Metadata } from "./tenderly/types";
 import { CONTRACTS_NOT_DETECTED, NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG } from "./tenderly/errors";
-import { extractCompilerVersion, getCompilerDataFromContracts, getContracts, resolveDependencies } from "./utils/util";
-import { DEFAULT_CHAIN_ID, PLUGIN_NAME } from "./constants";
+import {
+  extractCompilerVersion,
+  getCompilerDataFromContracts,
+  getContracts,
+  makeVerifyContractsRequest,
+  resolveDependencies,
+} from "./utils/util";
+import { DEFAULT_CHAIN_ID, PLUGIN_NAME, VERIFICATION_TYPES } from "./constants";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 
 export class Tenderly {
@@ -29,44 +40,82 @@ export class Tenderly {
   }
 
   public async verify(...contracts: any[]): Promise<void> {
-    logger.info("Invoked public verification.");
+    logger.info("Verification invoked.");
 
-    const priv = this.env.config.tenderly?.privateVerification;
-    if (priv !== undefined && priv && this.env.network.name !== "tenderly") {
-      logger.info(
-        "Private verification flag is set to TRUE in tenderly configuration. Redirecting to private verification."
-      );
-      return this.push(...contracts);
-    }
-
-    if (this.env.network.name === "tenderly") {
+    const verificationType = this._getVerificationType();
+    if (verificationType === VERIFICATION_TYPES.FORK) {
       logger.info("Network parameter is set to 'tenderly', redirecting to fork verification.");
       return this.tenderlyNetwork.verify(contracts);
     }
 
     const flatContracts: ContractByName[] = contracts.reduce((accumulator, value) => accumulator.concat(value), []);
-
-    const requestData = await this._filterContracts(flatContracts);
-
+    const requestData = await makeVerifyContractsRequest(this.env, flatContracts);
     if (requestData === null) {
       logger.error("Verification failed due to bad processing of the data in /artifacts directory.");
       return;
     }
 
-    await this.tenderlyService.verifyContracts(requestData);
-  }
-
-  public async verifyAPI(request: TenderlyContractUploadRequest): Promise<void> {
-    logger.info("Invoked public verification through API request.");
-
-    if (this.env.network.name === "tenderly") {
-      logger.error(
-        `Error in ${PLUGIN_NAME}: Network parameter is set to 'tenderly' and verifyAPI() is not available for fork deployments, please use verifyForkAPI().`
+    if (verificationType === VERIFICATION_TYPES.PRIVATE) {
+      logger.info("Private verification flag is set to true, redirecting to private verification.");
+      if (this.env.config.tenderly?.project === undefined) {
+        logger.error(
+          `Error in ${PLUGIN_NAME}: Please provide the project field in the tenderly object in hardhat.config.js`
+        );
+        return;
+      }
+      if (this.env.config.tenderly?.username === undefined) {
+        logger.error(
+          `Error in ${PLUGIN_NAME}: Please provide the username field in the tenderly object in hardhat.config.js`
+        );
+        return;
+      }
+      return this.tenderlyService.pushContractsMultiCompiler(
+        requestData,
+        this.env.config.tenderly.project,
+        this.env.config.tenderly.username
       );
-      return;
     }
 
-    await this.tenderlyService.verifyContracts(request);
+    logger.info("Publicly verifying contracts.");
+    return this.tenderlyService.verifyContractsMultiCompiler(requestData);
+  }
+
+  public async verifyMultiCompilerAPI(request: TenderlyVerifyContractsRequest): Promise<void> {
+    logger.info("Invoked verification (multi compiler version) through API.");
+    logger.trace("Request data:", request);
+
+    switch (this._getVerificationType()) {
+      case VERIFICATION_TYPES.FORK:
+        logger.error(
+          `Error in ${PLUGIN_NAME}: Network parameter is set to 'tenderly' and verifyMultiCompilerAPI() is not available for fork deployments, please use verifyForkAPI().`
+        );
+        break;
+      case VERIFICATION_TYPES.PRIVATE:
+        if (this.env.config.tenderly?.project === undefined) {
+          logger.error(
+            `Error in ${PLUGIN_NAME}: Please provide the project field in the tenderly object in hardhat.config.js`
+          );
+          return;
+        }
+        if (this.env.config.tenderly?.username === undefined) {
+          logger.error(
+            `Error in ${PLUGIN_NAME}: Please provide the username field in the tenderly object in hardhat.config.js`
+          );
+          return;
+        }
+
+        logger.info("Private verification flag is set to true, redirecting to private verification.");
+        await this.tenderlyService.pushContractsMultiCompiler(
+          request,
+          this.env.config.tenderly.project,
+          this.env.config.tenderly.username
+        );
+        break;
+      case VERIFICATION_TYPES.PUBLIC:
+        logger.info("Publicly verifying contracts.");
+        await this.tenderlyService.verifyContractsMultiCompiler(request);
+        break;
+    }
   }
 
   public async verifyForkAPI(
@@ -97,45 +146,34 @@ export class Tenderly {
     return this.tenderlyNetwork;
   }
 
-  public async push(...contracts: any[]): Promise<void> {
-    logger.info("Invoked pushing onto Tenderly.");
+  private _getVerificationType(): string {
+    if (this.env.network.name === "tenderly") {
+      return VERIFICATION_TYPES.FORK;
+    }
 
     const priv = this.env.config.tenderly?.privateVerification;
-    if (priv !== undefined && !priv) {
-      logger.info(
-        "Private verification flag is set to FALSE in tenderly configuration. Redirecting to public verification."
-      );
-      return this.verify(...contracts);
+    if (priv !== undefined && priv && this.env.network.name !== "tenderly") {
+      return VERIFICATION_TYPES.PRIVATE;
     }
 
-    const flatContracts: ContractByName[] = contracts.reduce((accumulator, value) => accumulator.concat(value), []);
+    return VERIFICATION_TYPES.PUBLIC;
+  }
 
-    const requestData = await this._filterContracts(flatContracts);
+  public async push(...contracts: any[]): Promise<void> {
+    return this.verify(...contracts);
+  }
 
-    if (this.env.config.tenderly.project === undefined) {
+  public async verifyAPI(request: TenderlyContractUploadRequest): Promise<void> {
+    logger.info("Invoked public verification through API request.");
+
+    if (this.env.network.name === "tenderly") {
       logger.error(
-        `Error in ${PLUGIN_NAME}: Please provide the project field in the tenderly object in hardhat.config.js`
+        `Error in ${PLUGIN_NAME}: Network parameter is set to 'tenderly' and verifyAPI() is not available for fork deployments, please use verifyForkAPI().`
       );
       return;
     }
 
-    if (this.env.config.tenderly.username === undefined) {
-      logger.error(
-        `Error in ${PLUGIN_NAME}: Please provide the username field in the tenderly object in hardhat.config.js`
-      );
-      return;
-    }
-
-    if (requestData === null) {
-      logger.error("Pushing failed due to bad processing of the data in /artifacts directory.");
-      return;
-    }
-
-    await this.tenderlyService.pushContracts(
-      requestData,
-      this.env.config.tenderly.project,
-      this.env.config.tenderly.username
-    );
+    await this.tenderlyService.verifyContracts(request);
   }
 
   public async pushAPI(
