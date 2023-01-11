@@ -244,7 +244,6 @@ export class TenderlyNetwork {
     }
 
     const solcConfig = getCompilerDataFromContracts(contracts, flatContracts, this.env.config);
-    
     if (solcConfig === undefined) {
       logger.error(NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG);
     }

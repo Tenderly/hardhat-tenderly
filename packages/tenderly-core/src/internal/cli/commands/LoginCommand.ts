@@ -28,7 +28,7 @@ export const LoginCommand = new commander.Command("login").description("login to
 
   logger.debug("Access token accepted. Trying to log in.");
   setAccessToken(accessToken);
-  
+
   console.log("Successfully logged in to Tenderly.");
   logger.info("Successfully logged in to Tenderly.");
 });
