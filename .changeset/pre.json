@@ -6,8 +6,6 @@
     "@tenderly/hardhat-tenderly": "1.3.0"
   },
   "changesets": [
-    "mean-forks-remain",
-    "orange-jobs-enjoy",
-    "popular-spoons-pull"
+    "tender-beers-collect"
   ]
 }
