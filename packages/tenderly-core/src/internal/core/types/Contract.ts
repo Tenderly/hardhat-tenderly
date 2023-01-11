@@ -1,3 +1,5 @@
+import { SolcConfig } from "hardhat/types";
+
 export interface TenderlyContractConfig {
   compiler_version?: string;
   optimizations_used?: boolean;
@@ -16,6 +18,18 @@ export interface TenderlyContract {
   sourcePath: string;
   compiler?: ContractCompiler;
   networks?: Record<string, ContractNetwork>;
+}
+
+export interface TenderlyVerificationContract {
+  contractToVerify: string;
+  sources: Record<string, TenderlyVerifyContractsSource>;
+  networks?: Record<string, ContractNetwork>;
+  compiler?: SolcConfig;
+}
+
+export interface TenderlyVerifyContractsSource {
+  name: string;
+  code: string;
 }
 
 export interface TenderlyArtifact {
@@ -72,4 +86,18 @@ export interface BytecodeMismatchError {
   got: string;
   similarity: number;
   assumed_reason: string;
+}
+
+export interface CompilationError {
+  source_location: SourceLocation;
+  error_type: string;
+  component: string;
+  message: string;
+  formatted_message: string;
+}
+
+export interface SourceLocation {
+  file: string;
+  start: number;
+  end: number;
 }

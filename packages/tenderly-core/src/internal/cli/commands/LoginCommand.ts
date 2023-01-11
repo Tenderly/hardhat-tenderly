@@ -34,7 +34,7 @@ export const LoginCommand = new commander.Command("login").description("login to
 });
 
 async function promptAccessToken(): Promise<string> {
-  console.log(`Redirecting to ${TENDERLY_DASHBOARD_BASE_URL}/account/authorization`)
+  console.log(`Redirecting to ${TENDERLY_DASHBOARD_BASE_URL}/account/authorization`);
   logger.debug(`Redirecting to ${TENDERLY_DASHBOARD_BASE_URL}/account/authorization`);
   await open(`${TENDERLY_DASHBOARD_BASE_URL}/account/authorization`);
 
