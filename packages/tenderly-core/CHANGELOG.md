@@ -1,5 +1,11 @@
 # tenderly
 
+## 0.1.0-beta.1
+
+### Minor Changes
+
+- [#105](https://github.com/Tenderly/hardhat-tenderly/pull/105) [`252a564`](https://github.com/Tenderly/hardhat-tenderly/commit/252a564f1488915f76e1f6061eb0e523dc38d984) Thanks [@dule-git](https://github.com/dule-git)! - Supported multi-compiler contract verification for private and public verification methods. Offloaded obtaining compilation data to hardhat.
+
 ## 0.2.0
 
 ### Minor Changes
