@@ -316,7 +316,7 @@ export class TenderlyService {
       }
       if (response.results.verified_contracts !== undefined && response.results.verified_contracts !== null) {
         for (const verifiedContract of response.results.verified_contracts) {
-          await this.addContract(username, tenderlyProject, {
+          await this.addContractToProject(username, tenderlyProject, {
             network_id: verifiedContract.network_id,
             address: verifiedContract.address,
             display_name: verifiedContract.contract_name,
@@ -392,9 +392,9 @@ export class TenderlyService {
     }
   }
 
-  public async addContract(
-    username: string, 
-    project: string, 
+  public async addContractToProject(
+    username: string,
+    project: string,
     request: TenderlyAddContractRequest
   ): Promise<void> {
     logger.debug("Bulk adding contracts to project:", project);
