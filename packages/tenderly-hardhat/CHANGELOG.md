@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 1.5.1
+
+### Patch Changes
+
+- [#109](https://github.com/Tenderly/hardhat-tenderly/pull/109) [`1dd5dfd`](https://github.com/Tenderly/hardhat-tenderly/commit/1dd5dfd14b1a24bbb68ed5a67df72bdade17118c) Thanks [@dule-git](https://github.com/dule-git)! - Fixed wrong import.
+
 ## 1.5.0
 
 ### Minor Changes
