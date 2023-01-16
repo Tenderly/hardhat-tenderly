@@ -2,6 +2,8 @@
 import { ethers } from "hardhat";
 
 export async function main() {
+  console.log("🖖🏽[ethers] Deploying and Verifying Greeter in Tenderly");
+
   const Greeter = await ethers.getContractFactory("Greeter");
   const greeter = await Greeter.deploy("Hello, Hardhat!");
 
