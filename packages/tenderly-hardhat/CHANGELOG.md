@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 1.5.2
+
+### Patch Changes
+
+- [#111](https://github.com/Tenderly/hardhat-tenderly/pull/111) [`4ecba3b`](https://github.com/Tenderly/hardhat-tenderly/commit/4ecba3b7c8907d0e8e0940a923ecb80a9b923ba0) Thanks [@dule-git](https://github.com/dule-git)! - Updated examples/ directory and updated README.md files
+
 ## 1.5.1
 
 ### Patch Changes
