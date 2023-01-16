@@ -5,6 +5,8 @@ import { HttpNetworkConfig } from "hardhat/types";
 export async function main() {
   const forkID = `${(network.config as HttpNetworkConfig).url}`.split("/").pop() ?? "";
 
+  console.log("🖖🏽[ethers] Deploying and Verifying Greeter in Tenderly");
+  
   const Greeter = await ethers.getContractFactory("Greeter");
   const greeter = await Greeter.deploy("Hello, Manual Hardhat on Fork !");
 
@@ -15,7 +17,7 @@ export async function main() {
   await tenderly.verifyForkAPI(
     {
       config: {
-        compiler_version: "0.8.9",
+        compiler_version: "0.8.17",
         evm_version: "default",
         optimizations_count: 200,
         optimizations_used: false,
@@ -25,7 +27,7 @@ export async function main() {
         {
           contractName: "Greeter",
           source: readFileSync("contracts/Greeter.sol", "utf-8").toString(),
-          sourcePath: "contracts/whatever/Greeter.sol",
+          sourcePath: "contracts/Greeter.sol",
           networks: {
             // important: key is the Fork ID (UUID-like string)
             [forkID]: {
@@ -41,7 +43,7 @@ export async function main() {
           networks: {},
           compiler: {
             name: "solc",
-            version: "0.8.9",
+            version: "0.8.17",
           },
         },
       ],
