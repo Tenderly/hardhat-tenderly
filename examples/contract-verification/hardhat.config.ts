@@ -2,7 +2,7 @@ import * as tdly from "@tenderly/hardhat-tenderly";
 import { HardhatUserConfig } from "hardhat/config";
 import * as dotenv from "dotenv";
 
-tdly.setup({ automaticVerifications: true });
+tdly.setup({ automaticVerifications: false });
 
 dotenv.config();
 
