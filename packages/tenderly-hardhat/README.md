@@ -73,6 +73,11 @@ module.exports = {
   }
 }
 ```
+> **Warning**
+>: Username can be your own and the username of the organization. Which one, it depends on who is the owner of the project you are trying to verify your contracts on. If the project belongs to the organization you are part of, It should be filled with organization username , otherwise your own username.
+> The quickest and most secure way to make sure to which party the project belongs to is to look at the url of the particular project. You will see something like:
+https://dashboard.tenderly.co/Tenderly/project/contracts
+So you can take the username and project from there. In this case the username is Tenderly and the project is project.
 
 ### Private verification mode
 In order to configure private verification mode, set `privateVerification` to `true` inside the `tenderly` field inside `hardhat.config.ts`. 

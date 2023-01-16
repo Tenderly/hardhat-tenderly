@@ -3,46 +3,47 @@ import { readFileSync } from "fs";
 import { ethers, tenderly } from "hardhat";
 
 export async function main() {
+  console.log("🖖🏽[ethers] Deploying and Verifying Greeter in Tenderly");
   // deploy stuff but later pretend it's been deployed ages ago on Ropsten.
   const Greeter = await ethers.getContractFactory("Greeter");
   const greeter = await Greeter.deploy("Hello, Manual Hardhat!");
 
   await greeter.deployed();
   const greeterAddress = greeter.address;
-  console.log("Manual Simple: {Greeter} deployed to", greeterAddress);
+  console.log("Manual Advanced: {Greeter} deployed to", greeterAddress);
 
-  // pretend it's been deployed ages ago on Ropsten in a different deployment.
-  // Hence we know NETWORK_ID=3 and the address of the contract (greeterAddress)
-  const NETWORK_ID = 3;
+  // pretend it's been deployed ages ago on Sepolia in a different deployment.
+  // Hence we know NETWORK_ID=11155111 and the address of the contract (calculatorAddress)
+  const NETWORK_ID = "11155111";
 
-  await tenderly.verifyAPI({
-    config: {
-      compiler_version: "0.8.9",
-      evm_version: "default",
-      optimizations_count: 200,
-      optimizations_used: false,
-    },
+  await tenderly.verifyMultiCompilerAPI({
     contracts: [
       {
-        contractName: "Greeter",
-        source: readFileSync("contracts/Greeter.sol", "utf-8").toString(),
-        sourcePath: "contracts/whatever/Greeter.sol",
-        networks: {
-          // The key is the network ID (1 for Mainnet, 3 for Ropsten and so on)
-          [NETWORK_ID]: {
-            address: greeterAddress,
-            links: {},
+        contractToVerify: "Greeter",
+        sources: {
+          "contracts/Greeter.sol": {
+            name: "Greeter",
+            code: readFileSync("contracts/Greeter.sol", "utf-8").toString(),
+          },
+          "hardhat/console.sol": {
+            name: "console",
+            code: readFileSync("node_modules/hardhat/console.sol", "utf-8").toString(),
           },
         },
-      },
-      {
-        contractName: "console",
-        source: readFileSync("node_modules/hardhat/console.sol", "utf-8").toString(),
-        sourcePath: "hardhat/console.sol",
-        networks: {},
+        // solidity format compiler with a little modification at libraries param
         compiler: {
-          name: "solc",
-          version: "0.8.9",
+          version: "0.8.17",
+          settings: {
+            optimizer: {
+              enabled: false,
+              runs: 200,
+            },
+          },
+        },
+        networks: {
+          [NETWORK_ID]: {
+            address: greeterAddress,
+          },
         },
       },
     ],

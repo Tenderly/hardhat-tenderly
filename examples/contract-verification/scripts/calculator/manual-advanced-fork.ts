@@ -16,12 +16,13 @@ export async function main() {
 
   // 🧮 Calculator (uses maths)
   const calculatorAddress = await deployCalculator(mathsAddress);
+  // const calculatorAddress = "0x85904a6b167973b7d51eec66f420735a3f9a4345";
 
   await tenderly.verifyForkAPI(
     {
       root: "",
       config: {
-        compiler_version: "0.8.9",
+        compiler_version: "0.8.17",
         optimizations_used: false,
       },
       contracts: [
@@ -30,7 +31,7 @@ export async function main() {
           source: readFileSync("contracts/Calculator.sol", "utf-8").toString(),
           sourcePath: "Calculator.sol",
           compiler: {
-            version: "0.8.9",
+            version: "0.8.17",
           },
           networks: {
             // important: key is the Fork ID (UUID like string)
@@ -48,7 +49,7 @@ export async function main() {
           source: readFileSync("contracts/libraries/Maths.sol", "utf-8").toString(),
           sourcePath: "libraries/Maths.sol",
           compiler: {
-            version: "0.8.9",
+            version: "0.8.17",
           },
           networks: {},
         },
