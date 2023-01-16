@@ -8,23 +8,27 @@ dotenv.config();
 
 const { TENDERLY_PRIVATE_VERIFICATION } = process.env;
 
-const priaveteVerification = TENDERLY_PRIVATE_VERIFICATION === "true";
+const privateVerification = TENDERLY_PRIVATE_VERIFICATION === "true";
 
-console.log("Using private verification? ", priaveteVerification, TENDERLY_PRIVATE_VERIFICATION);
+console.log("Using private verification? ", privateVerification, TENDERLY_PRIVATE_VERIFICATION);
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.9",
+  solidity: "0.8.17",
 
   networks: {
     tenderly: {
-      chainId: 1,
       url: `https://rpc.tenderly.co/fork/${process.env.TENDERLY_FORK_ID ?? ""}`,
     },
+    sepolia: {
+      url: `${process.env.SEPOLIA_URL ?? ""}`,
+      accounts: [process.env.SEPOLIA_PRIVATE_KEY ?? ""],
+    },
   },
+
   tenderly: {
     project: process.env.TENDERLY_PROJECT ?? "",
     username: process.env.TENDERLY_USERNAME ?? "",
-    privateVerification: priaveteVerification,
+    privateVerification,
   },
 };
 
