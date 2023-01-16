@@ -2,15 +2,17 @@ import * as tdly from "@tenderly/hardhat-tenderly";
 import { HardhatUserConfig } from "hardhat/config";
 import * as dotenv from "dotenv";
 
-tdly.setup({ automaticVerifications: false });
-
-dotenv.config();
-
-const { TENDERLY_PRIVATE_VERIFICATION } = process.env;
+const { TENDERLY_PRIVATE_VERIFICATION, TENDERLY_AUTOMATIC_VERIFICATION } = process.env;
 
 const privateVerification = TENDERLY_PRIVATE_VERIFICATION === "true";
+const automaticVerifications = TENDERLY_AUTOMATIC_VERIFICATION === "true";
 
 console.log("Using private verification? ", privateVerification, TENDERLY_PRIVATE_VERIFICATION);
+console.log("Using automatic verification? ", automaticVerifications, TENDERLY_AUTOMATIC_VERIFICATION);
+
+tdly.setup({ automaticVerifications });
+
+dotenv.config();
 
 const config: HardhatUserConfig = {
   solidity: "0.8.17",
