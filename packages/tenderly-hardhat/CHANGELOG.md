@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 1.5.3
+
+### Patch Changes
+
+- [#113](https://github.com/Tenderly/hardhat-tenderly/pull/113) [`64e86cf`](https://github.com/Tenderly/hardhat-tenderly/commit/64e86cfe00fb4c7538ace4b777302d4d2b366ddd) Thanks [@dule-git](https://github.com/dule-git)! - Fixed extracting data from libraries when libraries are not defined.
+
 ## 1.5.2
 
 ### Patch Changes
