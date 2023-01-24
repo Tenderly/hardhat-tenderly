@@ -25,7 +25,11 @@ async function verifyContract({ contracts, libraries }: any, hre: HardhatRuntime
   }
 
   const formattedContracts: ContractByName[] = [];
-  const librariesMap = extractLibraries(libraries);
+  let librariesMap: any = {};
+  if (libraries !== undefined) {
+    librariesMap = extractLibraries(libraries);
+  }
+
   for (const contract of contracts) {
     const [name, address] = contract.split("=");
     formattedContracts.push({
