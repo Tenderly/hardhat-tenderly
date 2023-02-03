@@ -42,33 +42,30 @@ export class Tenderly {
   public async verify(...contracts: any[]): Promise<void> {
     logger.info("Verification invoked.");
 
-    const verificationType = this._getVerificationType();
-    if (verificationType === VERIFICATION_TYPES.FORK) {
-      logger.info("Network parameter is set to 'tenderly', redirecting to fork verification.");
-      return this.tenderlyNetwork.verify(contracts);
-    }
-
     const flatContracts: ContractByName[] = contracts.reduce((accumulator, value) => accumulator.concat(value), []);
-    const requestData = await makeVerifyContractsRequest(this.env, flatContracts);
+    const requestData = await makeVerifyContractsRequest(
+      this.env,
+      flatContracts,
+      this.tenderlyNetwork.forkID // If network is not set to "tenderly", forkID will be undefined
+    );
     if (requestData === null) {
       logger.error("Verification failed due to bad processing of the data in /artifacts directory.");
       return;
     }
 
+    const verificationType = this._getVerificationType();
+
+    if (verificationType === VERIFICATION_TYPES.FORK) {
+      logger.info("Network parameter is set to 'tenderly', redirecting to fork verification.");
+      await this._throwIfUsernameOrProjectNotSet();
+
+      return this.tenderlyNetwork.verify(requestData);
+    }
+
     if (verificationType === VERIFICATION_TYPES.PRIVATE) {
       logger.info("Private verification flag is set to true, redirecting to private verification.");
-      if (this.env.config.tenderly?.project === undefined) {
-        logger.error(
-          `Error in ${PLUGIN_NAME}: Please provide the project field in the tenderly object in hardhat.config.js`
-        );
-        return;
-      }
-      if (this.env.config.tenderly?.username === undefined) {
-        logger.error(
-          `Error in ${PLUGIN_NAME}: Please provide the username field in the tenderly object in hardhat.config.js`
-        );
-        return;
-      }
+      await this._throwIfUsernameOrProjectNotSet();
+
       return this.tenderlyService.pushContractsMultiCompiler(
         requestData,
         this.env.config.tenderly.project,
@@ -118,21 +115,22 @@ export class Tenderly {
     }
   }
 
-  public async verifyForkAPI(
-    request: TenderlyForkContractUploadRequest,
+  public async verifyForkMultiCompilerAPI(
+    request: TenderlyVerifyContractsRequest,
     tenderlyProject: string,
     username: string,
     forkID: string
   ): Promise<void> {
-    logger.info("Invoked fork verification through API request.");
+    logger.info("Invoked fork verification through API request. (Multi compiler version)");
     if (this.env.network.name !== "tenderly") {
       logger.error(
         `Error in ${PLUGIN_NAME}: Network parameter is not set to 'tenderly' and verifyForkAPI() is only available for tenderly fork deployments, please use --network tenderly.`
       );
       return;
     }
+    await this._throwIfUsernameOrProjectNotSet();
 
-    await this.tenderlyNetwork.verifyAPI(request, tenderlyProject, username, forkID);
+    await this.tenderlyNetwork.verifyMultiCompilerAPI(request, tenderlyProject, username, forkID);
   }
 
   public network(): TenderlyNetwork {
@@ -163,6 +161,19 @@ export class Tenderly {
     return this.verify(...contracts);
   }
 
+  private async _throwIfUsernameOrProjectNotSet(): Promise<void> {
+    if (this.env.config.tenderly?.project === undefined) {
+      throw Error(
+        `Error in ${PLUGIN_NAME}: Please provide the project field in the tenderly object in hardhat.config.js`
+      );
+    }
+    if (this.env.config.tenderly?.username === undefined) {
+      throw Error(
+        `Error in ${PLUGIN_NAME}: Please provide the username field in the tenderly object in hardhat.config.js`
+      );
+    }
+  }
+
   public async verifyAPI(request: TenderlyContractUploadRequest): Promise<void> {
     logger.info("Invoked public verification through API request.");
 
@@ -174,6 +185,23 @@ export class Tenderly {
     }
 
     await this.tenderlyService.verifyContracts(request);
+  }
+
+  public async verifyForkAPI(
+    request: TenderlyForkContractUploadRequest,
+    tenderlyProject: string,
+    username: string,
+    forkID: string
+  ): Promise<void> {
+    logger.info("Invoked fork verification through API request.");
+    if (this.env.network.name !== "tenderly") {
+      logger.error(
+        `Error in ${PLUGIN_NAME}: Network parameter is not set to 'tenderly' and verifyForkAPI() is only available for tenderly fork deployments, please use --network tenderly.`
+      );
+      return;
+    }
+
+    await this.tenderlyNetwork.verifyAPI(request, tenderlyProject, username, forkID);
   }
 
   public async pushAPI(
