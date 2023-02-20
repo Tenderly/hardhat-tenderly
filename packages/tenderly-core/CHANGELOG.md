@@ -1,5 +1,11 @@
 # tenderly
 
+## 0.4.0
+
+### Minor Changes
+
+- Implemented multi-compiler fork verification.
+
 ## 0.3.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # @tenderly/hardhat-tenderly
 
+## 2.0.0
+
+### Minor Changes
+
+- Implemented multi-compiler fork verification.
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tenderly@0.4.0
+
 ## 1.5.3
 
 ### Patch Changes
