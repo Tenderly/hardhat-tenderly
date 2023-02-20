@@ -1,6 +1,6 @@
 # @tenderly/hardhat-tenderly
 
-## 2.0.0
+## 1.6.1
 
 ### Minor Changes
 
