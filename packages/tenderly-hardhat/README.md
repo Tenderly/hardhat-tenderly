@@ -74,10 +74,10 @@ module.exports = {
 }
 ```
 > **Warning**
->: Username can be your own and the username of the organization. Which one, it depends on who is the owner of the project you are trying to verify your contracts on. If the project belongs to the organization you are part of, It should be filled with organization username , otherwise your own username.
+>: Username can be your own and the username of the organization. Which one, it depends on who is the owner of the project you are trying to verify your contracts on. If the project belongs to the organization you are part of, It should be filled with organization username, otherwise your own username.
 > The quickest and most secure way to make sure to which party the project belongs to is to look at the url of the particular project. You will see something like:
-https://dashboard.tenderly.co/Tenderly/project/contracts
-So you can take the username and project from there. In this case the username is Tenderly and the project is project.
+https://dashboard.tenderly.co/Tenderly/project/contracts.
+You can take the username and project from there. In this case the username is Tenderly and the project is project.
 
 ### Private verification mode
 In order to configure private verification mode, set `privateVerification` to `true` inside the `tenderly` field inside `hardhat.config.ts`. 
@@ -199,9 +199,9 @@ For more information on how to use `tenderly:verify` task, run `npx hardhat help
 ## More verification approaches
 You can also verify your contracts via exposed API calls. Although this is not recommended, you can fill the request and call some of the following methods:
 - `verifyMultiCompilerAPI(request: TenderlyVerifyContractsRequest)`
-- `verifyForkAPI(request: TenderlyForkContractUploadRequest)`
+- `verifyForkMultiCompilerAPI(request: TenderlyVerifyContractsRequest)`
 
-For more information on how to use these methods, you can check our their javadocs.
+For more information on how to use these methods, you can check out their javadocs.
 
 # Troubleshooting
 If you are having trouble with the plugin and want to contact support, you can run the deploy script with the following ```--verbose``` flag as so:

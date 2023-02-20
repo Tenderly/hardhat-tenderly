@@ -2,7 +2,7 @@ import * as axios from "axios";
 
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { TenderlyService } from "tenderly";
-import { TenderlyForkContractUploadRequest } from "tenderly/types";
+import { TenderlyForkContractUploadRequest, TenderlyVerifyContractsRequest } from "tenderly/types";
 import { getConfig, writeConfig } from "tenderly/utils/config";
 import { TENDERLY_JSON_RPC_BASE_URL } from "tenderly/common/constants";
 
@@ -10,7 +10,7 @@ import { convertToLogCompliantForkInitializeResponse } from "tenderly/utils/log-
 import { PLUGIN_NAME } from "./constants";
 import { ContractByName } from "./tenderly/types";
 import { NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG } from "./tenderly/errors";
-import { getCompilerDataFromContracts, getContracts, makeForkVerifyContractsRequest } from "./utils/util";
+import { getCompilerDataFromContracts, getContracts } from "./utils/util";
 import { logger } from "./utils/logger";
 
 export class TenderlyNetwork {
@@ -90,7 +90,7 @@ export class TenderlyNetwork {
     return oldHead;
   }
 
-  public async verify(...contracts: any[]) {
+  public async verify(requestData: TenderlyVerifyContractsRequest) {
     logger.info("Invoked fork verification.");
     if (!this._checkNetwork()) {
       return;
@@ -101,24 +101,26 @@ export class TenderlyNetwork {
       await this.initializeFork();
     }
 
-    const flatContracts: ContractByName[] = contracts.reduce((accumulator, value) => accumulator.concat(value), []);
-    const requestData = await makeForkVerifyContractsRequest(this.env, flatContracts, this.head!, this.forkID!);
-    if (requestData === null) {
-      logger.error("Fork verification failed due to bad processing of data in /artifacts directory.");
-      return;
-    }
-    logger.silly("Processed request data:", requestData);
-
-    if (requestData?.contracts.length === 0) {
-      logger.error("Filtering contracts did not succeed. The length of the contracts is 0.");
-      return;
-    }
-
-    await this.tenderlyService.verifyForkContracts(
+    await this.tenderlyService.verifyForkContractsMultiCompiler(
       requestData,
       this.env.config.tenderly.project,
       this.env.config.tenderly.username,
       this.forkID!
+    );
+  }
+
+  public async verifyMultiCompilerAPI(
+    request: TenderlyVerifyContractsRequest,
+    tenderlyProject: string,
+    username: string,
+    forkID: string
+  ) {
+    logger.info("Invoked fork verification via API.");
+    await this.tenderlyService.verifyForkContractsMultiCompiler(
+      request, 
+      tenderlyProject, 
+      username, 
+      forkID
     );
   }
 

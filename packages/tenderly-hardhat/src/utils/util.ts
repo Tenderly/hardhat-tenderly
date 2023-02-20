@@ -4,7 +4,6 @@ import { Artifact, CompilationJob, DependencyGraph, HardhatRuntimeEnvironment, S
 import {
   TenderlyContract,
   TenderlyContractConfig,
-  TenderlyForkContractUploadRequest,
   TenderlyVerificationContract,
   TenderlyVerifyContractsRequest,
   TenderlyVerifyContractsSource,
@@ -16,7 +15,6 @@ import {
   TASK_COMPILE_SOLIDITY_GET_DEPENDENCY_GRAPH,
   TASK_COMPILE_SOLIDITY_GET_SOURCE_NAMES,
   TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS,
-  TASK_COMPILE_SOLIDITY_MERGE_COMPILATION_JOBS,
 } from "hardhat/builtin-tasks/task-names";
 import { Libraries } from "hardhat-deploy/types";
 import { CONTRACT_NAME_PLACEHOLDER, PLUGIN_NAME } from "../constants";
@@ -26,38 +24,9 @@ import { logger } from "./logger";
 
 export const makeVerifyContractsRequest = async (
   hre: HardhatRuntimeEnvironment,
-  flatContracts: ContractByName[]
-): Promise<TenderlyVerifyContractsRequest | null> => {
-  return _makeVerifyContractsRequest(hre, flatContracts);
-};
-
-// TODO(dusan): This function is implemented because there were updates on private and public verifications
-// but fork verification remained the same. That is, the request formats for private/public and fork verifications differ.
-// Hence, this function extracts the same data as private/public verifications, but then converts it into a suitable format
-// for fork verification.
-export const makeForkVerifyContractsRequest = async (
-  hre: HardhatRuntimeEnvironment,
-  flatContracts: ContractByName[],
-  txRoot: string,
-  forkId: string
-): Promise<TenderlyForkContractUploadRequest | null> => {
-  const request = await _makeVerifyContractsRequest(hre, flatContracts, forkId);
-  const forkRequest: TenderlyForkContractUploadRequest = await _convertToForkRequest(
-    hre,
-    request as TenderlyVerifyContractsRequest
-  );
-
-  return {
-    ...forkRequest,
-    root: txRoot,
-  };
-};
-
-async function _makeVerifyContractsRequest(
-  hre: HardhatRuntimeEnvironment,
   flatContracts: ContractByName[],
   forkId?: string
-): Promise<TenderlyVerifyContractsRequest | null> {
+): Promise<TenderlyVerifyContractsRequest | null> => {
   logger.info("Processing data needed for verification.");
 
   const contracts: TenderlyVerificationContract[] = [];
@@ -120,7 +89,7 @@ async function _makeVerifyContractsRequest(
   return {
     contracts,
   };
-}
+};
 
 async function extractSources(
   hre: HardhatRuntimeEnvironment,
@@ -214,58 +183,6 @@ async function repackLibraries(compiler: SolcConfig): Promise<SolcConfig> {
   compiler.settings.libraries = libraries;
 
   return compiler;
-}
-
-// TODO(dusan): This function shouldn't be here. Fork verification should have the same request format as private or public verification
-async function _convertToForkRequest(
-  hre: HardhatRuntimeEnvironment,
-  request: TenderlyVerifyContractsRequest
-): Promise<TenderlyForkContractUploadRequest> {
-  const forkRequest: TenderlyForkContractUploadRequest = { config: {}, contracts: [], root: "" };
-
-  // Merge all compilation jobs to see if they can all fit into one request, if not, throw an error because fork verification doesn't support multiple compiler version.
-  const compilationJobs: CompilationJob[] = [];
-  for (const contract of request.contracts) {
-    compilationJobs.push(await getCompilationJob(hre, contract.contractToVerify));
-  }
-  const mergedJob: CompilationJob[] = await hre.run(TASK_COMPILE_SOLIDITY_MERGE_COMPILATION_JOBS, { compilationJobs });
-  if (mergedJob.length > 1) {
-    throw new Error(
-      "The provided contracts must be compiled with the same compiler configuration. At this point, hardhat-tenderly plugin doesn't support multi compiler verification on FORKS. Private and public verification support multi compiler verification."
-    );
-  }
-
-  for (const contract of request.contracts) {
-    for (const [sourcePath, source] of Object.entries(contract.sources)) {
-      const forkContract: TenderlyContract = {
-        compiler: undefined,
-        contractName: source.name,
-        networks: undefined,
-        source: source.code,
-        sourcePath,
-      };
-      if (
-        forkContract.contractName === contract.contractToVerify ||
-        `${forkContract.sourcePath}:${forkContract.contractName}` === contract.contractToVerify
-      ) {
-        forkContract.networks = contract.networks;
-      }
-      forkRequest.contracts.push(forkContract);
-    }
-  }
-
-  forkRequest.config = {};
-  forkRequest.config.compiler_version = request.contracts[0].compiler?.version;
-  forkRequest.config.optimizations_used = request.contracts[0].compiler?.settings?.optimizer?.enabled;
-  forkRequest.config.optimizations_count = request.contracts[0].compiler?.settings?.optimizer?.runs;
-  forkRequest.config.evm_version = request.contracts[0].compiler?.settings?.evmVersion;
-  if (request.contracts[0].compiler?.settings?.debug?.revertStrings) {
-    forkRequest.config.debug = {
-      revertStrings: request.contracts[0].compiler?.settings?.debug?.revertStrings,
-    };
-  }
-
-  return forkRequest;
 }
 
 export const getCompilationJob = async (
