@@ -1,5 +1,11 @@
 # tenderly
 
+## 0.4.0
+
+### Minor Changes
+
+- [#115](https://github.com/Tenderly/hardhat-tenderly/pull/115) [`d420bf1`](https://github.com/Tenderly/hardhat-tenderly/commit/d420bf1ba647f805ed11824448ecb1d3358358b9) Thanks [@dule-git](https://github.com/dule-git)! - Implemented multi-compiler fork verification.
+
 ## 0.3.0
 
 ### Minor Changes
