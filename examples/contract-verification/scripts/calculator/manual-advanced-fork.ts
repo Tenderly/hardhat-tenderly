@@ -18,40 +18,49 @@ export async function main() {
   const calculatorAddress = await deployCalculator(mathsAddress);
   // const calculatorAddress = "0x85904a6b167973b7d51eec66f420735a3f9a4345";
 
-  await tenderly.verifyForkAPI(
+  await tenderly.verifyForkMultiCompilerAPI(
     {
-      root: "",
-      config: {
-        compiler_version: "0.8.17",
-        optimizations_used: false,
-      },
       contracts: [
         {
-          contractName: "Calculator",
-          source: readFileSync("contracts/Calculator.sol", "utf-8").toString(),
-          sourcePath: "Calculator.sol",
+          contractToVerify: "Calculator",
+          sources: {
+            "contracts/Calculator.sol": {
+              name: "Calculator",
+              code: readFileSync("contracts/Calculator.sol", "utf-8").toString(),
+            },
+            "hardhat/console.sol": {
+              name: "console",
+              code: readFileSync("node_modules/hardhat/console.sol", "utf-8").toString(),
+            },
+            "contracts/libraries/Maths.sol": {
+              name: "Maths",
+              code: readFileSync("contracts/libraries/Maths.sol", "utf-8").toString(),
+            },
+          },
+          // solidity format compiler with a little modification at libraries param
           compiler: {
             version: "0.8.17",
-          },
-          networks: {
-            // important: key is the Fork ID (UUID like string)
-            [forkID]: {
-              address: calculatorAddress,
-              // Link the dependency to the deployed maths contract
-              links: {
-                Maths: mathsAddress,
+            settings: {
+              optimizer: {
+                enabled: false,
+                runs: 200,
+              },
+              libraries: {
+                "contracts/libraries/Maths.sol": {
+                  // WARNING: Beware of the addresses parameter
+                  // To see the explanation of why you need to put the addresses parameter, see the following link: https://docs.tenderly.co/monitoring/smart-contract-verification/verifying-contracts-using-the-tenderly-hardhat-plugin/manual-contract-verification
+                  addresses: {
+                    Maths: mathsAddress,
+                  },
+                },
               },
             },
           },
-        },
-        {
-          contractName: "Maths",
-          source: readFileSync("contracts/libraries/Maths.sol", "utf-8").toString(),
-          sourcePath: "libraries/Maths.sol",
-          compiler: {
-            version: "0.8.17",
+          networks: {
+            [forkID]: {
+              address: calculatorAddress,
+            },
           },
-          networks: {},
         },
       ],
     },

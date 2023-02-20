@@ -46,7 +46,7 @@ export class TenderlyApiService {
     };
 
     logger.debug("Configured tenderly rpc instance with parameters:", {
-      baseURL: TENDERLY_API_BASE_URL,
+      baseURL: TENDERLY_JSON_RPC_BASE_URL,
       access_key:
         tdlyConfig.access_key !== undefined && tdlyConfig.access_key !== null && tdlyConfig.access_key !== ""
           ? "super secret access_key is set in 'access_key' field"

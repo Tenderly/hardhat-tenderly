@@ -6,7 +6,7 @@ export async function main() {
   const forkID = `${(network.config as HttpNetworkConfig).url}`.split("/").pop() ?? "";
 
   console.log("🖖🏽[ethers] Deploying and Verifying Greeter in Tenderly");
-  
+
   const Greeter = await ethers.getContractFactory("Greeter");
   const greeter = await Greeter.deploy("Hello, Manual Hardhat on Fork !");
 
@@ -14,36 +14,35 @@ export async function main() {
   const greeterAddress = greeter.address;
   console.log("Manual Advanced (fork): {Greeter} deployed to", greeterAddress);
 
-  await tenderly.verifyForkAPI(
+  await tenderly.verifyForkMultiCompilerAPI(
     {
-      config: {
-        compiler_version: "0.8.17",
-        evm_version: "default",
-        optimizations_count: 200,
-        optimizations_used: false,
-      },
-      root: "",
       contracts: [
         {
-          contractName: "Greeter",
-          source: readFileSync("contracts/Greeter.sol", "utf-8").toString(),
-          sourcePath: "contracts/Greeter.sol",
-          networks: {
-            // important: key is the Fork ID (UUID-like string)
-            [forkID]: {
-              address: greeterAddress,
-              links: {},
+          contractToVerify: "Greeter",
+          sources: {
+            "contracts/Greeter.sol": {
+              name: "Greeter",
+              code: readFileSync("contracts/Greeter.sol", "utf-8").toString(),
+            },
+            "hardhat/console.sol": {
+              name: "console",
+              code: readFileSync("node_modules/hardhat/console.sol", "utf-8").toString(),
             },
           },
-        },
-        {
-          contractName: "console",
-          source: readFileSync("node_modules/hardhat/console.sol", "utf-8").toString(),
-          sourcePath: "hardhat/console.sol",
-          networks: {},
+          // solidity format compiler with a little modification at libraries param
           compiler: {
-            name: "solc",
             version: "0.8.17",
+            settings: {
+              optimizer: {
+                enabled: false,
+                runs: 200,
+              },
+            },
+          },
+          networks: {
+            [forkID]: {
+              address: greeterAddress,
+            },
           },
         },
       ],
