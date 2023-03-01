@@ -316,7 +316,7 @@ export class TenderlyService {
       }
       if (response.results.verified_contracts !== undefined && response.results.verified_contracts !== null) {
         for (const verifiedContract of response.results.verified_contracts) {
-          await this.addContractToProject(username, tenderlyProject, {
+          await this.addContractsToProject(username, tenderlyProject, {
             network_id: verifiedContract.network_id,
             address: verifiedContract.address,
             display_name: verifiedContract.contract_name,
@@ -453,10 +453,10 @@ export class TenderlyService {
     }
   }
 
-  public async addContractToProject(
+  public async addContractsToProject(
     username: string,
     project: string,
-    request: TenderlyAddContractRequest
+    ...contracts: TenderlyAddContractRequest[]
   ): Promise<void> {
     logger.debug("Bulk adding contracts to project:", project);
     if (!TenderlyApiService.isAuthenticated()) {
@@ -466,8 +466,10 @@ export class TenderlyService {
 
     const tenderlyApi = TenderlyApiService.configureInstance();
     try {
-      const res = await tenderlyApi.post(`/api/v1/account/${username}/project/${project}/address`, { ...request });
-      if (res.status !== 200) {
+      const res = await tenderlyApi.post(`/api/v2/accounts/${username}/projects/${project}/contracts`, {
+        contracts,
+      });
+      if (res.status !== 200 && res.status !== 204) {
         logger.error(`There was an error while adding contracts to project. Status is ${res.status}`);
         return;
       }

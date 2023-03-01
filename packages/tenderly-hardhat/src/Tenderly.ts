@@ -4,6 +4,7 @@ import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { TenderlyService } from "tenderly";
 import {
+  TenderlyAddContractRequest,
   TenderlyArtifact,
   TenderlyContractUploadRequest,
   TenderlyForkContractUploadRequest,
@@ -159,6 +160,18 @@ export class Tenderly {
 
   public async push(...contracts: any[]): Promise<void> {
     return this.verify(...contracts);
+  }
+
+  public async addToProject(...contracts: TenderlyAddContractRequest[]): Promise<void> {
+    logger.info("Add contracts to project invoked.");
+
+    await this._throwIfUsernameOrProjectNotSet();
+
+    await this.tenderlyService.addContractsToProject(
+      this.env.config.tenderly.username,
+      this.env.config.tenderly.project,
+      ...contracts
+    );
   }
 
   private async _throwIfUsernameOrProjectNotSet(): Promise<void> {

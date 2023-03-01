@@ -6,3 +6,9 @@ export interface ContractByName {
   network?: string;
   libraries?: Libraries;
 }
+
+export interface ContractByAddress {
+  address: string;
+  display_name?: string;
+  network_id: string;
+}
