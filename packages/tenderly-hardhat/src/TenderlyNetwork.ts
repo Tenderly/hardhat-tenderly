@@ -171,6 +171,13 @@ export class TenderlyNetwork {
     return this.forkID;
   }
 
+  public setDevnetID(devnetID: string | undefined) {
+    if (!this._checkNetwork()) {
+      return;
+    }
+    this.devnetID = devnetID;
+  }
+
   public setFork(fork: string | undefined): void {
     if (!this._checkNetwork()) {
       return;
