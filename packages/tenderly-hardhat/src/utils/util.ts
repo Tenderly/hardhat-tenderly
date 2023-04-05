@@ -25,7 +25,7 @@ import { logger } from "./logger";
 export const makeVerifyContractsRequest = async (
   hre: HardhatRuntimeEnvironment,
   flatContracts: ContractByName[],
-  forkId?: string
+  platformID?: string
 ): Promise<TenderlyVerifyContractsRequest | null> => {
   logger.info("Processing data needed for verification.");
 
@@ -57,8 +57,8 @@ export const makeVerifyContractsRequest = async (
     if (hre.config.networks[network].chainId !== undefined) {
       chainId = hre.config.networks[network].chainId!.toString();
     }
-    if (chainId === undefined && network === "tenderly" && forkId !== undefined) {
-      chainId = forkId;
+    if (chainId === undefined && network === "tenderly" && platformID !== undefined) {
+      chainId = platformID;
     }
     logger.trace(`ChainId for network '${network}' is ${chainId}`);
 

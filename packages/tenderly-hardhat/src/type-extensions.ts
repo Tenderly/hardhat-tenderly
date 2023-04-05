@@ -7,7 +7,7 @@ import {
   TenderlyVerifyContractsRequest,
 } from "tenderly/types";
 
-import { ContractByName, TenderlyConfig } from "./tenderly/types";
+import { ContractByName,  } from "./tenderly/types";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 
 export interface TenderlyPlugin {

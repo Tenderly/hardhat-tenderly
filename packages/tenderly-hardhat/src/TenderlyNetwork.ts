@@ -19,6 +19,7 @@ export class TenderlyNetwork {
   public accessKey: string;
   public head: string | undefined;
   public forkID: string | undefined;
+  public devnetID: string | undefined;
   public tenderlyJsonRpc: axios.AxiosInstance;
   public accounts: Record<string, string> | undefined;
   public env: HardhatRuntimeEnvironment;
@@ -39,8 +40,13 @@ export class TenderlyNetwork {
     this.host = this.tenderlyJsonRpc.defaults.baseURL!;
 
     if (hre.network.name === "tenderly" && "url" in hre.network.config && hre.network.config.url !== undefined) {
-      this.forkID = hre.network.config.url.split("/").pop();
-      logger.info("Fork ID is:", this.forkID);
+      if(hre.network.config.url.includes("devnet")) {
+        this.devnetID = hre.network.config.url.split("/").pop();
+        logger.info("Devnet ID is:", this.devnetID);
+      } else {
+        this.forkID = hre.network.config.url.split("/").pop();
+        logger.info("Fork ID is:", this.forkID);
+      }
     }
   }
 
@@ -96,11 +102,20 @@ export class TenderlyNetwork {
       return;
     }
 
+    if (this.devnetID !== undefined) {
+      await this.tenderlyService.verifyDevnetContractsMultiCompiler(
+        requestData,
+        this.env.config.tenderly.project,
+        this.env.config.tenderly.username,
+        this.forkID!
+      );
+      return
+    }
+
     if (this.head === undefined && this.forkID === undefined) {
       logger.warn("Head or fork are not initialized.");
       await this.initializeFork();
     }
-
     await this.tenderlyService.verifyForkContractsMultiCompiler(
       requestData,
       this.env.config.tenderly.project,
