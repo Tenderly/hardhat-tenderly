@@ -82,6 +82,12 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
   }
 
   if ("url" in hre.network.config && hre.network.config.url !== undefined) {
+    if (hre.network.config.url.includes("devnet")) {
+      const devnetID = hre.network.config.url.split("/").pop();
+      hre.tenderly.network().setDevnetID(devnetID);
+      logger.info(`There is a devnet url in the 'tenderly' network`, { devnetID });
+      return;
+    }
     const forkID = hre.network.config.url.split("/").pop();
     hre.tenderly.network().setFork(forkID);
     logger.info(`There is a fork url in the 'tenderly' network`, { forkID });

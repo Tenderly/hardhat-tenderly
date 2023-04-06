@@ -4,5 +4,6 @@ export const VERIFICATION_TYPES = {
   FORK: "fork",
   PRIVATE: "private",
   PUBLIC: "public",
+  DEVNET: "devnet",
 };
 export const CONTRACT_NAME_PLACEHOLDER = "HARDHAT_TENDERLY_CONTRACT_NAME_PLACEHOLDER";

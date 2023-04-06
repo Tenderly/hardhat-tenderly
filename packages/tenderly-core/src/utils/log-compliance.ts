@@ -101,6 +101,7 @@ export function convertToLogCompliantVerificationResponse(res: VerifyContractsRe
   return {
     results: logCompliantVerificationResults,
     compilation_errors: logCompliantCompilationErrors,
+    display_link: res.display_link,
   };
 }
 
