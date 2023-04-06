@@ -1,5 +1,11 @@
 # tenderly
 
+## 0.5.0
+
+### Minor Changes
+
+- [#129](https://github.com/Tenderly/hardhat-tenderly/pull/129) [`fd6924d`](https://github.com/Tenderly/hardhat-tenderly/commit/fd6924dc3f530a3f05c159c8aeb6d29786ec3a1a) Thanks [@veljko-matic](https://github.com/veljko-matic)! - Added verification to devnet.
+
 ## 0.4.0
 
 ### Minor Changes

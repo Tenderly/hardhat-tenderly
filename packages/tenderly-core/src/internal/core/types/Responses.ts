@@ -13,4 +13,5 @@ export interface VerificationResult {
 export interface VerifyContractsResponse {
   compilation_errors: CompilationError[];
   results: VerificationResult[];
+  display_link?: string
 }
