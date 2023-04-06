@@ -22,6 +22,8 @@ export class TenderlyNetwork {
   public tenderlyJsonRpc: axios.AxiosInstance;
   public accounts: Record<string, string> | undefined;
   public env: HardhatRuntimeEnvironment;
+  public devnetID: string | undefined;
+
 
   private tenderlyService = new TenderlyService(PLUGIN_NAME);
 
@@ -39,8 +41,13 @@ export class TenderlyNetwork {
     this.host = this.tenderlyJsonRpc.defaults.baseURL!;
 
     if (hre.network.name === "tenderly" && "url" in hre.network.config && hre.network.config.url !== undefined) {
-      this.forkID = hre.network.config.url.split("/").pop();
-      logger.info("Fork ID is:", this.forkID);
+      if(hre.network.config.url.includes("devnet")) {
+        this.devnetID = hre.network.config.url.split("/").pop();
+        logger.info("Devnet ID is:", this.devnetID);
+      } else {
+        this.forkID = hre.network.config.url.split("/").pop();
+        logger.info("Fork ID is:", this.forkID);
+      }
     }
   }
 
@@ -94,6 +101,17 @@ export class TenderlyNetwork {
     logger.info("Invoked fork verification.");
     if (!this._checkNetwork()) {
       return;
+    }
+
+
+    if (this.devnetID !== undefined) {
+      await this.tenderlyService.verifyDevnetContractsMultiCompiler(
+        requestData,
+        this.env.config.tenderly.project,
+        this.env.config.tenderly.username,
+        this.devnetID,
+      );
+      return
     }
 
     if (this.head === undefined && this.forkID === undefined) {
@@ -194,6 +212,12 @@ export class TenderlyNetwork {
       logger.error("Error was caught while calling fork initialization:", err);
       throw err;
     }
+  }
+  public setDevnetID(devnetID: string | undefined) {
+    if (!this._checkNetwork()) {
+      return;
+    }
+    this.devnetID = devnetID;
   }
 
   private _writeHead() {

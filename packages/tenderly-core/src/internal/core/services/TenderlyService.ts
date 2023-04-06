@@ -532,4 +532,65 @@ export class TenderlyService {
     }
     return [];
   }
+
+  public async verifyDevnetContractsMultiCompiler(
+    request: TenderlyVerifyContractsRequest,
+    tenderlyProject: string,
+    username: string,
+    devnetID: string
+  ): Promise<void> {
+    logger.info("Verifying contracts on devnet. (Multi compiler version)");
+
+    if (!TenderlyApiService.isAuthenticated()) {
+      logger.error(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
+      return;
+    }
+
+    const tenderlyApi = TenderlyApiService.configureInstance();
+    try {
+      const res = await tenderlyApi.post(
+        `api/v1/account/${username}/project/${tenderlyProject}/devnet/endpoint/${devnetID}/contracts/verify`, { ...request }
+      );
+      if (res.data === undefined || res.data === null) {
+        logger.error(
+          "There was an error while verifying contracts on devnet (Multi compiler version). Obtained response is invalid."
+        );
+      }
+      const response = convertToLogCompliantVerificationResponse(res.data);
+      logger.trace("Verification response:", response);
+
+      if (response.compilation_errors !== undefined && response.compilation_errors !== null) {
+        logger.error("There have been compilation errors while verifying contracts.", response.compilation_errors);
+        return;
+      }
+
+      if (response.results === undefined || response.results === null) {
+        logger.error(
+          "There has been an error while verifying contracts, no verified contracts nor bytecode mismatch errors are returned."
+        );
+        return;
+      }
+
+      if (
+        response.results.bytecode_mismatch_errors !== undefined &&
+        response.results.bytecode_mismatch_errors !== null
+      ) {
+        for (const bytecodeMismatchError of response.results.bytecode_mismatch_errors) {
+          logger.error("There has been a bytecode mismatch error while verifying contract.", bytecodeMismatchError);
+        }
+      }
+      if (response.results.verified_contracts !== undefined && response.results.verified_contracts !== null) {
+        for (const verifiedContract of response.results.verified_contracts) {
+          const contractLink = response.display_link;
+          const logMsg = `Contract ${verifiedContract.address} verified. You can view the contract at the devnet: ${contractLink}`;
+          console.log(logMsg);
+          logger.trace(logMsg);
+        }
+      }
+    } catch (err) {
+      const logCompliantApiError = convertToLogCompliantApiError(err);
+      logger.error(logCompliantApiError);
+      logger.error(`Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`);
+    }
+  }
 }
