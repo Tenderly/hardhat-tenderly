@@ -1,5 +1,11 @@
 # tenderly
 
+## 0.5.0-1.6.0-beta.0.0
+
+### Minor Changes
+
+- Added devnet verification.
+
 ## 0.4.0
 
 ### Minor Changes

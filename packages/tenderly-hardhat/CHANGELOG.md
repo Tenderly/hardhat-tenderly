@@ -1,5 +1,16 @@
 # @tenderly/hardhat-tenderly
 
+## 2.0.0-1.6.0-beta.0.0
+
+### Minor Changes
+
+- Added devnet verification.
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tenderly@0.5.0-1.6.0-beta.0.0
+
 ## 1.6.1
 
 ### Minor Changes
