@@ -548,7 +548,6 @@ export class TenderlyService {
 
     const tenderlyApi = TenderlyApiService.configureInstance();
     try {
-      console.log(`api/v1/account/${username}/project/${tenderlyProject}/devnet/endpoint/${devnetID}/contracts/verify`)
       const res = await tenderlyApi.post(
         `api/v1/account/${username}/project/${tenderlyProject}/devnet/endpoint/${devnetID}/contracts/verify`, { ...request }
       );
