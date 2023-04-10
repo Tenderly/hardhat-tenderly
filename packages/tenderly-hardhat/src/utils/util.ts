@@ -57,7 +57,7 @@ export const makeVerifyContractsRequest = async (
     if (hre.config.networks[network].chainId !== undefined) {
       chainId = hre.config.networks[network].chainId!.toString();
     }
-    if (chainId === undefined && network === "tenderly" && platformID !== undefined) {
+    if (chainId === undefined && isTenderlyNetworkName(network) && platformID !== undefined) {
       chainId = platformID;
     }
     logger.trace(`ChainId for network '${network}' is ${chainId}`);
@@ -417,6 +417,10 @@ export const extractCompilerVersion = (config: HardhatConfig, sourcePath?: strin
 
   return config.solidity.compilers[0].version;
 };
+
+export const isTenderlyNetworkName = (name: string): boolean => {
+  return name === "tenderly" || name === "devnet"
+}
 
 const determineCompilerConfig = (compilers: SolcConfig[], contractCompiler: string): TenderlyContractConfig => {
   for (const compiler of compilers) {
