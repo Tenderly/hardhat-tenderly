@@ -14,6 +14,7 @@ Here's a brief description. There are three modes you can configure to verify yo
 - **Private verification mode** - Only you or people who share the project with you may see the source code of the contract and interact with it.
 - **Public verification mode** - Anyone can see the source code of the contract and interact with it.
 - **Fork verification mode** - Verify deployed contract on a [tenderly fork](https://docs.tenderly.co/simulations-and-forks/how-to-create-a-fork).
+- **Devnet verification mode** - Verify deployed contract on a [tenderly devnet]().
 
 Also, there are three ways of how you can actually do the verification based on the mode you configured in verification modes. These ways are called **Verification Approaches**:
 - **Automatic verification approach** - The plugin will automatically verify your contracts after each deployment.
@@ -81,10 +82,10 @@ You can take the username and project from there. In this case the username is T
 
 ### Private verification mode
 In order to configure private verification mode, set `privateVerification` to `true` inside the `tenderly` field inside `hardhat.config.ts`. 
-Also, the `--network` flag must NOT be set to `tenderly` when running `npx hardhat run` command, or fork verification mode will be configured. 
+Also, the `--network` flag must NOT be set to `tenderly` or `devnet` when running `npx hardhat run` command, or fork/devnet verification mode will be configured.
 ### Public verification mode
 In order to configure public verification mode, set `privateVerification` to `false` inside the `tenderly` field inside `hardhat.config.ts`.
-Also, the `--network` flag must NOT be set to `tenderly` when running `npx hardhat run` command, or fork verification mode will be configured. 
+Also, the `--network` flag must NOT be set to `tenderly` or `devnet` when running `npx hardhat run` command, or fork/devnet verification mode will be configured.
 ### Fork verification mode
 In order to configure fork verification mode, set `privateVerification` to `false` inside the `tenderly` field inside `hardhat.config.ts`.
 To configure the fork you want to verify the contracts on, set the `tenderly` network inside `HardhatConfig` structure in `hardhat.config.ts`:
@@ -118,12 +119,45 @@ Parameters:
 - `url` is the fork rpc url that you can find on the dashboard in the info tab of the particular fork you want to verify your contracts on.
 - `accounts` field should be your private key or mnemonic as with every other network.
 - Also, the `--network` flag MUST be set to `tenderly` when running `npx hardhat run` command in order to configure fork verification mode.
+### Devnet verification mode
+In order to configure devnet verification mode, set `privateVerification` to `false` inside the `tenderly` field inside `hardhat.config.ts`.
+To configure the devnet you want to verify the contracts on, set the `devnet` network inside `HardhatConfig` structure in `hardhat.config.ts`:
+```ts
+module.exports = {
+  solidity: {
+    ...
+  },
+  networks: {
+    ... // other networks 
+    sepolia: {
+      url: "https://sepolia.gateway.tenderly.co/...",
+      accounts: ["0x..."],
+    },
+    ...,
+    // -------- CONFIGURE DEVNET HERE -----------
+    devnet: {
+      url: "https://rpc.vnet.tenderly.co/devnet/...",
+      accounts: ["0x..."]
+    }
+    // ----------------------------------------
+},
+  tenderly: { // as before
+    username: "tenderly",
+    project: "project",
+    privateVerification: false
+  }
+}
+```
+Parameters:
+- `url` is the devnet rpc url that you can copy on the dashboard in the Copy RPC link section of the particular devnet you want to verify your contracts on.
+- `accounts` field should be your private key or mnemonic as with every other network.
+- Also, the `--network` flag MUST be set to `devnet` when running `npx hardhat run` command in order to configure devnet verification mode.
 
 # Verification Approaches
 This section explains the steps you take to actually verify your contracts.
 You can verify your contracts **Automatically**, **Manually** or via **Task**.
 
-For every of these three approaches, you can configure the mode of verification. Either **Private**, **Public** or **Fork** verification mode. See how to configure these modes in **Verification Modes** section above.
+For every of these three approaches, you can configure the mode of verification. Either **Private**, **Public**, **Fork** or **Devnet** verification mode. See how to configure these modes in **Verification Modes** section above.
 
 ## Automatic verification approach (Recommended)
 This approach will automatically verify the contract after deployment. Precisely, when you call the `deployed()` function as in:
@@ -200,6 +234,7 @@ For more information on how to use `tenderly:verify` task, run `npx hardhat help
 You can also verify your contracts via exposed API calls. Although this is not recommended, you can fill the request and call some of the following methods:
 - `verifyMultiCompilerAPI(request: TenderlyVerifyContractsRequest)`
 - `verifyForkMultiCompilerAPI(request: TenderlyVerifyContractsRequest)`
+- `verifyDevnetMultiCompilerAPI(request: TenderlyVerifyContractsRequest)`
 
 For more information on how to use these methods, you can check out their javadocs.
 
