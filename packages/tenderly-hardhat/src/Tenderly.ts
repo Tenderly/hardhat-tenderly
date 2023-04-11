@@ -18,6 +18,7 @@ import {
   extractCompilerVersion,
   getCompilerDataFromContracts,
   getContracts,
+  isTenderlyNetworkName,
   makeVerifyContractsRequest,
   resolveDependencies,
 } from "./utils/util";
@@ -56,7 +57,7 @@ export class Tenderly {
       return;
     }
     if (this.isVerificationOnPlatform(verificationType)) {
-      logger.info(`Network parameter is set to 'tenderly', redirecting to ${verificationType} verification.`);
+      logger.info(`Network parameter is set to '${this.getNetworkName()}', redirecting to ${verificationType} verification.`);
       await this._throwIfUsernameOrProjectNotSet();
 
       return this.tenderlyNetwork.verify(requestData);
@@ -89,7 +90,7 @@ export class Tenderly {
         break;
       case VERIFICATION_TYPES.DEVNET:
         logger.error(
-          `Error in ${PLUGIN_NAME}: Network parameter is set to 'tenderly' and verifyMultiCompilerAPI() is not available for devnet deployments`
+          `Error in ${PLUGIN_NAME}: Network parameter is set to '${this.getNetworkName()}' and verifyMultiCompilerAPI() is not available for devnet deployments`
         );
         break;
       case VERIFICATION_TYPES.PRIVATE:
@@ -145,9 +146,9 @@ export class Tenderly {
     devnetID: string
   ): Promise<void> {
     logger.info("Invoked devnet verification through API request. (Multi compiler version)");
-    if (this.env.network.name !== "tenderly") {
+    if (!isTenderlyNetworkName(this.env.network.name)) {
       logger.error(
-        `Error in ${PLUGIN_NAME}: Network parameter is not set to 'tenderly' and verifyDevnetMultiCompilerAPI() is only available for tenderly devnet deployments, please use --network tenderly.`
+        `Error in ${PLUGIN_NAME}: Network parameter is not set to 'devnet' and verifyDevnetMultiCompilerAPI() is only available for tenderly devnet deployments, please use --network devnet.`
       );
       return;
     }
@@ -160,6 +161,10 @@ export class Tenderly {
     return this.tenderlyNetwork;
   }
 
+  public getNetworkName(): string {
+    return this.env.network.name
+  }
+
   public setNetwork(network: TenderlyNetwork): TenderlyNetwork {
     this.tenderlyNetwork = network;
     logger.trace("Network is set to 'tenderly'.", network);
@@ -168,13 +173,12 @@ export class Tenderly {
   }
 
   private _getVerificationType(): string {
-    if (this.env.network.name === "tenderly") 
-    {
+    if (isTenderlyNetworkName(this.env.network.name )) {
       return this.tenderlyNetwork.devnetID !== undefined ? VERIFICATION_TYPES.DEVNET : VERIFICATION_TYPES.FORK
     }
 
     const priv = this.env.config.tenderly?.privateVerification;
-    if (priv !== undefined && priv && this.env.network.name !== "tenderly") {
+    if (priv !== undefined && priv && !isTenderlyNetworkName(this.env.network.name)) {
       return VERIFICATION_TYPES.PRIVATE;
     }
 
@@ -201,10 +205,10 @@ export class Tenderly {
   public async verifyAPI(request: TenderlyContractUploadRequest): Promise<void> {
     logger.info("Invoked public verification through API request.");
 
-    if (this.env.network.name === "tenderly") {
+    if (isTenderlyNetworkName(this.env.network.name)) {
       if (this._getVerificationType() === VERIFICATION_TYPES.DEVNET){
         logger.error(
-          `Error in ${PLUGIN_NAME}: Network parameter is set to 'tenderly' and verifyAPI() is not available for devnet deployments.`
+          `Error in ${PLUGIN_NAME}: Network parameter is set to '${this.getNetworkName()}' and verifyAPI() is not available for devnet deployments.`
         );
         return
       }
@@ -241,10 +245,10 @@ export class Tenderly {
   ): Promise<void> {
     logger.info("Invoked pushing contracts through API.");
 
-    if (this.env.network.name === "tenderly") {
+    if (isTenderlyNetworkName(this.env.network.name)) {
       if (this._getVerificationType() === VERIFICATION_TYPES.DEVNET){
         logger.error(
-          `Error in ${PLUGIN_NAME}: Network parameter is set to 'tenderly' and pushAPI() is not available for devnet deployments.`
+          `Error in ${PLUGIN_NAME}: Network parameter is set to '${this.getNetworkName()}' and pushAPI() is not available for devnet deployments.`
         );
         return
       }

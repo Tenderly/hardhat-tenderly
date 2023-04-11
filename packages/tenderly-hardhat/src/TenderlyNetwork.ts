@@ -10,7 +10,7 @@ import { convertToLogCompliantForkInitializeResponse } from "tenderly/utils/log-
 import { PLUGIN_NAME } from "./constants";
 import { ContractByName } from "./tenderly/types";
 import { NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG } from "./tenderly/errors";
-import { getCompilerDataFromContracts, getContracts } from "./utils/util";
+import { getCompilerDataFromContracts, getContracts, isTenderlyNetworkName } from "./utils/util";
 import { logger } from "./utils/logger";
 
 export class TenderlyNetwork {
@@ -40,7 +40,7 @@ export class TenderlyNetwork {
     this.tenderlyJsonRpc = this._configureTenderlyRPCInstance();
     this.host = this.tenderlyJsonRpc.defaults.baseURL!;
 
-    if (hre.network.name === "tenderly" && "url" in hre.network.config && hre.network.config.url !== undefined) {
+    if (isTenderlyNetworkName(hre.network.name) && "url" in hre.network.config && hre.network.config.url !== undefined) {
       if(hre.network.config.url.includes("devnet")) {
         this.devnetID = hre.network.config.url.split("/").pop();
         logger.info("Devnet ID is:", this.devnetID);
@@ -98,7 +98,7 @@ export class TenderlyNetwork {
   }
 
   public async verify(requestData: TenderlyVerifyContractsRequest) {
-    logger.info("Invoked fork verification.");
+    logger.info("Invoked verification.");
     if (!this._checkNetwork()) {
       return;
     }
@@ -297,9 +297,9 @@ export class TenderlyNetwork {
   }
 
   private _checkNetwork(): boolean {
-    if (this.env.network.name !== "tenderly") {
+    if (!isTenderlyNetworkName(this.env.network.name)) {
       logger.error(
-        `Warning in ${PLUGIN_NAME}: Network is not set to tenderly. Please call the task again with --network tenderly`
+        `Warning in ${PLUGIN_NAME}: Network is not set to 'tenderly'. Please call the task again with --network tenderly`
       );
       return false;
     }
