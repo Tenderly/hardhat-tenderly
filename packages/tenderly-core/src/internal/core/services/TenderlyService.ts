@@ -537,16 +537,16 @@ export class TenderlyService {
     request: TenderlyVerifyContractsRequest,
     tenderlyProject: string,
     username: string,
-    devnetID: string
+    devnetID: string,
+    accessKey?: string,
   ): Promise<void> {
     logger.info("Verifying contracts on devnet. (Multi compiler version)");
 
-    if (!TenderlyApiService.isAuthenticated()) {
+    if (!accessKey && !TenderlyApiService.isAuthenticated()) {
       logger.error(`Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`);
       return;
     }
-
-    const tenderlyApi = TenderlyApiService.configureInstance();
+    const tenderlyApi = TenderlyApiService.configureInstance(accessKey);
     try {
       const res = await tenderlyApi.post(
         `api/v1/account/${username}/project/${tenderlyProject}/devnet/endpoint/${devnetID}/contracts/verify`, { ...request }
