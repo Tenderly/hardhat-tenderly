@@ -11,7 +11,6 @@ export const configFilePath = `${configDir + path.sep}config.yaml`;
 
 export function getConfig(): TenderlyConfig {
   logger.trace("Getting tenderly config.");
-
   if (configExists()) {
     const fileData = fs.readFileSync(configFilePath);
 

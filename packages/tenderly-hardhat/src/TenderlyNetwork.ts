@@ -110,6 +110,7 @@ export class TenderlyNetwork {
         this.env.config.tenderly.project,
         this.env.config.tenderly.username,
         this.devnetID,
+        this.env.config.tenderly.accessKey,
       );
       return
     }
