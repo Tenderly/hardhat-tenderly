@@ -139,6 +139,24 @@ export class Tenderly {
     await this.tenderlyNetwork.verifyMultiCompilerAPI(request, tenderlyProject, username, forkID);
   }
 
+  public async verifyDevnetMultiCompilerAPI(
+    request: TenderlyVerifyContractsRequest,
+    tenderlyProject: string,
+    username: string,
+    devnetID: string
+  ): Promise<void> {
+    logger.info("Invoked devnet verification through API request. (Multi compiler version)");
+    if (this.env.network.name !== "tenderly") {
+      logger.error(
+        `Error in ${PLUGIN_NAME}: Network parameter is not set to 'tenderly' and verifyDevnetMultiCompilerAPI() is only available for tenderly devnet deployments, please use --network tenderly.`
+      );
+      return;
+    }
+    await this._throwIfUsernameOrProjectNotSet();
+
+    await this.tenderlyNetwork.verifyDevnetMultiCompilerAPI(request, tenderlyProject, username, devnetID);
+  }
+
   public network(): TenderlyNetwork {
     return this.tenderlyNetwork;
   }

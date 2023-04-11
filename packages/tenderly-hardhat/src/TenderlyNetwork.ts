@@ -142,6 +142,21 @@ export class TenderlyNetwork {
     );
   }
 
+  public async verifyDevnetMultiCompilerAPI(
+    request: TenderlyVerifyContractsRequest,
+    tenderlyProject: string,
+    username: string,
+    devnetID: string
+  ) {
+    logger.info("Invoked devnet verification via API.");
+    await this.tenderlyService.verifyDevnetContractsMultiCompiler(
+      request,
+      tenderlyProject,
+      username,
+      devnetID,
+    );
+  }
+
   public async verifyAPI(
     request: TenderlyForkContractUploadRequest,
     tenderlyProject: string,
