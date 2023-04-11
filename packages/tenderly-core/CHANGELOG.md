@@ -1,5 +1,11 @@
 # tenderly
 
+## 0.5.1
+
+### Patch Changes
+
+- [#138](https://github.com/Tenderly/hardhat-tenderly/pull/138) [`b5fca34`](https://github.com/Tenderly/hardhat-tenderly/commit/b5fca3490ecbd1051f32fa1116cd1221d711cd03) Thanks [@veljko-matic](https://github.com/veljko-matic)! - Add ability to provide access key to configureInstance, and logic around devnet and hardhat
+
 ## 0.5.0
 
 ### Minor Changes
