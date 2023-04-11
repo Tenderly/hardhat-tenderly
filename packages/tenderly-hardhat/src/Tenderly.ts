@@ -146,7 +146,7 @@ export class Tenderly {
     devnetID: string
   ): Promise<void> {
     logger.info("Invoked devnet verification through API request. (Multi compiler version)");
-    if (this.env.network.name !== "tenderly") {
+    if (!isTenderlyNetworkName(this.env.network.name)) {
       logger.error(
         `Error in ${PLUGIN_NAME}: Network parameter is not set to 'tenderly' and verifyDevnetMultiCompilerAPI() is only available for tenderly devnet deployments, please use --network tenderly.`
       );
