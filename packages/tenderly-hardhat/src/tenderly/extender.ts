@@ -78,7 +78,7 @@ extendConfig((resolvedConfig: HardhatConfig) => {
 
 const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
   if (!isTenderlyNetworkName(hre.network.name)) {
-    logger.info(`Used network is not ${hre.network.name} so there is no extending of the provider.`);
+    logger.info(`Used network is not 'tenderly' so there is no extending of the provider.`);
     return;
   }
 

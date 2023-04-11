@@ -299,7 +299,7 @@ export class TenderlyNetwork {
   private _checkNetwork(): boolean {
     if (!isTenderlyNetworkName(this.env.network.name)) {
       logger.error(
-        `Warning in ${PLUGIN_NAME}: Network is not set to ${this.env.network.name}. Please call the task again with --network ${this.env.network.name}`
+        `Warning in ${PLUGIN_NAME}: Network is not set to 'tenderly'. Please call the task again with --network tenderly`
       );
       return false;
     }
