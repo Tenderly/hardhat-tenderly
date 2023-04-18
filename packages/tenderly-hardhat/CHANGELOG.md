@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 1.7.2
+
+### Patch Changes
+
+- [#140](https://github.com/Tenderly/hardhat-tenderly/pull/140) [`39e1eec`](https://github.com/Tenderly/hardhat-tenderly/commit/39e1eec3e502267d894645fe340a7aee5d024728) Thanks [@dule-git](https://github.com/dule-git)! - Move hardhat to devDependencies
+
 ## 1.7.1
 
 ### Patch Changes
