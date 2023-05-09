@@ -1,5 +1,13 @@
 # @tenderly/hardhat-tenderly
 
+## 1.7.3-beta.2
+
+### Patch Changes
+
+- Another test
+
+- [#143](https://github.com/Tenderly/hardhat-tenderly/pull/143) [`3609782`](https://github.com/Tenderly/hardhat-tenderly/commit/360978244335e2a9e2160e05b871034abd299aea) Thanks [@dule-git](https://github.com/dule-git)! - Fixed a bug that took hardhat's compiler configuration and passed it by reference instead of by value during the verification process.
+
 ## 1.7.3-beta.1
 
 ### Patch Changes
