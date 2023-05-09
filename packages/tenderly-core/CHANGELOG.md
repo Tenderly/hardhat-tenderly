@@ -42,6 +42,12 @@
 
 - [#143](https://github.com/Tenderly/hardhat-tenderly/pull/143) [`f2f90f6`](https://github.com/Tenderly/hardhat-tenderly/commit/f2f90f60c531a5b12a0d10eb48cd492c64f01fea) Thanks [@dule-git](https://github.com/dule-git)! - Fixed a bug that took hardhat's compiler configuration and passed it by reference instead of by value during the verification process.
 
+## 0.5.2-beta.0
+
+### Patch Changes
+
+- Testing beta version packages
+
 ## 0.5.1
 
 ### Patch Changes
