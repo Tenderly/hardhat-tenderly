@@ -47,9 +47,14 @@ This will trigger a GitHub Action that will publish the prerelease packages to n
 
 Open PR with destination to `master` branch and run:
 
+Generate an `.md` file that describes the changes. These files will be used to create a PR by the changeset github action hook:
+```
+yarn changeset 
+```
+
+Commit the changes:
 ```bash
-yarn changeset // adding changesets
 git add .
-git commit -m "Add changeset"
+git commit -m "Version packages"
 git push
 ```
