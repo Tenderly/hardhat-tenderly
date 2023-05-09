@@ -1,5 +1,18 @@
 # @tenderly/hardhat-tenderly
 
+## 1.7.3-beta.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tenderly@0.5.2-beta.0
+
+## 1.7.3-beta.0
+
+### Patch Changes
+
+- Fixed a bug that took hardhat's compiler configuration and passed it by reference instead of by value during the verification process.
+
 ## 1.7.2
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # tenderly
 
+## 0.5.2-beta.0
+
+### Patch Changes
+
+- Testing beta version packages
+
 ## 0.5.1
 
 ### Patch Changes
