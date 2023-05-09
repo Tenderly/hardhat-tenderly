@@ -118,14 +118,14 @@ async function extractSources(
 
 async function insertLibraries(
   hre: HardhatRuntimeEnvironment,
-  hardhatCompiler: SolcConfig,
+  originalCompiler: SolcConfig,
   libraries: Libraries | undefined | null
 ): Promise<SolcConfig> {
   // we need to copy the compiler in order to not disturb the hardhat's compiler from the settings
   const copiedCompiler: SolcConfig = {
-    version: hardhatCompiler.version,
+    version: originalCompiler.version,
     settings: {
-      ...hardhatCompiler.settings
+      ...originalCompiler.settings
     }
   }
   if (libraries === undefined || libraries === null) {
