@@ -118,30 +118,37 @@ async function extractSources(
 
 async function insertLibraries(
   hre: HardhatRuntimeEnvironment,
-  compiler: SolcConfig,
+  originalCompiler: SolcConfig,
   libraries: Libraries | undefined | null
 ): Promise<SolcConfig> {
+  // we need to copy the compiler in order to not modify the hardhat's compiler from the settings
+  const copiedCompiler: SolcConfig = {
+    version: originalCompiler.version,
+    settings: {
+      ...originalCompiler.settings
+    }
+  }
   if (libraries === undefined || libraries === null) {
-    return compiler;
+    return copiedCompiler;
   }
 
-  if (compiler.settings.libraries !== undefined && compiler.settings.libraries !== null) {
+  if (copiedCompiler.settings.libraries !== undefined && copiedCompiler.settings.libraries !== null) {
     throw new Error(
       `There are multiple definitions of libraries the contract should use. One is defined in the verify request and the other as an compiler config override. Please remove one of them.`
     );
   }
 
-  compiler.settings.libraries = {};
+  copiedCompiler.settings.libraries = {};
   for (const [libName, libAddress] of Object.entries(libraries)) {
     const libArtifact: Artifact = hre.artifacts.readArtifactSync(libName);
-    if (compiler.settings.libraries[libArtifact.sourceName] === undefined) {
-      compiler.settings.libraries[libArtifact.sourceName] = {};
+    if (copiedCompiler.settings.libraries[libArtifact.sourceName] === undefined) {
+      copiedCompiler.settings.libraries[libArtifact.sourceName] = {};
     }
 
-    compiler.settings.libraries[libArtifact.sourceName][libName] = libAddress;
+    copiedCompiler.settings.libraries[libArtifact.sourceName][libName] = libAddress;
   }
 
-  return compiler;
+  return copiedCompiler;
 }
 
 /* 
