@@ -121,7 +121,7 @@ async function insertLibraries(
   originalCompiler: SolcConfig,
   libraries: Libraries | undefined | null
 ): Promise<SolcConfig> {
-  // we need to copy the compiler in order to not disturb the hardhat's compiler from the settings
+  // we need to copy the compiler in order to not modify the hardhat's compiler from the settings
   const copiedCompiler: SolcConfig = {
     version: originalCompiler.version,
     settings: {
