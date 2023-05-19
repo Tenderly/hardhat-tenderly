@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 1.7.4
+
+### Patch Changes
+
+- [#145](https://github.com/Tenderly/hardhat-tenderly/pull/145) [`35ab874`](https://github.com/Tenderly/hardhat-tenderly/commit/35ab874a1da6a76aec397db84c9f130768ea06c6) Thanks [@dule-git](https://github.com/dule-git)! - Resolved an issue where the user specifies chainId inside the tenderly network in hardhat.config.ts.
+
 ## 1.7.3
 
 ### Patch Changes
