@@ -3,6 +3,7 @@ import * as axios from "axios";
 import { logger } from "../../../utils/logger";
 import { getConfig, isAccessTokenSet } from "../../../utils/config";
 import { TENDERLY_API_BASE_URL, TENDERLY_JSON_RPC_BASE_URL } from "../../../common/constants";
+import {HARDHAT_TENDERLY_VERSION} from "./hardhat-tenderly-version";
 
 export class TenderlyApiService {
   public static configureInstance(providedAccessKey?: string): axios.AxiosInstance {
@@ -17,7 +18,10 @@ export class TenderlyApiService {
     }
     const params = {
       baseURL: TENDERLY_API_BASE_URL,
-      headers: { "x-access-key": accessKey },
+      headers: { 
+        "x-access-key": accessKey,
+        "x-user-agent": `@tenderly/hardhat-tenderly/${HARDHAT_TENDERLY_VERSION}`
+      },
     };
 
     logger.debug("Configured instance with parameters:", {
