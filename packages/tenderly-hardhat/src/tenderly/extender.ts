@@ -18,6 +18,7 @@ import { TenderlyNetwork } from "../TenderlyNetwork";
 import { PLUGIN_NAME } from "../constants";
 import { wrapEthers } from "./ethers";
 import { wrapHHDeployments } from "./hardhat-deploy";
+import { isTenderlyNetworkName } from "../utils/util";
 
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
@@ -76,8 +77,8 @@ extendConfig((resolvedConfig: HardhatConfig) => {
 });
 
 const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
-  if (hre.network.name !== "tenderly") {
-    logger.info("Used network is not 'tenderly' so there is no extending of the provider.");
+  if (!isTenderlyNetworkName(hre.network.name)) {
+    logger.info(`Used network is not 'tenderly' so there is no extending of the provider.`);
     return;
   }
 
@@ -85,7 +86,7 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
     if (hre.network.config.url.includes("devnet")) {
       const devnetID = hre.network.config.url.split("/").pop();
       hre.tenderly.network().setDevnetID(devnetID);
-      logger.info(`There is a devnet url in the 'tenderly' network`, { devnetID });
+      logger.info(`There is a devnet url in the '${hre.network.name}' network`, { devnetID });
       return;
     }
     const forkID = hre.network.config.url.split("/").pop();

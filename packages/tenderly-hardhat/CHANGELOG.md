@@ -1,5 +1,35 @@
 # @tenderly/hardhat-tenderly
 
+## 1.7.5
+
+### Patch Changes
+
+- [#147](https://github.com/Tenderly/hardhat-tenderly/pull/147) [`4326062`](https://github.com/Tenderly/hardhat-tenderly/commit/4326062a176d220ead5cdc810d8e49f903aaa9f6) Thanks [@dule-git](https://github.com/dule-git)! - Added x-user-agent header to request
+
+## 1.7.4
+
+### Patch Changes
+
+- [#145](https://github.com/Tenderly/hardhat-tenderly/pull/145) [`35ab874`](https://github.com/Tenderly/hardhat-tenderly/commit/35ab874a1da6a76aec397db84c9f130768ea06c6) Thanks [@dule-git](https://github.com/dule-git)! - Resolved an issue where the user specifies chainId inside the tenderly network in hardhat.config.ts.
+
+## 1.7.3
+
+### Patch Changes
+
+- [#143](https://github.com/Tenderly/hardhat-tenderly/pull/143) [`f2f90f6`](https://github.com/Tenderly/hardhat-tenderly/commit/f2f90f60c531a5b12a0d10eb48cd492c64f01fea) Thanks [@dule-git](https://github.com/dule-git)! - Fixed a bug that took hardhat's compiler configuration and passed it by reference instead of by value during the verification process.
+
+## 1.7.2
+
+### Patch Changes
+
+- [#140](https://github.com/Tenderly/hardhat-tenderly/pull/140) [`39e1eec`](https://github.com/Tenderly/hardhat-tenderly/commit/39e1eec3e502267d894645fe340a7aee5d024728) Thanks [@dule-git](https://github.com/dule-git)! - Move hardhat to devDependencies
+
+## 1.7.1
+
+### Patch Changes
+
+- [#138](https://github.com/Tenderly/hardhat-tenderly/pull/138) [`b5fca34`](https://github.com/Tenderly/hardhat-tenderly/commit/b5fca3490ecbd1051f32fa1116cd1221d711cd03) Thanks [@veljko-matic](https://github.com/veljko-matic)! - Add ability to provide access key to configureInstance, and logic around devnet and hardhat
+
 ## 1.7.0
 
 ### Minor Changes

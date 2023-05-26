@@ -53,12 +53,11 @@ export const makeVerifyContractsRequest = async (
     }
     logger.trace("Found network is:", network);
 
-    let chainId: string = NETWORK_NAME_CHAIN_ID_MAP[network.toLowerCase()];
-    if (hre.config.networks[network].chainId !== undefined) {
-      chainId = hre.config.networks[network].chainId!.toString();
-    }
-    if (chainId === undefined && network === "tenderly" && platformID !== undefined) {
+    let chainId = undefined;
+    if (isTenderlyNetworkName(network) && platformID !== undefined) {
       chainId = platformID;
+    } else {
+      chainId = NETWORK_NAME_CHAIN_ID_MAP[network.toLowerCase()].toString();
     }
     logger.trace(`ChainId for network '${network}' is ${chainId}`);
 
@@ -118,30 +117,37 @@ async function extractSources(
 
 async function insertLibraries(
   hre: HardhatRuntimeEnvironment,
-  compiler: SolcConfig,
+  originalCompiler: SolcConfig,
   libraries: Libraries | undefined | null
 ): Promise<SolcConfig> {
+  // we need to copy the compiler in order to not modify the hardhat's compiler from the settings
+  const copiedCompiler: SolcConfig = {
+    version: originalCompiler.version,
+    settings: {
+      ...originalCompiler.settings
+    }
+  }
   if (libraries === undefined || libraries === null) {
-    return compiler;
+    return copiedCompiler;
   }
 
-  if (compiler.settings.libraries !== undefined && compiler.settings.libraries !== null) {
+  if (copiedCompiler.settings.libraries !== undefined && copiedCompiler.settings.libraries !== null) {
     throw new Error(
       `There are multiple definitions of libraries the contract should use. One is defined in the verify request and the other as an compiler config override. Please remove one of them.`
     );
   }
 
-  compiler.settings.libraries = {};
+  copiedCompiler.settings.libraries = {};
   for (const [libName, libAddress] of Object.entries(libraries)) {
     const libArtifact: Artifact = hre.artifacts.readArtifactSync(libName);
-    if (compiler.settings.libraries[libArtifact.sourceName] === undefined) {
-      compiler.settings.libraries[libArtifact.sourceName] = {};
+    if (copiedCompiler.settings.libraries[libArtifact.sourceName] === undefined) {
+      copiedCompiler.settings.libraries[libArtifact.sourceName] = {};
     }
 
-    compiler.settings.libraries[libArtifact.sourceName][libName] = libAddress;
+    copiedCompiler.settings.libraries[libArtifact.sourceName][libName] = libAddress;
   }
 
-  return compiler;
+  return copiedCompiler;
 }
 
 /* 
@@ -417,6 +423,10 @@ export const extractCompilerVersion = (config: HardhatConfig, sourcePath?: strin
 
   return config.solidity.compilers[0].version;
 };
+
+export const isTenderlyNetworkName = (name: string): boolean => {
+  return name === "tenderly" || name === "devnet"
+}
 
 const determineCompilerConfig = (compilers: SolcConfig[], contractCompiler: string): TenderlyContractConfig => {
   for (const compiler of compilers) {
