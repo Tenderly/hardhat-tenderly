@@ -1,5 +1,11 @@
 # tenderly
 
+## 0.5.3-beta.1
+
+### Patch Changes
+
+- Fixed prebuild.js script
+
 ## 0.5.3-beta.0
 
 ### Patch Changes

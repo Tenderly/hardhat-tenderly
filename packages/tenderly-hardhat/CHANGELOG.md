@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 1.7.5-beta.1
+
+### Patch Changes
+
+- Fixed prebuild.js script
+
 ## 1.7.5-beta.0
 
 ### Patch Changes
