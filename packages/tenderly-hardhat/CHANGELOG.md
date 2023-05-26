@@ -90,6 +90,12 @@
 
 - [#147](https://github.com/Tenderly/hardhat-tenderly/pull/147) [`4326062`](https://github.com/Tenderly/hardhat-tenderly/commit/4326062a176d220ead5cdc810d8e49f903aaa9f6) Thanks [@dule-git](https://github.com/dule-git)! - Added x-user-agent header to request
 
+## 1.7.5-beta.0
+
+### Patch Changes
+
+- Added x-user-agent header
+
 ## 1.7.4
 
 ### Patch Changes
