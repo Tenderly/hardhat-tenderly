@@ -1,5 +1,11 @@
 # tenderly
 
+## 0.5.3-beta.0
+
+### Patch Changes
+
+- Added x-user-agent header
+
 ## 0.5.2-beta.1
 
 ### Patch Changes

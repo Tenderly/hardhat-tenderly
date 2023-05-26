@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 1.7.5-beta.0
+
+### Patch Changes
+
+- Added x-user-agent header
+
 ## 1.7.3-beta.2
 
 ### Patch Changes
