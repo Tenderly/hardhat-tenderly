@@ -4,7 +4,7 @@
   "license": "MIT",
   "homepage": "https://tenderly.co",
   "description": "Hardhat plugin for integration with Tenderly",
-  "version": "1.7.4",
+  "version": "1.7.5",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
@@ -56,7 +56,7 @@
     "fs-extra": "^10.1.0",
     "hardhat-deploy": "^0.11.14",
     "js-yaml": "^4.1.0",
-    "tenderly": "^0.5.1",
+    "tenderly": "^0.5.3",
     "tslog": "^4.3.1"
   },
   "peerDependencies": {
