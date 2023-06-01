@@ -57,7 +57,9 @@ export const makeVerifyContractsRequest = async (
     if (isTenderlyNetworkName(network) && platformID !== undefined) {
       chainId = platformID;
     } else {
-      chainId = NETWORK_NAME_CHAIN_ID_MAP[network.toLowerCase()].toString();
+      chainId = NETWORK_NAME_CHAIN_ID_MAP[network.toLowerCase()] !== undefined ? 
+        NETWORK_NAME_CHAIN_ID_MAP[network.toLowerCase()].toString() :
+        hre.network.config.chainId ;
     }
     logger.trace(`ChainId for network '${network}' is ${chainId}`);
 
