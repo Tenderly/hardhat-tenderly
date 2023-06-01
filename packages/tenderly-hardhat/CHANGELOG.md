@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 1.7.6
+
+### Patch Changes
+
+- [#149](https://github.com/Tenderly/hardhat-tenderly/pull/149) [`c1d43a8`](https://github.com/Tenderly/hardhat-tenderly/commit/c1d43a85e8dbf9e1953f8ba5174094cd1553ef02) Thanks [@dule-git](https://github.com/dule-git)! - Enable clients to specify their own `chainId`
+
 ## 1.7.5
 
 ### Patch Changes
