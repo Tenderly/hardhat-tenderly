@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 1.7.7
+
+### Patch Changes
+
+- [#151](https://github.com/Tenderly/hardhat-tenderly/pull/151) [`1f5ac79`](https://github.com/Tenderly/hardhat-tenderly/commit/1f5ac79b8ad7964939a83d66c5c46f5a22712168) Thanks [@dule-git](https://github.com/dule-git)! - When looking for the chainId for the network to verify on, firstly look in the network configuration that the user specifed, then look at the base that tenderly has.
+
 ## 1.7.6
 
 ### Patch Changes
