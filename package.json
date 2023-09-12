@@ -17,7 +17,6 @@
         "version-packages": "changeset version"
     },
     "devDependencies": {
-        "@changesets/changelog-github": "^0.4.7",
         "@changesets/cli": "^2.25.0",
         "prettier": "^3.2.4",
         "wsrun": "^5.2.4"
