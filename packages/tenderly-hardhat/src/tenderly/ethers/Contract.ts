@@ -1,6 +1,6 @@
 import {Contract, ContractTransactionReceipt, ethers} from "ethers";
 import { BigNumber } from "@ethersproject/bignumber";
-import { Libraries } from "hardhat-deploy/types";
+import { Libraries } from "@nomicfoundation/hardhat-ethers/types";
 
 import { TenderlyPlugin } from "../../type-extensions";
 import { ContractByName } from "../types";
@@ -29,7 +29,7 @@ export class TdlyContract {
         if (deploymentTransaction === undefined || deploymentTransaction === null) {
           return;
         }
-        
+
         const wait = deploymentTransaction.wait;
 
         deploymentTransaction.wait = async (confirmations?: number | undefined): Promise<null | ContractTransactionReceipt> => {
@@ -37,7 +37,7 @@ export class TdlyContract {
           if (receipt === undefined || receipt === null) {
             return null;
           }
-          
+
           if (receipt.contractAddress === undefined || receipt.contractAddress === null) {
             return receipt;
           }
@@ -51,10 +51,11 @@ export class TdlyContract {
     });
   }
 
-  public async deployed(): Promise<Contract> {
-    const contract = await this.nativeContract.deployed();
-    if (this.nativeContract.deployTransaction === undefined || this.nativeContract.deployTransaction === null) {
-      await this._tdlyVerify(contract.address);
+  public async waitForDeployment(): Promise<Contract> {
+    const contract = await this.nativeContract.waitForDeployment();
+    const deploymentTransaction = this.nativeContract.deploymentTransaction();
+    if (deploymentTransaction !== undefined && deploymentTransaction !== null) {
+      await this._tdlyVerify(await contract.getAddress());
     }
 
     return contract;

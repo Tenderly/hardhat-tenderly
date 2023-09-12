@@ -1,5 +1,5 @@
 import { Contract, ContractFactory, Signer } from "ethers";
-import { Libraries } from "@nomiclabs/hardhat-ethers/types";
+import { Libraries } from "@nomicfoundation/hardhat-ethers/types";
 
 import { classFunctions } from "../../utils/util";
 import { TenderlyPlugin } from "../../type-extensions";
@@ -42,7 +42,7 @@ export class TdlyContractFactory {
   public async deploy(...args: any[]): Promise<Contract> {
     const contract = await this.nativeContractFactory.deploy(...args);
 
-    return new TdlyContract(contract, this.tenderly, this.contractName, this.libs) as unknown as Contract;
+    return new TdlyContract(contract as Contract, this.tenderly, this.contractName, this.libs) as unknown as Contract;
   }
 
   public connect(signer: Signer) {

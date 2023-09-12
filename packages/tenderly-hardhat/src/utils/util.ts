@@ -16,7 +16,7 @@ import {
   TASK_COMPILE_SOLIDITY_GET_SOURCE_NAMES,
   TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS,
 } from "hardhat/builtin-tasks/task-names";
-import { Libraries } from "hardhat-deploy/types";
+import { Libraries } from "@nomicfoundation/hardhat-ethers/types";
 import { CONTRACT_NAME_PLACEHOLDER, PLUGIN_NAME } from "../constants";
 import { CONTRACTS_NOT_DETECTED } from "../tenderly/errors";
 import { ContractByName, Metadata } from "../tenderly/types";
@@ -120,7 +120,7 @@ async function extractSources(
 async function insertLibraries(
   hre: HardhatRuntimeEnvironment,
   originalCompiler: SolcConfig,
-  libraries: Libraries | undefined | null
+  libraries: Libraries | undefined
 ): Promise<SolcConfig> {
   // we need to copy the compiler in order to not modify the hardhat's compiler from the settings
   const copiedCompiler: SolcConfig = {
