@@ -441,7 +441,10 @@ export class TenderlyService {
       if (response.results.verified_contracts !== undefined && response.results.verified_contracts !== null) {
         for (const verifiedContract of response.results.verified_contracts) {
           const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/${username}/${tenderlyProject}/fork/${forkID}`;
-          const logMsg = `Contract ${verifiedContract.address} verified. You can view the contract at the fork: ${contractLink}`;
+          let logMsg = `Contract ${verifiedContract.address} verified. You can view the contract at the fork: ${contractLink}`;
+          if (response.display_link != undefined && response.display_link != '') {
+            logMsg = `Contract ${verifiedContract.address} verified. You can view the contract at: ${response.display_link}`;
+          }
           console.log(logMsg);
           logger.trace(logMsg);
         }
