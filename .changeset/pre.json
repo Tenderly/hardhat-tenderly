@@ -1,0 +1,11 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "tenderly": "0.5.3-beta.1",
+    "@tenderly/hardhat-tenderly": "1.7.5-beta.1"
+  },
+  "changesets": [
+    "chatty-feet-walk"
+  ]
+}
