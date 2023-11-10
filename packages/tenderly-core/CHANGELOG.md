@@ -1,5 +1,11 @@
 # tenderly
 
+## 0.6.0
+
+### Minor Changes
+
+- [#161](https://github.com/Tenderly/hardhat-tenderly/pull/161) [`a563356`](https://github.com/Tenderly/hardhat-tenderly/commit/a5633566b33ac7f3a808d4206201c11c443b04d5) Thanks [@veljko-matic](https://github.com/veljko-matic)! - Return valid display link
+
 ## 0.5.3
 
 ### Patch Changes
