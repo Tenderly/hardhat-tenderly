@@ -53,12 +53,13 @@ export const makeVerifyContractsRequest = async (
     }
     logger.trace("Found network is:", network);
 
-    let chainId: string = NETWORK_NAME_CHAIN_ID_MAP[network.toLowerCase()];
-    if (hre.config.networks[network].chainId !== undefined) {
-      chainId = hre.config.networks[network].chainId!.toString();
-    }
-    if (chainId === undefined && isTenderlyNetworkName(network) && platformID !== undefined) {
+    let chainId = undefined;
+    if (isTenderlyNetworkName(network) && platformID !== undefined) {
       chainId = platformID;
+    } else if (hre.network?.config?.chainId !== undefined) {
+      chainId = hre.network.config.chainId.toString();
+    } else if (NETWORK_NAME_CHAIN_ID_MAP[network.toLowerCase()] !== undefined) {
+      chainId = NETWORK_NAME_CHAIN_ID_MAP[network.toLowerCase()].toString();
     }
     logger.trace(`ChainId for network '${network}' is ${chainId}`);
 
