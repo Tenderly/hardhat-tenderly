@@ -46,7 +46,6 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "ethers": "^5.6.9",
     "prettier": "^2.7.1",
     "ts-node": "^10.9.1",
     "typechain": "^8.1.0",
@@ -54,8 +53,9 @@
   },
   "dependencies": {
     "@nomiclabs/hardhat-ethers": "^2.1.0",
-    "@tenderly/hardhat-tenderly": "^1.8.0",
+    "@tenderly/hardhat-tenderly": "^1.7.7",
     "dotenv": "^16.0.1",
+    "ethers": "^5.7.1",
     "hardhat": "^2.10.2"
   }
 }
