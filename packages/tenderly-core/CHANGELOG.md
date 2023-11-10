@@ -1,5 +1,11 @@
 # tenderly
 
+## 0.6.0-beta.0
+
+### Minor Changes
+
+- Return valid display link
+
 ## 0.5.3
 
 ### Patch Changes

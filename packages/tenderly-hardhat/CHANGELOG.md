@@ -1,5 +1,22 @@
 # @tenderly/hardhat-tenderly
 
+## 1.8.0-beta.3
+
+### Minor Changes
+
+- Return valid display link
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tenderly@0.6.0-beta.0
+
+## 1.8.0-beta.2
+
+### Minor Changes
+
+- Return valid display link
+
 ## 1.7.7
 
 ### Patch Changes
@@ -20,15 +37,17 @@
 
 ## 1.7.5-beta.1
 
-### Patch Changes
-
-- Fixed prebuild.js script
-
 ## 1.7.5-beta.0
 
 ### Patch Changes
 
 - Added x-user-agent header
+
+## 1.7.4
+
+### Patch Changes
+
+- Fixed prebuild.js script
 
 ## 1.7.3-beta.2
 
