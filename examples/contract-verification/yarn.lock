@@ -783,10 +783,10 @@
     "@sentry/types" "5.30.0"
     tslib "^1.9.3"
 
-"@tenderly/hardhat-tenderly@^1.7.7":
-  version "1.7.7"
-  resolved "https://registry.yarnpkg.com/@tenderly/hardhat-tenderly/-/hardhat-tenderly-1.7.7.tgz#b320ee6bea3779e4781eb0299a3a816cbdc83def"
-  integrity sha512-p/jLzRPpoD7J0LGvUFEQjgniDzmP5AzfTgy41qqzyjhOsW0voe7wZI8lXjadl5MEr7rAXN1iH3VncT13qG6+Zw==
+"@tenderly/hardhat-tenderly@1.8.0-beta.3":
+  version "1.8.0-beta.3"
+  resolved "https://registry.yarnpkg.com/@tenderly/hardhat-tenderly/-/hardhat-tenderly-1.8.0-beta.3.tgz#f83dca29381090ccdded89bd70a0ddd9438610a7"
+  integrity sha512-EHKdMWnbENCBtoPZ80kW+3pIoYw4eUUnSCQfkr25YDQjAmJhpATlgrimA7ERN39oWs0fmcvJOY2IzlkYB2UTpw==
   dependencies:
     "@ethersproject/bignumber" "^5.7.0"
     "@nomiclabs/hardhat-ethers" "^2.1.1"
@@ -795,7 +795,7 @@
     fs-extra "^10.1.0"
     hardhat-deploy "^0.11.14"
     js-yaml "^4.1.0"
-    tenderly "^0.5.3"
+    tenderly "^0.6.0-beta.0"
     tslog "^4.3.1"
 
 "@tsconfig/node10@^1.0.7":
@@ -4039,10 +4039,10 @@ table@^6.8.0:
     string-width "^4.2.3"
     strip-ansi "^6.0.1"
 
-tenderly@^0.5.3:
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/tenderly/-/tenderly-0.5.3.tgz#115653ff33fc33e3be41ab7dd669fdbe0f28a6fb"
-  integrity sha512-sR+sbZKZzt3b2+moXJsrkBvbava1/4mGulIfuZw8bwr2OpCH8N00dME1t89JC8RjVnQjy4VewVFHyWANdn5zYQ==
+tenderly@^0.6.0-beta.0:
+  version "0.6.0-beta.0"
+  resolved "https://registry.yarnpkg.com/tenderly/-/tenderly-0.6.0-beta.0.tgz#9454044be72959b616a5ee546ce919cc08307ebc"
+  integrity sha512-+8tQtay5nwL8Dsh/50EObisy0+1sQ/GXDTzDUKgQgmMgy+I36u2Y0f+m6Fj7S7ANRgJmdlq5JSLhHwcvSoKO0g==
   dependencies:
     axios "^0.27.2"
     cli-table3 "^0.6.2"
