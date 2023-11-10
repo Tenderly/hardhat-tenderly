@@ -72,6 +72,23 @@
 - Updated dependencies [[`a563356`](https://github.com/Tenderly/hardhat-tenderly/commit/a5633566b33ac7f3a808d4206201c11c443b04d5)]:
   - tenderly@0.6.0
 
+## 1.8.0-beta.3
+
+### Minor Changes
+
+- Return valid display link
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tenderly@0.6.0-beta.0
+
+## 1.8.0-beta.2
+
+### Minor Changes
+
+- Return valid display link
+
 ## 1.7.7
 
 ### Patch Changes
@@ -91,10 +108,6 @@
 - [#147](https://github.com/Tenderly/hardhat-tenderly/pull/147) [`4326062`](https://github.com/Tenderly/hardhat-tenderly/commit/4326062a176d220ead5cdc810d8e49f903aaa9f6) Thanks [@dule-git](https://github.com/dule-git)! - Added x-user-agent header to request
 
 ## 1.7.5-beta.1
-
-### Patch Changes
-
-- Fixed prebuild.js script
 
 ## 1.7.5-beta.0
 
