@@ -7,11 +7,10 @@ export async function main() {
 
   console.log("🖖🏽[ethers] Deploying and Verifying Greeter in Tenderly");
 
-  const Greeter = await ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Manual Hardhat on Fork !");
+  let greeter = await ethers.deployContract("Greeter", ["Hello, Manual Hardhat on Fork !"]);
 
-  await greeter.deployed();
-  const greeterAddress = greeter.address;
+  greeter = await greeter.waitForDeployment();
+  const greeterAddress = await greeter.getAddress();
   console.log("Manual Advanced (fork): {Greeter} deployed to", greeterAddress);
 
   await tenderly.verifyForkMultiCompilerAPI(
