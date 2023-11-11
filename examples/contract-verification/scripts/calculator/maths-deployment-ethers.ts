@@ -2,26 +2,24 @@
 import { ethers } from "hardhat";
 
 export async function deployMaths() {
-  const Maths = await ethers.getContractFactory("Maths");
   console.log("📐[ethers] Deploying Maths library");
-  const maths = await Maths.deploy();
-  await maths.deployed();
+  let maths = await ethers.deployContract("Maths");
+  maths = await maths.waitForDeployment();
 
-  console.log("📐[ethers] {Maths} deployed to", maths.address);
+  console.log("📐[ethers] {Maths} deployed to", await maths.getAddress());
 
-  return maths.address;
+  return await maths.getAddress();
 }
 
 export async function deployCalculator(mathsAddress: string) {
-  const Calculator = await ethers.getContractFactory("Calculator", {
+  console.log("🧮[ethers] Deploying Calculator smart contract");
+  let calculator = await ethers.deployContract("Calculator", {
     libraries: {
       Maths: mathsAddress,
     },
   });
-  console.log("🧮[ethers] Deploying Calculator smart contract");
-  const calculator = await Calculator.deploy();
-  await calculator.deployed();
+  calculator = await calculator.waitForDeployment();
 
-  console.log("🧮[ethers] {Calculator} deployed to", calculator.address);
-  return calculator.address;
+  console.log("🧮[ethers] {Calculator} deployed to", await calculator.getAddress());
+  return await calculator.getAddress();
 }

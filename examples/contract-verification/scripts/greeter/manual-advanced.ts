@@ -5,11 +5,10 @@ import { ethers, tenderly } from "hardhat";
 export async function main() {
   console.log("🖖🏽[ethers] Deploying and Verifying Greeter in Tenderly");
   // deploy stuff but later pretend it's been deployed ages ago on Ropsten.
-  const Greeter = await ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Manual Hardhat!");
+  let greeter = await ethers.deployContract("Greeter", ["Hello, Manual Hardhat!"]);
 
-  await greeter.deployed();
-  const greeterAddress = greeter.address;
+  greeter = await greeter.waitForDeployment();
+  const greeterAddress = await greeter.getAddress();
   console.log("Manual Advanced: {Greeter} deployed to", greeterAddress);
 
   // pretend it's been deployed ages ago on Sepolia in a different deployment.
