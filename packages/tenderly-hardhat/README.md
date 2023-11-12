@@ -1,11 +1,11 @@
 ![npm (tag)](https://img.shields.io/npm/v/@tenderly/hardhat-tenderly/latest?color=23C197&labelColor=060e18&style=for-the-badge)
 
-# hardhat-tenderly
+# @tenderly/hardhat-tenderly
 
 [Hardhat](http://hardhat.org) plugin for integration with [Tenderly](https://tenderly.co).
 
 This repo represents the hardhat-tenderly plugin. With its functionalities, you can verify contracts on the Tenderly platform.
-Verification represents an entry point into Tenderly's functionalities. With verified contracts, you can use various features like [debugger](https://docs.tenderly.co/debugger/how-to-use-tenderly-debugger) or [simulations and forks](https://docs.tenderly.co/simulations-and-forks/how-to-simulate-a-transaction). 
+Verification represents an entry point into Tenderly's functionalities. With verified contracts, you can use various features like [debugger](https://docs.tenderly.co/debugger/how-to-use-tenderly-debugger), [simulations and forks](https://docs.tenderly.co/simulations-and-forks/intro-to-simulations) or [devnets](https://docs.tenderly.co/devnets/intro-to-devnets). 
 This repo will make it possible to verify your contracts with ease, so you can focus on building your dapp.
 
 You can read about hardhat-tenderly's verification features in detail [here](https://docs.tenderly.co/monitoring/smart-contract-verification/verifying-contracts-using-the-tenderly-hardhat-plugin).
@@ -13,8 +13,8 @@ You can read about hardhat-tenderly's verification features in detail [here](htt
 Here's a brief description. There are three modes you can configure to verify your contracts and these are called **Verification Modes**: 
 - **Private verification mode** - Only you or people who share the project with you may see the source code of the contract and interact with it.
 - **Public verification mode** - Anyone can see the source code of the contract and interact with it.
-- **Fork verification mode** - Verify deployed contract on a [tenderly fork](https://docs.tenderly.co/simulations-and-forks/how-to-create-a-fork).
-- **Devnet verification mode** - Verify deployed contract on a [tenderly devnet]().
+- **Fork verification mode** - Verify deployed contract on a <b>tenderly fork</b>.
+- **Devnet verification mode** - Verify deployed contract on a <b>tenderly devnet</b>.
 
 Also, there are three ways of how you can actually do the verification based on the mode you configured in verification modes. These ways are called **Verification Approaches**:
 - **Automatic verification approach** - The plugin will automatically verify your contracts after each deployment.
@@ -157,15 +157,18 @@ Parameters:
 This section explains the steps you take to actually verify your contracts.
 You can verify your contracts **Automatically**, **Manually** or via **Task**.
 
+You can check the [examples/contract-verification](https://github.com/Tenderly/hardhat-tenderly/tree/master/examples/contract-verification) part of the repo to get more insight into how to use these verification approaches.
+
 For every of these three approaches, you can configure the mode of verification. Either **Private**, **Public**, **Fork** or **Devnet** verification mode. See how to configure these modes in **Verification Modes** section above.
 
 ## Automatic verification approach (Recommended)
-This approach will automatically verify the contract after deployment. Precisely, when you call the `deployed()` function as in:
+This approach will automatically verify the contract after deployment. Precisely, when you call the `waitForDeployment()` function as in:
 ```typescript
-const Greeter = await ethers.getContractFactory("Greeter");
-const greeter = await Greeter.deploy("Hello, Hardhat!");
+import { ethers } from "hardhat";
 
-await greeter.deployed();
+const greeter = await ethers.deployContract("Greeter", ["Hello, Hardhat!"]);
+
+await greeter.waitForDeployment();
 ```
 The plugin will wait for the contract to be deployed and verify it afterwards.
 
@@ -190,14 +193,13 @@ This is an example on how you can call it from your deploy script:
 ```ts
 import { ethers, tenderly } from "hardhat";
 
-const Greeter = await ethers.getContractFactory("Greeter");
-const greeter = await Greeter.deploy("Hello, Hardhat!");
+let greeter = await ethers.deployContract("Greeter", ["Hello, Hardhat!"]);
 
-await greeter.deployed();
+greeter = await greeter.waitForDeployment();
 
 await tenderly.verify({
   name: "Greeter",
-  address: greeter.address,
+  address: await greeter.getAddress(),
   libraries: {
       LibraryName1: "0x...",
       LibraryName2: "0x..."
