@@ -1,5 +1,11 @@
 # tenderly
 
+## 0.7.0-beta.0
+
+### Minor Changes
+
+- Enable @tenderly/hardhat-tenderly to work with @nomicfoundation/hardhat-ethers and ethers-v6
+
 ## 0.6.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # @tenderly/hardhat-tenderly
 
+## 2.0.0-beta.4
+
+### Major Changes
+
+- Enable @tenderly/hardhat-tenderly to work with @nomicfoundation/hardhat-ethers and ethers-v6
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tenderly@0.6.0-beta.1
+
 ## 1.8.0
 
 ### Minor Changes
