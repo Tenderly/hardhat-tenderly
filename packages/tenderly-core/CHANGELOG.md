@@ -63,6 +63,12 @@
 
   You can check out our updated [examples/contract-verification](https://github.com/Tenderly/hardhat-tenderly/tree/master/examples/contract-verification) folder that has examples that work with the new package versions.
 
+## 0.7.0-beta.0
+
+### Minor Changes
+
+- Enable @tenderly/hardhat-tenderly to work with @nomicfoundation/hardhat-ethers and ethers-v6
+
 ## 0.6.0
 
 ### Minor Changes
