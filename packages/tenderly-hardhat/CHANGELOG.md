@@ -84,6 +84,17 @@
 - Updated dependencies [[`02952c4`](https://github.com/Tenderly/hardhat-tenderly/commit/02952c4b59f4b332e5742deb6251d9a282fbfa34)]:
   - tenderly@0.7.0
 
+## 2.0.0-beta.4
+
+### Major Changes
+
+- Enable @tenderly/hardhat-tenderly to work with @nomicfoundation/hardhat-ethers and ethers-v6
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tenderly@0.6.0-beta.1
+
 ## 1.8.0
 
 ### Minor Changes
@@ -142,13 +153,7 @@
 
 ### Patch Changes
 
-- [#145](https://github.com/Tenderly/hardhat-tenderly/pull/145) [`35ab874`](https://github.com/Tenderly/hardhat-tenderly/commit/35ab874a1da6a76aec397db84c9f130768ea06c6) Thanks [@dule-git](https://github.com/dule-git)! - Resolved an issue where the user specifies chainId inside the tenderly network in hardhat.config.ts.
-
-## 1.7.3
-
-### Patch Changes
-
-- [#143](https://github.com/Tenderly/hardhat-tenderly/pull/143) [`f2f90f6`](https://github.com/Tenderly/hardhat-tenderly/commit/f2f90f60c531a5b12a0d10eb48cd492c64f01fea) Thanks [@dule-git](https://github.com/dule-git)! - Fixed a bug that took hardhat's compiler configuration and passed it by reference instead of by value during the verification process.
+- Fixed prebuild.js script
 
 ## 1.7.3-beta.2
 
