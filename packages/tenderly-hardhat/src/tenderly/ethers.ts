@@ -1,9 +1,15 @@
 import { ethers } from "ethers";
 import { Artifact } from "hardhat/types";
-import { Libraries, FactoryOptions, HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/types";
+import {
+  Libraries,
+  FactoryOptions,
+  HardhatEthersHelpers,
+  DeployContractOptions,
+} from "@nomicfoundation/hardhat-ethers/types";
 
 import { TenderlyPlugin } from "../type-extensions";
 import { TdlyContractFactory } from "./ethers/ContractFactory";
+import { TdlyContract } from "./ethers/Contract";
 
 export function wrapEthers(
   nativeEthers: typeof ethers & HardhatEthersHelpers,
@@ -18,6 +24,12 @@ export function wrapEthers(
     nativeEthers.getContractFactory,
     tenderly
   ) as typeof nativeEthers.getContractFactory;
+
+  // Ethers's deployContract
+  nativeEthers.deployContract = wrapDeployContract(
+    nativeEthers.deployContract,
+    tenderly
+  ) as typeof nativeEthers.deployContract;
 
   // Contract
   nativeEthers.getContractAtFromArtifact = wrapGetContractAtFromArtifact(
@@ -39,7 +51,7 @@ export declare function getContractFactoryName(
 
 export declare function getContractFactoryABI(
   abi: any[],
-  bytecode: ethers.utils.BytesLike,
+  bytecode: ethers.BytesLike,
   signer?: ethers.Signer
 ): Promise<ethers.ContractFactory>;
 
@@ -49,7 +61,7 @@ function wrapGetContractFactory(
 ): typeof getContractFactoryName | typeof getContractFactoryABI {
   return async function (
     nameOrAbi: string | any[],
-    bytecodeOrFactoryOptions?: (ethers.Signer | FactoryOptions) | ethers.utils.BytesLike,
+    bytecodeOrFactoryOptions?: (ethers.Signer | FactoryOptions) | ethers.BytesLike,
     signer?: ethers.Signer
   ): Promise<ethers.ContractFactory> {
     if (typeof nameOrAbi === "string") {
@@ -69,9 +81,33 @@ function wrapGetContractFactory(
 
     return (func as typeof getContractFactoryABI)(
       nameOrAbi,
-      bytecodeOrFactoryOptions as ethers.utils.BytesLike,
+      bytecodeOrFactoryOptions as ethers.BytesLike,
       signer
     );
+  };
+}
+
+export declare function deployContract(
+  name: string,
+  signerOrOptions?: ethers.Signer | DeployContractOptions
+): Promise<ethers.Contract>;
+
+function wrapDeployContract(
+  func: typeof deployContract,
+  tenderly: TenderlyPlugin
+): typeof deployContract {
+  return async function (
+    name: string,
+    signerOrOptions?: ethers.Signer | DeployContractOptions
+  ): Promise<ethers.Contract> {
+    const contract = await func(name, signerOrOptions);
+
+    let libraries;
+    if (signerOrOptions !== undefined && "libraries" in signerOrOptions) {
+      libraries = signerOrOptions.libraries;
+    }
+
+    return new TdlyContract(contract, tenderly, name, libraries) as unknown as ethers.Contract;
   };
 }
 
@@ -156,6 +192,6 @@ function wrapContractFactory(
 async function tryToVerify(tenderly: TenderlyPlugin, name: string, contract: ethers.Contract) {
   await tenderly.verify({
     name,
-    address: contract.address,
+    address: await contract.getAddress(),
   });
 }

@@ -1,4 +1,4 @@
-import { Libraries } from "@nomiclabs/hardhat-ethers/types";
+import { Libraries } from "@nomicfoundation/hardhat-ethers/types";
 
 export interface ContractByName {
   name: string;

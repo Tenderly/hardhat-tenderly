@@ -1,4 +1,3 @@
-import "@nomiclabs/hardhat-ethers";
 import "./type-extensions";
 import "./tasks";
 

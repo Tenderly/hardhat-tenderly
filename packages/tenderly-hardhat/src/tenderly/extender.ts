@@ -1,8 +1,8 @@
-import { ethers } from "ethers";
+import "@nomicfoundation/hardhat-ethers";
 import { lazyObject } from "hardhat/plugins";
 import { extendConfig, extendEnvironment } from "hardhat/config";
 import { HardhatRuntimeEnvironment, HttpNetworkConfig, HardhatConfig } from "hardhat/types";
-import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/types";
+import { HardhatEthersHelpers } from "@nomicfoundation/hardhat-ethers/types";
 import { TenderlyService } from "tenderly";
 import { logger as serviceLogger } from "tenderly/utils/logger";
 import { TenderlyNetwork as TenderlyNetworkInterface } from "tenderly/types";
@@ -12,13 +12,14 @@ import {
   TENDERLY_JSON_RPC_BASE_URL,
 } from "tenderly/common/constants";
 
+import { ethers } from "ethers";
 import { logger } from "../utils/logger";
 import { Tenderly } from "../Tenderly";
 import { TenderlyNetwork } from "../TenderlyNetwork";
 import { PLUGIN_NAME } from "../constants";
+import { isTenderlyNetworkName } from "../utils/util";
 import { wrapEthers } from "./ethers";
 import { wrapHHDeployments } from "./hardhat-deploy";
-import { isTenderlyNetworkName } from "../utils/util";
 
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
@@ -102,7 +103,7 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
       hre.tenderly.setNetwork(tenderlyNetwork);
       const forkID = await hre.tenderly.network().getForkID();
       (hre.network.config as HttpNetworkConfig).url = `${TENDERLY_JSON_RPC_BASE_URL}/fork/${forkID ?? ""}`;
-      hre.ethers.provider = new hre.ethers.providers.Web3Provider(hre.tenderly.network());
+      // hre.ethers.provider = new hre.ethers.BrowserProvider(hre.tenderly.network());
     })
     .catch((_) => {
       logger.error(`Error happened while trying to initialize fork ${PLUGIN_NAME}. Check your tenderly configuration`);
@@ -136,7 +137,13 @@ const populateNetworks = (): void => {
 };
 
 const extendEthers = (hre: HardhatRuntimeEnvironment): void => {
-  if ("ethers" in hre && hre.ethers !== undefined && "tenderly" in hre && hre.tenderly !== undefined) {
+  if (
+    "ethers" in hre &&
+    hre.ethers !== undefined &&
+    hre.ethers !== null &&
+    "tenderly" in hre &&
+    hre.tenderly !== undefined
+  ) {
     Object.assign(
       hre.ethers,
       wrapEthers(

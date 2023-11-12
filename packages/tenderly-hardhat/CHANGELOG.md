@@ -1,5 +1,16 @@
 # @tenderly/hardhat-tenderly
 
+## 1.8.0
+
+### Minor Changes
+
+- [#161](https://github.com/Tenderly/hardhat-tenderly/pull/161) [`a563356`](https://github.com/Tenderly/hardhat-tenderly/commit/a5633566b33ac7f3a808d4206201c11c443b04d5) Thanks [@veljko-matic](https://github.com/veljko-matic)! - Return valid display link
+
+### Patch Changes
+
+- Updated dependencies [[`a563356`](https://github.com/Tenderly/hardhat-tenderly/commit/a5633566b33ac7f3a808d4206201c11c443b04d5)]:
+  - tenderly@0.6.0
+
 ## 1.8.0-beta.3
 
 ### Minor Changes

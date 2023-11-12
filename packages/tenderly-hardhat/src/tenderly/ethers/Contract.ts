@@ -1,6 +1,6 @@
-import { Contract, ethers } from "ethers";
+import {Contract, ContractTransactionReceipt, ethers} from "ethers";
 import { BigNumber } from "@ethersproject/bignumber";
-import { Libraries } from "hardhat-deploy/types";
+import { Libraries } from "@nomicfoundation/hardhat-ethers/types";
 
 import { TenderlyPlugin } from "../../type-extensions";
 import { ContractByName } from "../types";
@@ -24,11 +24,23 @@ export class TdlyContract {
         return;
       }
 
-      if (key === "deployTransaction") {
-        const wait = nativeContract[key].wait;
+      if (key === "deploymentTransaction") {
+        const deploymentTransaction = nativeContract[key]();
+        if (deploymentTransaction === undefined || deploymentTransaction === null) {
+          return;
+        }
 
-        nativeContract[key].wait = async (confirmations?: number | undefined): Promise<TransactionReceipt> => {
+        const wait = deploymentTransaction.wait;
+
+        deploymentTransaction.wait = async (confirmations?: number | undefined): Promise<null | ContractTransactionReceipt> => {
           const receipt = await wait(confirmations);
+          if (receipt === undefined || receipt === null) {
+            return null;
+          }
+
+          if (receipt.contractAddress === undefined || receipt.contractAddress === null) {
+            return receipt;
+          }
           await this._tdlyVerify(receipt.contractAddress);
 
           return receipt;
@@ -39,10 +51,11 @@ export class TdlyContract {
     });
   }
 
-  public async deployed(): Promise<Contract> {
-    const contract = await this.nativeContract.deployed();
-    if (this.nativeContract.deployTransaction === undefined || this.nativeContract.deployTransaction === null) {
-      await this._tdlyVerify(contract.address);
+  public async waitForDeployment(): Promise<Contract> {
+    const contract = await this.nativeContract.waitForDeployment();
+    const deploymentTransaction = this.nativeContract.deploymentTransaction();
+    if (deploymentTransaction !== undefined && deploymentTransaction !== null) {
+      await this._tdlyVerify(await contract.getAddress());
     }
 
     return contract;

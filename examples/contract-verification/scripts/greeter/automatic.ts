@@ -4,12 +4,12 @@ import { ethers } from "hardhat";
 export async function main() {
   console.log("🖖🏽[ethers] Deploying and Verifying Greeter in Tenderly");
 
-  const Greeter = await ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
+  let greeter = await ethers.deployContract("Greeter", ["Hello, Hardhat!"]);
 
-  await greeter.deployed();
+  greeter = await greeter.waitForDeployment();
 
-  console.log("{Greeter} deployed to", greeter.address);
+  const greeterAddress = await greeter.getAddress();
+  console.log("{Greeter} deployed to", greeterAddress);
 }
 
 main().catch((error) => {
