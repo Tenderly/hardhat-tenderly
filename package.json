@@ -21,5 +21,8 @@
         "prettier": "^2.7.1",
         "wsrun": "^5.2.4"
     },
-    "dependencies": {}
+    "dependencies": {
+      "ethers": "^6.8.1",
+      "hardhat": "^2.19.0"
+    }
 }
