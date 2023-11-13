@@ -22,3 +22,4 @@ Everything pretty much stays the same, except different names are involved.
 `contract.deployed()` becomes `contract.waitForDeployment()`
 
 You can check out our updated [examples/contract-verification](https://github.com/Tenderly/hardhat-tenderly/tree/master/examples/contract-verification) folder that has examples that work with the new package versions.
+
