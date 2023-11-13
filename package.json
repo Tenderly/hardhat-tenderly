@@ -17,11 +17,12 @@
         "version-packages": "changeset version"
     },
     "devDependencies": {
-        "@changesets/changelog-github": "^0.4.7",
         "@changesets/cli": "^2.25.0",
         "prettier": "^2.7.1",
-        "typescript": "^4.8.2",
         "wsrun": "^5.2.4"
     },
-    "dependencies": {}
+    "dependencies": {
+      "ethers": "^6.8.1",
+      "hardhat": "^2.19.0"
+    }
 }

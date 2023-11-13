@@ -1,4 +1,5 @@
 import { SolcConfig } from "hardhat/types";
+import { Libraries } from "@nomicfoundation/hardhat-ethers/types";
 
 export interface TenderlyContractConfig {
   compiler_version?: string;
@@ -47,7 +48,7 @@ export interface ContractCompiler {
 
 export interface ContractNetwork {
   events?: any;
-  links?: Record<string, string>;
+  links?: Libraries | undefined;
   address: string;
   transactionHash?: string;
 }

@@ -39,7 +39,7 @@ export interface TenderlyPlugin {
   /** *
    * @description
    * <p>Verify contracts on tenderly platform with a provided request.</p>
-   * <p>This method only offers public and private verification. Unfortunately, at this point, there is no multi compiler version of fork verification.</p>
+   * <p>This method only offers public and private verification. For verifying contracts on fork, look up <b>verifyForkMultiCompilerAPI</b>.</p>
    * <ul>
    *   <li><b>Private verification</b> - Set <i>privateVerification</i> flag in hardhat.config.ts as <i>true</i> and <i>--network</i> parameter must be anything but <i>tenderly</i></li>
    *   <li><b>Public verification</b> - Set <i>privateVerification</i> flag in hardhat.config.ts as <i>false</i> and <i>--network</i> parameter must be anything but <i>tenderly</i></li>
@@ -90,6 +90,132 @@ export interface TenderlyPlugin {
    * });
    */
   verifyMultiCompilerAPI: (request: TenderlyVerifyContractsRequest) => Promise<void>;
+
+  /** *
+   * @description
+   * <p>Verify contracts on a tenderly fork with a provided request.</p>
+   * <p>This method only offers fork verification. For verifying the contract privately or publicly, look up <b>verifyMultiCompilerAPI</b>.</p>
+   * <ul>
+   *   <li><b>Fork verification</b> - Set <i>privateVerification</i> flag in hardhat.config.ts as <i>false</i> and <i>--network</i> parameter must be set to <i>tenderly</i></li>
+   * </ul>
+   * <p>This method can be used for single or multi compiler verification.</p>
+   * <p><b>Note:</b> You are probably better off verifying via <code>tenderly.verify(...contracts)</code>.
+   * If your contract has any dependencies, you must manually provide them their sources in the <code>sources</code> map inside a particular contract.</p>
+   * @param request
+   * <p>Request object that will be sent to the platform.</p>
+   * <p>contractToVerify should have the name of the contract that you wish to verify. The name must belong to one of source names.</p>
+   * <p>compiler complies with the structure of solidity compiler.
+   * <p>In order to provide a network id as a key in the <i>networks</i> you can import the NETWORK_NAME_CHAIN_ID_MAP map as:</p>
+   * <p><code>import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";</code></p>
+   * <p>and then do</p>
+   * <code>NETWORK_NAME_CHAIN_ID_MAP["sepolia"]</code>
+   * @param tenderlyProject - Tenderly project name
+   * @param username - Tenderly project username (or organization username)
+   * @param forkID - Fork id on which verification is occurring
+   * @example
+   * tenderly.verifyForkMultiCompilerAPI({
+   *   "contracts": [
+   *     {
+   *       "contractToVerify": "contracts/interfaces/Token.sol:Token",
+   *       "sources": {
+   *         "path/to/contract": {
+   *           "name": "Token",
+   *           "code": "source code of the contract...",
+   *         },
+   *         "path/to/another/contract": {
+   *           "name": "AnotherContract",
+   *           "code": "source code of the contract..."
+   *         }
+   *       },
+   *       "compiler": {
+   *         "version": "0.8.17",
+   *         "settings": {
+   *           "optimizer": {
+   *             "enabled": true,
+   *             "runs": 200
+   *           }
+   *         }
+   *       },
+   *       "networks": {
+   *         11155111: {
+   *           "address": "0x1234567890123456789012345678901234567890"
+   *         }
+   *       }
+   *     }
+   *   ]
+   * },
+   * "your-project", "your-username", "your-fork-id"
+   * );
+   */
+  verifyForkMultiCompilerAPI: (
+    request: TenderlyVerifyContractsRequest,
+    tenderlyProject: string,
+    username: string,
+    forkID: string
+  ) => Promise<void>;
+
+  /** *
+   * @description
+   * <p>Verify contracts on a tenderly devnet with a provided request.</p>
+   * <p>This method only offers devnet verification.</p>
+   * <ul>
+   *   <li><b>Devnet verification</b> - Set <i>privateVerification</i> flag in hardhat.config.ts as <i>false</i> and <i>--network</i> parameter must be set to <i>tenderly</i></li>
+   * </ul>
+   * <p>This method can be used for single or multi compiler verification.</p>
+   * <p><b>Note:</b> You are probably better off verifying via <code>tenderly.verify(...contracts)</code>.
+   * If your contract has any dependencies, you must manually provide them their sources in the <code>sources</code> map inside a particular contract.</p>
+   * @param request
+   * <p>Request object that will be sent to the platform.</p>
+   * <p>contractToVerify should have the name of the contract that you wish to verify. The name must belong to one of source names.</p>
+   * <p>compiler complies with the structure of solidity compiler.
+   * <p>In order to provide a network id as a key in the <i>networks</i> you can import the NETWORK_NAME_CHAIN_ID_MAP map as:</p>
+   * <p><code>import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";</code></p>
+   * <p>and then do</p>
+   * <code>NETWORK_NAME_CHAIN_ID_MAP["sepolia"]</code>
+   * @param tenderlyProject - Tenderly project name
+   * @param username - Tenderly project username (or organization username)
+   * @param devnetID - Devnet id on which verification is occurring
+   * @example
+   * tenderly.verifyDevnetMultiCompilerAPI({
+   *   "contracts": [
+   *     {
+   *       "contractToVerify": "contracts/interfaces/Token.sol:Token",
+   *       "sources": {
+   *         "path/to/contract": {
+   *           "name": "Token",
+   *           "code": "source code of the contract...",
+   *         },
+   *         "path/to/another/contract": {
+   *           "name": "AnotherContract",
+   *           "code": "source code of the contract..."
+   *         }
+   *       },
+   *       "compiler": {
+   *         "version": "0.8.17",
+   *         "settings": {
+   *           "optimizer": {
+   *             "enabled": true,
+   *             "runs": 200
+   *           }
+   *         }
+   *       },
+   *       "networks": {
+   *         11155111: {
+   *           "address": "0x1234567890123456789012345678901234567890"
+   *         }
+   *       }
+   *     }
+   *   ]
+   * },
+   * "your-project", "your-username", "your-devnet-id"
+   * );
+   */
+  verifyDevnetMultiCompilerAPI(
+    request: TenderlyVerifyContractsRequest,
+    tenderlyProject: string,
+    username: string,
+    devnetID: string
+  ): Promise<void>
 
   /** *
    * @description
