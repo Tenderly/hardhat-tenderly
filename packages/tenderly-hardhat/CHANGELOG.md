@@ -1,6 +1,6 @@
 # @tenderly/hardhat-tenderly
 
-## 2.0.0
+## 2.0.1
 
 ### Major Changes
 
@@ -18,7 +18,7 @@
 
   Everything pretty much stays the same, except different names are involved.
 
-  `Contract.deploy()` becomes `ethers.deploy('contract')`
+  `Contract.deploy()` becomes `ethers.deployContract('contract')`
 
   `contract.deployed()` becomes `contract.waitForDeployment()`
 
