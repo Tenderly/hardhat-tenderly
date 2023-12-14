@@ -23,6 +23,9 @@
     "LICENSE",
     "README.md"
   ],
+  "bin": {
+    "tenderly-hardhat-initt": "dist/scripts/hardhat-tenderly.js"
+  },
   "scripts": {
     "build": "rm -rf ./dist && tsc --build .",
     "clean": "rm -rf node_modules && rm -rf dist",
