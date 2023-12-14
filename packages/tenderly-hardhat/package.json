@@ -24,7 +24,7 @@
     "README.md"
   ],
   "bin": {
-    "tenderly-hardhat-initt": "dist/scripts/hardhat-tenderly.js"
+    "tenderly-hardhat-init": "dist/scripts/hardhat-tenderly.js"
   },
   "scripts": {
     "build": "rm -rf ./dist && tsc --build .",
