@@ -50,8 +50,9 @@ async function checkAndReadEnvs() {
   tenderlyConfig.TENDERLY_CONFIG_DEST_PATH =
     args["--config-dest-path"] ?? tenderlyConfig.TENDERLY_CONFIG_DEST_PATH ?? ".";
 
+  // only do prompting if interactive flag is there. Otherwise, it could hang on CI
   if (args["--interactive"]) {
-    // if no args, then this
+    // if no args, then reading config
     while (
       !tenderlyConfig.TENDERLY_PROJECT_SLUG ||
       !tenderlyConfig.TENDERLY_DEVNET_TEMPLATE ||
