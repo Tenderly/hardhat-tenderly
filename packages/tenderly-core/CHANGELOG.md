@@ -33,6 +33,12 @@
   npx hardhat run scripts/deploy.ts --network my_tenderly_network_1
   ```
 
+## 0.8.0-beta.0
+
+### Minor Changes
+
+- Enable muliple tenderly networks in hardhat.config.ts
+
 ## 0.7.0
 
 ### Minor Changes
