@@ -39,6 +39,35 @@
   npx hardhat run scripts/deploy.ts --network my_tenderly_network_1
   ```
 
+## 0.8.0-beta.1
+
+### Minor Changes
+
+- [#169](https://github.com/Tenderly/hardhat-tenderly/pull/169) [`f9ca615`](https://github.com/Tenderly/hardhat-tenderly/commit/f9ca6151924750d6ab27f706bba96c19c1e0c742) Thanks [@dule-git](https://github.com/dule-git)! - Enable multiple tenderly networks in hardhat.config.ts
+
+  From now on, you can put multiple networks in your `hardhat.config.ts` file in the `networks` property without the need name the network `tenderly` or `devnet`.
+
+  Just put:
+
+  ```ts
+  networks: {
+    my_tenderly_network_1: {
+      url: "https://rpc.tenderly.co/fork/<forkId>",
+    },
+    my_tenderly_network_2: {
+      url: "https://rpc.tenderly.co/fork/<forkId>",
+    },
+  }
+  ```
+
+  After that you can do:
+
+  ```bash
+  npx hardhat run scripts/deploy.ts --network my_tenderly_network_1
+  ```
+
+- Beta testing
+
 ## 0.8.0-beta.0
 
 ### Minor Changes
@@ -92,7 +121,7 @@
 ### Patch Changes
 
 - [#147](https://github.com/Tenderly/hardhat-tenderly/pull/147) [`4326062`](https://github.com/Tenderly/hardhat-tenderly/commit/4326062a176d220ead5cdc810d8e49f903aaa9f6) Thanks [@dule-git](https://github.com/dule-git)! - Added x-user-agent header to request
- 
+
 ## 0.5.3-beta.1
 
 ### Patch Changes
