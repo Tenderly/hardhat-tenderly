@@ -32,6 +32,17 @@
 - Updated dependencies [[`a863634`](https://github.com/Tenderly/hardhat-tenderly/commit/a863634a36510f9ea91c8e9e31453f04c16ca8bf)]:
   - tenderly@0.8.0
 
+## 2.1.0-beta.0
+
+### Minor Changes
+
+- Enable muliple tenderly networks in hardhat.config.ts
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tenderly@0.8.0-beta.0
+
 ## 2.0.1
 
 ### Major Changes
