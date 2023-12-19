@@ -19,13 +19,13 @@ dotenv.config();
 const config: HardhatUserConfig = {
   solidity: "0.8.17",
   networks: {
-    my_tenderly_fork1: { // or any other name
+    my_tenderly_fork_1: { // or any other name
       url: `${process.env.TENDERLY_FORK_RPC_URL ?? ""}`,
     },
-    my_tenderly_devnet1: { // or any other name
+    my_tenderly_devnet_1: { // or any other name
       url: `${process.env.TENDERLY_DEVNET_RPC_URL_1 ?? ""}`,
     },
-    my_tenderly_devnet2: { // or any other name
+    my_tenderly_devnet_2: { // or any other name
       url: `${process.env.TENDERLY_DEVNET_RPC_URL_2 ?? ""}`,
     },
     sepolia: {
