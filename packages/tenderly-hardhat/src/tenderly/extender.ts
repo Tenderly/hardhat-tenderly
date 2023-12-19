@@ -17,7 +17,7 @@ import { logger } from "../utils/logger";
 import { Tenderly } from "../Tenderly";
 import { TenderlyNetwork } from "../TenderlyNetwork";
 import { PLUGIN_NAME } from "../constants";
-import { isTenderlyNetworkName } from "../utils/util";
+import { isTenderlyNetworkConfig } from "../utils/util";
 import { wrapEthers } from "./ethers";
 import { wrapHHDeployments } from "./hardhat-deploy";
 
@@ -78,7 +78,7 @@ extendConfig((resolvedConfig: HardhatConfig) => {
 });
 
 const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
-  if (!isTenderlyNetworkName(hre.network.name)) {
+  if (!isTenderlyNetworkConfig(hre.network.config)) {
     logger.info(`Used network is not 'tenderly' so there is no extending of the provider.`);
     return;
   }

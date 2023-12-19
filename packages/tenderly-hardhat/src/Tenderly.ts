@@ -18,7 +18,7 @@ import {
   extractCompilerVersion,
   getCompilerDataFromContracts,
   getContracts,
-  isTenderlyNetworkName,
+  isTenderlyNetworkConfig,
   makeVerifyContractsRequest,
   resolveDependencies,
 } from "./utils/util";
@@ -56,7 +56,7 @@ export class Tenderly {
       logger.error("Verification failed due to bad processing of the data in /artifacts directory.");
       return;
     }
-    if (this.isVerificationOnPlatform(verificationType)) {
+    if (this._isVerificationOnPlatform(verificationType)) {
       logger.info(`Network parameter is set to '${this.getNetworkName()}', redirecting to ${verificationType} verification.`);
       await this._throwIfUsernameOrProjectNotSet();
 
@@ -146,7 +146,7 @@ export class Tenderly {
     devnetID: string
   ): Promise<void> {
     logger.info("Invoked devnet verification through API request. (Multi compiler version)");
-    if (!isTenderlyNetworkName(this.env.network.name)) {
+    if (!isTenderlyNetworkConfig(this.env.network.config)) {
       logger.error(
         `Error in ${PLUGIN_NAME}: Network parameter is not set to 'devnet' and verifyDevnetMultiCompilerAPI() is only available for tenderly devnet deployments, please use --network devnet.`
       );
@@ -173,12 +173,12 @@ export class Tenderly {
   }
 
   private _getVerificationType(): string {
-    if (isTenderlyNetworkName(this.env.network.name )) {
+    if (isTenderlyNetworkConfig(this.env.network.config)) {
       return this.tenderlyNetwork.devnetID !== undefined ? VERIFICATION_TYPES.DEVNET : VERIFICATION_TYPES.FORK
     }
 
     const priv = this.env.config.tenderly?.privateVerification;
-    if (priv !== undefined && priv && !isTenderlyNetworkName(this.env.network.name)) {
+    if (priv !== undefined && priv && !isTenderlyNetworkConfig(this.env.network.config)) {
       return VERIFICATION_TYPES.PRIVATE;
     }
 
@@ -205,7 +205,7 @@ export class Tenderly {
   public async verifyAPI(request: TenderlyContractUploadRequest): Promise<void> {
     logger.info("Invoked public verification through API request.");
 
-    if (isTenderlyNetworkName(this.env.network.name)) {
+    if (isTenderlyNetworkConfig(this.env.network.config)) {
       if (this._getVerificationType() === VERIFICATION_TYPES.DEVNET){
         logger.error(
           `Error in ${PLUGIN_NAME}: Network parameter is set to '${this.getNetworkName()}' and verifyAPI() is not available for devnet deployments.`
@@ -245,7 +245,7 @@ export class Tenderly {
   ): Promise<void> {
     logger.info("Invoked pushing contracts through API.");
 
-    if (isTenderlyNetworkName(this.env.network.name)) {
+    if (isTenderlyNetworkConfig(this.env.network.config)) {
       if (this._getVerificationType() === VERIFICATION_TYPES.DEVNET){
         logger.error(
           `Error in ${PLUGIN_NAME}: Network parameter is set to '${this.getNetworkName()}' and pushAPI() is not available for devnet deployments.`
@@ -416,7 +416,7 @@ export class Tenderly {
       config: config!,
     };
   }
-  private isVerificationOnPlatform(verificationType: string): boolean {
+  private _isVerificationOnPlatform(verificationType: string): boolean {
     return verificationType === VERIFICATION_TYPES.DEVNET || verificationType === VERIFICATION_TYPES.FORK
   }
 }
