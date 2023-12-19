@@ -1,5 +1,11 @@
 # tenderly
 
+## 0.8.0-beta.0
+
+### Minor Changes
+
+- Enable muliple tenderly networks in hardhat.config.ts
+
 ## 0.7.0
 
 ### Minor Changes
@@ -47,7 +53,7 @@
 ### Patch Changes
 
 - [#147](https://github.com/Tenderly/hardhat-tenderly/pull/147) [`4326062`](https://github.com/Tenderly/hardhat-tenderly/commit/4326062a176d220ead5cdc810d8e49f903aaa9f6) Thanks [@dule-git](https://github.com/dule-git)! - Added x-user-agent header to request
- 
+
 ## 0.5.3-beta.1
 
 ### Patch Changes
