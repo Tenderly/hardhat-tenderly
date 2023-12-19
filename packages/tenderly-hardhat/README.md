@@ -118,10 +118,22 @@ module.exports = {
 Parameters:
 - `url` is the fork rpc url that you can find on the dashboard in the info tab of the particular fork you want to verify your contracts on.
 - `accounts` field should be your private key or mnemonic as with every other network.
-- Also, the `--network` flag MUST be set to `tenderly` when running `npx hardhat run` command in order to configure fork verification mode.
+> **Pro Tip**:
+> You can set multiple tenderly networks in the `networks` property, just name them differently and assign different urls. For example:
+>```ts
+>networks: {
+>  my_tenderly_fork: {
+>    url: "https://rpc.tenderly.co/fork/...",
+>  },
+>  my_tenderly_devnet: {
+>    url: "https://rpc.vnet.tenderly.co/devnet/...",
+>  }
+>}
+>```
+
 ### Devnet verification mode
 In order to configure devnet verification mode, set `privateVerification` to `false` inside the `tenderly` field inside `hardhat.config.ts`.
-To configure the devnet you want to verify the contracts on, set the `devnet` network inside `HardhatConfig` structure in `hardhat.config.ts`:
+To configure the devnet you want to verify the contracts on, set the `tenderly` network inside `HardhatConfig` structure in `hardhat.config.ts`:
 ```ts
 module.exports = {
   solidity: {
@@ -135,7 +147,7 @@ module.exports = {
     },
     ...,
     // -------- CONFIGURE DEVNET HERE -----------
-    devnet: {
+    tenderly: {
       url: "https://rpc.vnet.tenderly.co/devnet/...",
       accounts: ["0x..."]
     }
@@ -151,7 +163,18 @@ module.exports = {
 Parameters:
 - `url` is the devnet rpc url that you can copy on the dashboard in the Copy RPC link section of the particular devnet you want to verify your contracts on.
 - `accounts` field should be your private key or mnemonic as with every other network.
-- Also, the `--network` flag MUST be set to `devnet` when running `npx hardhat run` command in order to configure devnet verification mode.
+> **Pro Tip**:
+> You can set multiple tenderly networks in the `networks` property, just name them differently and assign different urls. For example:
+>```ts
+>networks: {
+>  my_tenderly_fork: {
+>    url: "https://rpc.tenderly.co/fork/...",
+>  },
+>  my_tenderly_devnet: {
+>    url: "https://rpc.vnet.tenderly.co/devnet/...",
+>  }
+>}
+>```
 
 # Verification Approaches
 This section explains the steps you take to actually verify your contracts.

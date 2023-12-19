@@ -811,10 +811,10 @@
     "@sentry/types" "5.30.0"
     tslib "^1.9.3"
 
-"@tenderly/hardhat-tenderly@2.0.0-beta.4":
-  version "2.0.0-beta.4"
-  resolved "https://registry.yarnpkg.com/@tenderly/hardhat-tenderly/-/hardhat-tenderly-2.0.0-beta.4.tgz#81a2cb0d881f181a4139c369f5d59a6ed3fd8bdc"
-  integrity sha512-VCVsHrOYwyAbJjiwdjYaOH6T5UYcaXAzQXOOaBy7AVxgTbGqvNn/MPU8lYX0ohQhd6wusJQ/fEkc92qvtNavgQ==
+"@tenderly/hardhat-tenderly@^2.1.0-beta.0":
+  version "2.1.0-beta.0"
+  resolved "https://registry.yarnpkg.com/@tenderly/hardhat-tenderly/-/hardhat-tenderly-2.1.0-beta.0.tgz#c44c1728f1425de8621ab250b2237ad0d009aed0"
+  integrity sha512-a5/cI5tSCAgc6HgisU/pb8LdqVzqKNenysmUblVvxXbwISW2vCUkWQ4MkVvqdcT0zs4aKWBk/hA2hNSKjXCYSw==
   dependencies:
     "@ethersproject/bignumber" "^5.7.0"
     "@nomicfoundation/hardhat-ethers" "^3.0.4"
@@ -822,7 +822,7 @@
     ethers "^6.8.1"
     fs-extra "^10.1.0"
     hardhat-deploy "^0.11.43"
-    tenderly "^0.7.0-beta.0"
+    tenderly "^0.8.0-beta.0"
     ts-node "^10.9.1"
     tslog "^4.3.1"
     typescript "^5.2.2"
@@ -3586,10 +3586,10 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-tenderly@^0.7.0-beta.0:
-  version "0.7.0-beta.0"
-  resolved "https://registry.yarnpkg.com/tenderly/-/tenderly-0.7.0-beta.0.tgz#f54dd11e30abab359f97ed41656bd1de21ee6355"
-  integrity sha512-6/KcUjCcyHrA59AhA92MGxXsVZZsunUUKIunVVbjtfF2hjMY3w7MiIwWLthKDWLfqDM7iswt1huvpuxiJ/S22w==
+tenderly@^0.8.0-beta.0:
+  version "0.8.0-beta.0"
+  resolved "https://registry.yarnpkg.com/tenderly/-/tenderly-0.8.0-beta.0.tgz#eacb4e75eb48b726c7f67797f3ee28c44124c0a1"
+  integrity sha512-wFP97SDb9vXJrbYmGr6G4k8OHhwrZMiGnPSFEDKeg+0ZeSP5TAfxvthZ9Iu2hcR3W1b2fsBQFBpCsccYC+E6Bg==
   dependencies:
     axios "^0.27.2"
     cli-table3 "^0.6.2"
