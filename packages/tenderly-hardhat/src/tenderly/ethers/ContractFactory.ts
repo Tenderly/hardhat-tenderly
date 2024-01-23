@@ -60,4 +60,16 @@ export class TdlyContractFactory {
       this.libs,
     );
   }
+
+  public getLibs(): Libraries | undefined {
+    return this.libs;
+  }
+
+  public getContractName(): string {
+    return this.contractName;
+  }
+
+  public getNativeContractFactory(): ContractFactory {
+    return this.nativeContractFactory;
+  }
 }

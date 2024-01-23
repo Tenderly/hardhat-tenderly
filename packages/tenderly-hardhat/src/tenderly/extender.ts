@@ -1,4 +1,5 @@
 import "@nomicfoundation/hardhat-ethers";
+import "@openzeppelin/hardhat-upgrades";
 import { lazyObject } from "hardhat/plugins";
 import { extendConfig, extendEnvironment } from "hardhat/config";
 import {
@@ -17,12 +18,13 @@ import {
 } from "tenderly/common/constants";
 
 import { ethers } from "ethers";
+import { upgrades } from "hardhat";
 import { logger } from "../utils/logger";
 import { Tenderly } from "../Tenderly";
 import { TenderlyNetwork } from "../TenderlyNetwork";
 import { PLUGIN_NAME } from "../constants";
 import { isTenderlyNetworkConfig } from "../utils/util";
-import { wrapEthers } from "./ethers";
+import { wrapEthers, wrapUpgrades } from "./ethers";
 import { wrapHHDeployments } from "./hardhat-deploy";
 
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
@@ -65,6 +67,7 @@ export function setup() {
         "Automatic verification is enabled, proceeding to extend ethers library.",
       );
       extendEthers(hre);
+      extendUpgrades(hre);
       extendHardhatDeploy(hre);
       logger.debug("Wrapping ethers library finished.");
     }
@@ -170,6 +173,26 @@ const extendEthers = (hre: HardhatRuntimeEnvironment): void => {
         hre.ethers as unknown as typeof ethers & HardhatEthersHelpers,
         hre.tenderly,
       ) as unknown as typeof hre.ethers,
+    );
+  }
+};
+
+const extendUpgrades = (hre: HardhatRuntimeEnvironment): void => {
+  if (
+    "upgrades" in hre &&
+    hre.upgrades !== undefined &&
+    hre.upgrades !== null &&
+    "tenderly" in hre &&
+    hre.tenderly !== undefined
+  ) {
+    console.log("extending upgrades.");
+    Object.assign(
+      hre.upgrades,
+      wrapUpgrades(
+        hre,
+        hre.upgrades as unknown as typeof upgrades & HardhatEthersHelpers,
+        hre.tenderly
+      ) as unknown as typeof hre.upgrades
     );
   }
 };

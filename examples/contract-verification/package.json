@@ -21,12 +21,15 @@
     "private:calculator:automatic": "TENDERLY_PRIVATE_VERIFICATION=true TENDERLY_AUTOMATIC_VERIFICATION=true npx hardhat run scripts/calculator/automatic.ts",
     "private:calculator:manual-simple": "TENDERLY_PRIVATE_VERIFICATION=true TENDERLY_AUTOMATIC_VERIFICATION=false npx hardhat run scripts/calculator/manual-simple.ts",
     "private:calculator:manual-advanced": "TENDERLY_PRIVATE_VERIFICATION=true TENDERLY_AUTOMATIC_VERIFICATION=false npx hardhat run scripts/calculator/manual-advanced.ts",
+    "private:voting:manual-simple": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=false npx hardhat run scripts/proxy/voting-logic.ts",
     "fork:greeter:automatic": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=true npx hardhat run scripts/greeter/automatic.ts",
     "fork:greeter:manual-simple": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=false npx hardhat run scripts/greeter/manual-simple.ts",
     "fork:greeter:manual-advanced": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=false npx hardhat run scripts/greeter/manual-advanced-fork.ts",
     "fork:calculator:automatic": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=true npx hardhat run scripts/calculator/automatic.ts",
     "fork:calculator:manual-simple": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=false npx hardhat run scripts/calculator/manual-simple.ts",
-    "fork:calculator:manual-advanced": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=false npx hardhat run scripts/calculator/manual-advanced-fork.ts"
+    "fork:calculator:manual-advanced": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=false npx hardhat run scripts/calculator/manual-advanced-fork.ts",
+    "vnet:voting:manual-simple": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=false npx hardhat run scripts/proxy/voting-logic.ts",
+    "vnet:voting:automatic": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=true npx hardhat run scripts/proxy/voting-logic.ts"
   },
   "devDependencies": {
     "@types/node": "^20.5.7",
@@ -43,8 +46,16 @@
   "dependencies": {
     "@tenderly/hardhat-tenderly": "^2.1.1",
     "@nomicfoundation/hardhat-ethers": "^3.0.0",
-    "ethers": "^6.8.1",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.3",
+    "@openzeppelin/contracts": "^5.0.1",
+    "@openzeppelin/contracts-upgradeable": "^5.0.1",
+    "@openzeppelin/hardhat-upgrades": "^3.0.1",
+    "@openzeppelin/upgrades-core": "^1.32.2",
     "dotenv": "^16.0.1",
+    "ethers": "^6.8.1",
+    "global": "^4.4.0",
+    "global-tunnel-ng": "^2.7.1",
     "hardhat": "^2.19.0"
   }
 }

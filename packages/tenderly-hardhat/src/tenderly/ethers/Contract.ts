@@ -1,4 +1,4 @@
-import { Contract, ContractTransactionReceipt, ethers } from "ethers";
+import { Contract, ethers } from "ethers";
 import { BigNumber } from "@ethersproject/bignumber";
 import { Libraries } from "@nomicfoundation/hardhat-ethers/types";
 
@@ -29,36 +29,28 @@ export class TdlyContract {
         return;
       }
 
-      if (key === "deploymentTransaction") {
-        const deploymentTransaction = nativeContract[key]();
-        if (
-          deploymentTransaction === undefined ||
-          deploymentTransaction === null
-        ) {
-          return;
-        }
-
-        const wait = deploymentTransaction.wait;
-
-        deploymentTransaction.wait = async (
-          confirmations?: number | undefined,
-        ): Promise<null | ContractTransactionReceipt> => {
-          const receipt = await wait(confirmations);
-          if (receipt === undefined || receipt === null) {
-            return null;
-          }
-
-          if (
-            receipt.contractAddress === undefined ||
-            receipt.contractAddress === null
-          ) {
-            return receipt;
-          }
-          await this._tdlyVerify(receipt.contractAddress);
-
-          return receipt;
-        };
-      }
+      // if (key === "deploymentTransaction") {
+      //   const deploymentTransaction = nativeContract[key]();
+      //   if (deploymentTransaction === undefined || deploymentTransaction === null) {
+      //     return;
+      //   }
+      //
+      //   const wait = deploymentTransaction.wait;
+      //
+      //   deploymentTransaction.wait = async (confirmations?: number | undefined): Promise<null | ContractTransactionReceipt> => {
+      //     const receipt = await wait(confirmations);
+      //     if (receipt === undefined || receipt === null) {
+      //       return null;
+      //     }
+      //
+      //     if (receipt.contractAddress === undefined || receipt.contractAddress === null) {
+      //       return receipt;
+      //     }
+      //     await this._tdlyVerify(receipt.contractAddress);
+      //
+      //     return receipt;
+      //   };
+      // }
 
       this[key] = nativeContract[key];
     });
