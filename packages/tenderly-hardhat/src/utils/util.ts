@@ -60,7 +60,7 @@ export const makeVerifyContractsRequest = async (
     }
     logger.trace("Found network is:", networkName);
 
-    let chainId = undefined;
+    let chainId;
     if (isTenderlyNetworkConfig(hre.config.networks[networkName]) && platformID !== undefined) {
       chainId = platformID;
     } else if (hre.network?.config?.chainId !== undefined) {
@@ -133,9 +133,9 @@ async function insertLibraries(
   const copiedCompiler: SolcConfig = {
     version: originalCompiler.version,
     settings: {
-      ...originalCompiler.settings
-    }
-  }
+      ...originalCompiler.settings,
+    },
+  };
   if (libraries === undefined || libraries === null) {
     return copiedCompiler;
   }
@@ -447,8 +447,10 @@ export const isTenderlyNetworkConfig = (nw: NetworkConfig): boolean => {
   // The network belongs to tenderly if the rpc_url is one of the following:
   // - https://rpc.vnet.tenderly.co/devnet/...
   // - https://<network_name>.rpc.tenderly.co/...
+  // - https://virtual.<network_name>.rpc.tenderly.co/...
   // - https://rpc.tenderly.co/...
-  const regex = /^https?:\/\/(?:rpc\.vnet\.tenderly\.co\/devnet\/|(?:[\w-]+\.rpc|rpc)\.tenderly\.co\/).*$/;
+  const regex =
+    /^https?:\/\/(?:rpc\.vnet\.tenderly\.co\/devnet\/|(?:[\w-]+\.rpc|rpc)\.tenderly\.co\/|virtual\.[\w-]+\.rpc\.tenderly\.co\/).*$/;
   return regex.test(nw.url);
 };
 
