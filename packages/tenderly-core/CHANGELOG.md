@@ -1,5 +1,11 @@
 # tenderly
 
+## 0.8.1-beta.0
+
+### Patch Changes
+
+- Extend the recognition of Tenderly networks via the RPC url
+
 ## 0.8.0
 
 ### Minor Changes

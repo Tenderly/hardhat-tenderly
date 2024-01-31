@@ -5,5 +5,7 @@
     "tenderly": "0.8.0",
     "@tenderly/hardhat-tenderly": "2.1.0"
   },
-  "changesets": []
+  "changesets": [
+    "calm-seahorses-heal"
+  ]
 }
