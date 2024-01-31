@@ -1,6 +1,13 @@
 import { HardhatPluginError } from "hardhat/plugins";
-import { HardhatConfig } from "hardhat/src/types/config";
-import { Artifact, CompilationJob, DependencyGraph, HardhatRuntimeEnvironment, SolcConfig } from "hardhat/types";
+import { HardhatConfig, HttpNetworkConfig } from "hardhat/src/types/config";
+import {
+  Artifact,
+  CompilationJob,
+  DependencyGraph,
+  HardhatRuntimeEnvironment,
+  NetworkConfig,
+  SolcConfig,
+} from "hardhat/types";
 import {
   TenderlyContract,
   TenderlyContractConfig,
@@ -44,24 +51,24 @@ export const makeVerifyContractsRequest = async (
       throw err;
     }
 
-    const network = hre.hardhatArguments.network;
-    if (network === undefined) {
+    const networkName = hre.hardhatArguments.network;
+    if (networkName === undefined) {
       logger.error(
         `Error in ${PLUGIN_NAME}: Please provide a network via the hardhat --network argument or directly in the contract`
       );
       return null;
     }
-    logger.trace("Found network is:", network);
+    logger.trace("Found network is:", networkName);
 
-    let chainId = undefined;
-    if (isTenderlyNetworkName(network) && platformID !== undefined) {
+    let chainId;
+    if (isTenderlyNetworkConfig(hre.config.networks[networkName]) && platformID !== undefined) {
       chainId = platformID;
     } else if (hre.network?.config?.chainId !== undefined) {
       chainId = hre.network.config.chainId.toString();
-    } else if (NETWORK_NAME_CHAIN_ID_MAP[network.toLowerCase()] !== undefined) {
-      chainId = NETWORK_NAME_CHAIN_ID_MAP[network.toLowerCase()].toString();
+    } else if (NETWORK_NAME_CHAIN_ID_MAP[networkName.toLowerCase()] !== undefined) {
+      chainId = NETWORK_NAME_CHAIN_ID_MAP[networkName.toLowerCase()].toString();
     }
-    logger.trace(`ChainId for network '${network}' is ${chainId}`);
+    logger.trace(`ChainId for network '${networkName}' is ${chainId}`);
 
     if (chainId === undefined) {
       logger.error(
@@ -126,9 +133,9 @@ async function insertLibraries(
   const copiedCompiler: SolcConfig = {
     version: originalCompiler.version,
     settings: {
-      ...originalCompiler.settings
-    }
-  }
+      ...originalCompiler.settings,
+    },
+  };
   if (libraries === undefined || libraries === null) {
     return copiedCompiler;
   }
@@ -426,8 +433,29 @@ export const extractCompilerVersion = (config: HardhatConfig, sourcePath?: strin
   return config.solidity.compilers[0].version;
 };
 
-export const isTenderlyNetworkName = (name: string): boolean => {
-  return name === "tenderly" || name === "devnet"
+// isTenderlyNetworkConfig checks if a network belongs to tenderly by checking the rpc_url.
+// This is done so the user can put custom network names in the hardhat config and still use them with tenderly.
+// This is also done so the user can use multiple tenderly networks in their hardhat config file.
+export const isTenderlyNetworkConfig = (nw: NetworkConfig): boolean => {
+  if (nw === undefined || nw === null) {
+    return false;
+  }
+  if (!isHttpNetworkConfig(nw)) {
+    return false;
+  }
+
+  // The network belongs to tenderly if the rpc_url is one of the following:
+  // - https://rpc.vnet.tenderly.co/devnet/...
+  // - https://<network_name>.rpc.tenderly.co/...
+  // - https://virtual.<network_name>.rpc.tenderly.co/...
+  // - https://rpc.tenderly.co/...
+  const regex =
+    /^https?:\/\/(?:rpc\.vnet\.tenderly\.co\/devnet\/|(?:[\w-]+\.rpc|rpc)\.tenderly\.co\/|virtual\.[\w-]+\.rpc\.tenderly\.co\/).*$/;
+  return regex.test(nw.url);
+};
+
+function isHttpNetworkConfig(config: NetworkConfig): config is HttpNetworkConfig {
+  return (config as HttpNetworkConfig).url !== undefined;
 }
 
 const determineCompilerConfig = (compilers: SolcConfig[], contractCompiler: string): TenderlyContractConfig => {

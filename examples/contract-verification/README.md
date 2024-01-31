@@ -102,7 +102,7 @@ To run `private` verification of the `Greeter` using `manual-simple` method, you
 
 ```
 yarn run private:greeter:manual-simple --network sepolia
-yarn run fork:calculatr:manual-advanced
+yarn run fork:calculatr:manual-advanced --network my_tenderly_fork_1
 ```
 
-When running against a specific network, you must add `--network <NETWORK_NAME>`. The `fork:` scripts have `--network tenderly` already included.
+When running against a specific network, you must add `--network <NETWORK_NAME>`. 

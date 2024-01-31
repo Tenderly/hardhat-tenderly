@@ -1,4 +1,6 @@
 import * as tdly from "@tenderly/hardhat-tenderly";
+import "@nomicfoundation/hardhat-ethers";
+
 import { HardhatUserConfig } from "hardhat/config";
 import * as dotenv from "dotenv";
 
@@ -16,10 +18,15 @@ dotenv.config();
 
 const config: HardhatUserConfig = {
   solidity: "0.8.17",
-
   networks: {
-    tenderly: {
-      url: `https://rpc.tenderly.co/fork/${process.env.TENDERLY_FORK_ID ?? ""}`,
+    my_tenderly_fork_1: { // or any other name
+      url: `${process.env.TENDERLY_FORK_RPC_URL ?? ""}`,
+    },
+    my_tenderly_devnet_1: { // or any other name
+      url: `${process.env.TENDERLY_DEVNET_RPC_URL_1 ?? ""}`,
+    },
+    my_tenderly_devnet_2: { // or any other name
+      url: `${process.env.TENDERLY_DEVNET_RPC_URL_2 ?? ""}`,
     },
     sepolia: {
       url: `${process.env.SEPOLIA_URL ?? ""}`,
