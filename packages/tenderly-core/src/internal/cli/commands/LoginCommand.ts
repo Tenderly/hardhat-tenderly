@@ -5,37 +5,50 @@ import commander from "commander";
 import { logger } from "../../../utils/logger";
 
 import { isAccessTokenSet, setAccessToken } from "../../../utils/config";
-import { TENDERLY_API_BASE_URL, TENDERLY_DASHBOARD_BASE_URL } from "../../../common/constants";
+import {
+  TENDERLY_API_BASE_URL,
+  TENDERLY_DASHBOARD_BASE_URL,
+} from "../../../common/constants";
 
-export const LoginCommand = new commander.Command("login").description("login to Tenderly").action(async () => {
-  logger.info("Trying to login to Tenderly.");
+export const LoginCommand = new commander.Command("login")
+  .description("login to Tenderly")
+  .action(async () => {
+    logger.info("Trying to login to Tenderly.");
 
-  if (isAccessTokenSet()) {
-    logger.debug("Access token is already set. Checking if access token overwrite is needed.");
-    const response = await prompts({
-      type: "confirm",
-      name: "overwrite",
-      message: "Access token already set. Would you like to overwrite it?",
-    });
-    if (!response.overwrite) {
-      logger.debug("Access token overwrite skipped. Trying to login with the existing token.");
-      return;
+    if (isAccessTokenSet()) {
+      logger.debug(
+        "Access token is already set. Checking if access token overwrite is needed.",
+      );
+      const response = await prompts({
+        type: "confirm",
+        name: "overwrite",
+        message: "Access token already set. Would you like to overwrite it?",
+      });
+      if (!response.overwrite) {
+        logger.debug(
+          "Access token overwrite skipped. Trying to login with the existing token.",
+        );
+        return;
+      }
     }
-  }
 
-  logger.info("Access token not set.");
-  const accessToken = await promptAccessToken();
+    logger.info("Access token not set.");
+    const accessToken = await promptAccessToken();
 
-  logger.debug("Access token accepted. Trying to log in.");
-  setAccessToken(accessToken);
+    logger.debug("Access token accepted. Trying to log in.");
+    setAccessToken(accessToken);
 
-  console.log("Successfully logged in to Tenderly.");
-  logger.info("Successfully logged in to Tenderly.");
-});
+    console.log("Successfully logged in to Tenderly.");
+    logger.info("Successfully logged in to Tenderly.");
+  });
 
 async function promptAccessToken(): Promise<string> {
-  console.log(`Redirecting to ${TENDERLY_DASHBOARD_BASE_URL}/account/authorization`);
-  logger.debug(`Redirecting to ${TENDERLY_DASHBOARD_BASE_URL}/account/authorization`);
+  console.log(
+    `Redirecting to ${TENDERLY_DASHBOARD_BASE_URL}/account/authorization`,
+  );
+  logger.debug(
+    `Redirecting to ${TENDERLY_DASHBOARD_BASE_URL}/account/authorization`,
+  );
   await open(`${TENDERLY_DASHBOARD_BASE_URL}/account/authorization`);
 
   logger.info("Requesting access token.");

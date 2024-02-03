@@ -32,7 +32,7 @@ import { logger } from "./logger";
 export const makeVerifyContractsRequest = async (
   hre: HardhatRuntimeEnvironment,
   flatContracts: ContractByName[],
-  platformID?: string
+  platformID?: string,
 ): Promise<TenderlyVerifyContractsRequest | null> => {
   logger.info("Processing data needed for verification.");
 
@@ -46,7 +46,7 @@ export const makeVerifyContractsRequest = async (
     } catch (err) {
       // TODO(dusan): See how to wrap errors, don't return errors like this
       logger.error(
-        `Error while trying to get compilation job for contract '${flatContract.name}'. The provided contract name probably doesn't exist or is mistyped.`
+        `Error while trying to get compilation job for contract '${flatContract.name}'. The provided contract name probably doesn't exist or is mistyped.`,
       );
       throw err;
     }
@@ -54,30 +54,39 @@ export const makeVerifyContractsRequest = async (
     const networkName = hre.hardhatArguments.network;
     if (networkName === undefined) {
       logger.error(
-        `Error in ${PLUGIN_NAME}: Please provide a network via the hardhat --network argument or directly in the contract`
+        `Error in ${PLUGIN_NAME}: Please provide a network via the hardhat --network argument or directly in the contract`,
       );
       return null;
     }
     logger.trace("Found network is:", networkName);
 
     let chainId;
-    if (isTenderlyNetworkConfig(hre.config.networks[networkName]) && platformID !== undefined) {
+    if (
+      isTenderlyNetworkConfig(hre.config.networks[networkName]) &&
+      platformID !== undefined
+    ) {
       chainId = platformID;
     } else if (hre.network?.config?.chainId !== undefined) {
       chainId = hre.network.config.chainId.toString();
-    } else if (NETWORK_NAME_CHAIN_ID_MAP[networkName.toLowerCase()] !== undefined) {
+    } else if (
+      NETWORK_NAME_CHAIN_ID_MAP[networkName.toLowerCase()] !== undefined
+    ) {
       chainId = NETWORK_NAME_CHAIN_ID_MAP[networkName.toLowerCase()].toString();
     }
     logger.trace(`ChainId for network '${networkName}' is ${chainId}`);
 
     if (chainId === undefined) {
       logger.error(
-        `Error in ${PLUGIN_NAME}: Couldn't identify network. Please provide a chainId in the network config object`
+        `Error in ${PLUGIN_NAME}: Couldn't identify network. Please provide a chainId in the network config object`,
       );
       return null;
     }
 
-    const compiler = await insertLibraries(hre, job.getSolcConfig(), flatContract.libraries);
+    const compiler = await insertLibraries(
+      hre,
+      job.getSolcConfig(),
+      flatContract.libraries,
+    );
 
     contracts.push({
       contractToVerify: flatContract.name,
@@ -102,12 +111,13 @@ export const makeVerifyContractsRequest = async (
 async function extractSources(
   hre: HardhatRuntimeEnvironment,
   contractToVerify: string,
-  job: CompilationJob
+  job: CompilationJob,
 ): Promise<Record<string, TenderlyVerifyContractsSource>> {
   const sources: Record<string, TenderlyVerifyContractsSource> = {};
   logger.info("Extracting sources from compilation job.");
 
-  const mainArtifact: Artifact = hre.artifacts.readArtifactSync(contractToVerify);
+  const mainArtifact: Artifact =
+    hre.artifacts.readArtifactSync(contractToVerify);
   for (const file of job.getResolvedFiles()) {
     let contractName = CONTRACT_NAME_PLACEHOLDER;
     // Only the contract to verify should have its name extracted since we need to attach a network to it.
@@ -127,7 +137,7 @@ async function extractSources(
 async function insertLibraries(
   hre: HardhatRuntimeEnvironment,
   originalCompiler: SolcConfig,
-  libraries: Libraries | undefined
+  libraries: Libraries | undefined,
 ): Promise<SolcConfig> {
   // we need to copy the compiler in order to not modify the hardhat's compiler from the settings
   const copiedCompiler: SolcConfig = {
@@ -140,20 +150,26 @@ async function insertLibraries(
     return copiedCompiler;
   }
 
-  if (copiedCompiler.settings.libraries !== undefined && copiedCompiler.settings.libraries !== null) {
+  if (
+    copiedCompiler.settings.libraries !== undefined &&
+    copiedCompiler.settings.libraries !== null
+  ) {
     throw new Error(
-      `There are multiple definitions of libraries the contract should use. One is defined in the verify request and the other as an compiler config override. Please remove one of them.`
+      `There are multiple definitions of libraries the contract should use. One is defined in the verify request and the other as an compiler config override. Please remove one of them.`,
     );
   }
 
   copiedCompiler.settings.libraries = {};
   for (const [libName, libAddress] of Object.entries(libraries)) {
     const libArtifact: Artifact = hre.artifacts.readArtifactSync(libName);
-    if (copiedCompiler.settings.libraries[libArtifact.sourceName] === undefined) {
+    if (
+      copiedCompiler.settings.libraries[libArtifact.sourceName] === undefined
+    ) {
       copiedCompiler.settings.libraries[libArtifact.sourceName] = {};
     }
 
-    copiedCompiler.settings.libraries[libArtifact.sourceName][libName] = libAddress;
+    copiedCompiler.settings.libraries[libArtifact.sourceName][libName] =
+      libAddress;
   }
 
   return copiedCompiler;
@@ -187,7 +203,9 @@ async function repackLibraries(compiler: SolcConfig): Promise<SolcConfig> {
     return compiler;
   }
   const libraries: any = {};
-  for (const [fileName, libVal] of Object.entries(compiler.settings.libraries)) {
+  for (const [fileName, libVal] of Object.entries(
+    compiler.settings.libraries,
+  )) {
     if (libraries[fileName] === undefined) {
       libraries[fileName] = { addresses: {} };
     }
@@ -202,7 +220,7 @@ async function repackLibraries(compiler: SolcConfig): Promise<SolcConfig> {
 
 export const getCompilationJob = async (
   hre: HardhatRuntimeEnvironment,
-  contractName: string
+  contractName: string,
 ): Promise<CompilationJob> => {
   logger.trace("Getting compilation job for contract:", contractName);
 
@@ -219,11 +237,16 @@ export const getCompilationJob = async (
   });
 };
 
-async function getDependencyGraph(hre: HardhatRuntimeEnvironment): Promise<DependencyGraph> {
+async function getDependencyGraph(
+  hre: HardhatRuntimeEnvironment,
+): Promise<DependencyGraph> {
   const sourcePaths = await hre.run(TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS);
-  const sourceNames: string[] = await hre.run(TASK_COMPILE_SOLIDITY_GET_SOURCE_NAMES, {
-    sourcePaths,
-  });
+  const sourceNames: string[] = await hre.run(
+    TASK_COMPILE_SOLIDITY_GET_SOURCE_NAMES,
+    {
+      sourcePaths,
+    },
+  );
   return hre.run(TASK_COMPILE_SOLIDITY_GET_DEPENDENCY_GRAPH, {
     sourceNames,
   });
@@ -232,7 +255,7 @@ async function getDependencyGraph(hre: HardhatRuntimeEnvironment): Promise<Depen
 export const getCompilerDataFromContracts = (
   contracts: TenderlyContract[],
   flatContracts: ContractByName[],
-  hhConfig: HardhatConfig
+  hhConfig: HardhatConfig,
 ): TenderlyContractConfig | undefined => {
   logger.debug("Obtaining compiler data from contracts.");
 
@@ -246,9 +269,19 @@ export const getCompilerDataFromContracts = (
       }
       logger.trace("Obtaining compiler data from contract:", mainContract.name);
 
-      const contractConfig = newCompilerConfig(hhConfig, contract.sourcePath, contract.compiler?.version);
-      if (config !== null && config !== undefined && !compareConfigs(contractConfig, config)) {
-        logger.error(`Error in ${PLUGIN_NAME}: Different compiler versions provided in same request`);
+      const contractConfig = newCompilerConfig(
+        hhConfig,
+        contract.sourcePath,
+        contract.compiler?.version,
+      );
+      if (
+        config !== null &&
+        config !== undefined &&
+        !compareConfigs(contractConfig, config)
+      ) {
+        logger.error(
+          `Error in ${PLUGIN_NAME}: Different compiler versions provided in same request`,
+        );
         throw new Error("Compiler version mismatch");
       } else {
         config = contractConfig;
@@ -263,7 +296,7 @@ export const getCompilerDataFromContracts = (
 
 export const getContracts = async (
   hre: HardhatRuntimeEnvironment,
-  flatContracts: ContractByName[]
+  flatContracts: ContractByName[],
 ): Promise<TenderlyContract[]> => {
   logger.debug("Processing contracts from the artifacts/ directory.");
 
@@ -286,7 +319,10 @@ export const getContracts = async (
     },
     sources: {},
   };
-  logger.trace("Extracted compiler version is:", metadata.defaultCompiler.version);
+  logger.trace(
+    "Extracted compiler version is:",
+    metadata.defaultCompiler.version,
+  );
 
   data._resolvedFiles.forEach((resolvedFile: any, _: any) => {
     const sourcePath: string = resolvedFile.sourceName;
@@ -341,9 +377,15 @@ export const getContracts = async (
     requestContracts.push(contractToPush);
   }
 
-  logger.silly("Finished processing contracts from the artifacts/ folder:", requestContracts);
+  logger.silly(
+    "Finished processing contracts from the artifacts/ folder:",
+    requestContracts,
+  );
 
-  logger.silly("Finished processing contracts from the artifacts/ folder:", requestContracts);
+  logger.silly(
+    "Finished processing contracts from the artifacts/ folder:",
+    requestContracts,
+  );
 
   return requestContracts;
 };
@@ -352,7 +394,7 @@ export const resolveDependencies = (
   dependencyData: any,
   sourcePath: string,
   metadata: Metadata,
-  visited: Record<string, boolean>
+  visited: Record<string, boolean>,
 ): void => {
   if (visited[sourcePath]) {
     return;
@@ -360,16 +402,26 @@ export const resolveDependencies = (
 
   visited[sourcePath] = true;
 
-  dependencyData._dependenciesPerFile.get(sourcePath).forEach((resolvedDependency: any, _: any) => {
-    resolveDependencies(dependencyData, resolvedDependency.sourceName, metadata, visited);
-    metadata.sources[resolvedDependency.sourceName] = {
-      content: resolvedDependency.content.rawContent,
-      versionPragma: resolvedDependency.content.versionPragmas[0],
-    };
-  });
+  dependencyData._dependenciesPerFile
+    .get(sourcePath)
+    .forEach((resolvedDependency: any, _: any) => {
+      resolveDependencies(
+        dependencyData,
+        resolvedDependency.sourceName,
+        metadata,
+        visited,
+      );
+      metadata.sources[resolvedDependency.sourceName] = {
+        content: resolvedDependency.content.rawContent,
+        versionPragma: resolvedDependency.content.versionPragmas[0],
+      };
+    });
 };
 
-export const compareConfigs = (originalConfig: TenderlyContractConfig, newConfig: TenderlyContractConfig): boolean => {
+export const compareConfigs = (
+  originalConfig: TenderlyContractConfig,
+  newConfig: TenderlyContractConfig,
+): boolean => {
   if (originalConfig.compiler_version !== newConfig.compiler_version) {
     return false;
   }
@@ -388,15 +440,20 @@ export const compareConfigs = (originalConfig: TenderlyContractConfig, newConfig
 export const newCompilerConfig = (
   config: HardhatConfig,
   sourcePath?: string,
-  contractCompiler?: string
+  contractCompiler?: string,
 ): TenderlyContractConfig => {
-  if (sourcePath !== undefined && config.solidity.overrides[sourcePath] !== undefined) {
+  if (
+    sourcePath !== undefined &&
+    config.solidity.overrides[sourcePath] !== undefined
+  ) {
     logger.trace("There is a compiler config override for:", sourcePath);
 
     return {
       compiler_version: config.solidity.overrides[sourcePath].version,
-      optimizations_used: config.solidity.overrides[sourcePath].settings.optimizer.enabled,
-      optimizations_count: config.solidity.overrides[sourcePath].settings.optimizer.runs,
+      optimizations_used:
+        config.solidity.overrides[sourcePath].settings.optimizer.enabled,
+      optimizations_count:
+        config.solidity.overrides[sourcePath].settings.optimizer.runs,
       evm_version: config.solidity.overrides[sourcePath].settings.evmVersion,
       debug: config.solidity.overrides[sourcePath].settings.debug,
     };
@@ -418,8 +475,15 @@ export const newCompilerConfig = (
   };
 };
 
-export const extractCompilerVersion = (config: HardhatConfig, sourcePath?: string, versionPragma?: string): string => {
-  if (sourcePath !== undefined && config.solidity.overrides[sourcePath] !== undefined) {
+export const extractCompilerVersion = (
+  config: HardhatConfig,
+  sourcePath?: string,
+  versionPragma?: string,
+): string => {
+  if (
+    sourcePath !== undefined &&
+    config.solidity.overrides[sourcePath] !== undefined
+  ) {
     return config.solidity.overrides[sourcePath].version;
   }
   if (versionPragma !== undefined) {
@@ -454,11 +518,16 @@ export const isTenderlyNetworkConfig = (nw: NetworkConfig): boolean => {
   return regex.test(nw.url);
 };
 
-function isHttpNetworkConfig(config: NetworkConfig): config is HttpNetworkConfig {
+function isHttpNetworkConfig(
+  config: NetworkConfig,
+): config is HttpNetworkConfig {
   return (config as HttpNetworkConfig).url !== undefined;
 }
 
-const determineCompilerConfig = (compilers: SolcConfig[], contractCompiler: string): TenderlyContractConfig => {
+const determineCompilerConfig = (
+  compilers: SolcConfig[],
+  contractCompiler: string,
+): TenderlyContractConfig => {
   for (const compiler of compilers) {
     if (compareVersions(compiler.version, contractCompiler)) {
       logger.trace("Provided compiler matched the version: ", compiler.version);
@@ -474,7 +543,7 @@ const determineCompilerConfig = (compilers: SolcConfig[], contractCompiler: stri
   }
 
   logger.trace(
-    "Couldn't find the provided compiler among compilers in the configuration, returning the configuration of the first one"
+    "Couldn't find the provided compiler among compilers in the configuration, returning the configuration of the first one",
   );
 
   return {
@@ -486,7 +555,10 @@ const determineCompilerConfig = (compilers: SolcConfig[], contractCompiler: stri
   };
 };
 
-const compareVersions = (compilerVersion: string, contractVersionPragma: string): boolean => {
+const compareVersions = (
+  compilerVersion: string,
+  contractVersionPragma: string,
+): boolean => {
   switch (contractVersionPragma[0]) {
     case "^":
       return checkGTEVersion(compilerVersion, contractVersionPragma.slice(1));
@@ -528,7 +600,10 @@ const compareVersions = (compilerVersion: string, contractVersionPragma: string)
   return false;
 };
 
-const checkGTEVersion = (compilerVersion: string, contractVersionPragma: string) => {
+const checkGTEVersion = (
+  compilerVersion: string,
+  contractVersionPragma: string,
+) => {
   const compilerVersionSplit = compilerVersion.split(".");
   const contractVersionSplit = contractVersionPragma.split(".");
   for (let i = 0; i < compilerVersionSplit.length; i++) {
@@ -543,7 +618,10 @@ const checkGTEVersion = (compilerVersion: string, contractVersionPragma: string)
   return true;
 };
 
-const checkGTVersion = (compilerVersion: string, contractVersionPragma: string) => {
+const checkGTVersion = (
+  compilerVersion: string,
+  contractVersionPragma: string,
+) => {
   const compilerVersionSplit = compilerVersion.split(".");
   const contractVersionSplit = contractVersionPragma.split(".");
   for (let i = 0; i < compilerVersionSplit.length; i++) {
@@ -559,16 +637,22 @@ const checkGTVersion = (compilerVersion: string, contractVersionPragma: string) 
 };
 
 // ------------------------------------------------------------------------------------
-const isGetter = (x: any, name: string): any => ((Object.getOwnPropertyDescriptor(x, name) !== null || {}) as any).get;
-const isFunction = (x: any, name: string): boolean => typeof x[name] === "function";
+const isGetter = (x: any, name: string): any =>
+  ((Object.getOwnPropertyDescriptor(x, name) !== null || {}) as any).get;
+const isFunction = (x: any, name: string): boolean =>
+  typeof x[name] === "function";
 const deepFunctions = (x: any): string[] => {
   if (x && x !== Object.prototype) {
     return Object.getOwnPropertyNames(x)
-      .filter((name: string) => isGetter(x, name) !== null || isFunction(x, name))
+      .filter(
+        (name: string) => isGetter(x, name) !== null || isFunction(x, name),
+      )
       .concat(deepFunctions(Object.getPrototypeOf(x)) ?? []);
   }
   return [];
 };
 const distinctDeepFunctions = (x: any) => Array.from(new Set(deepFunctions(x)));
 export const classFunctions = (x: any) =>
-  distinctDeepFunctions(x).filter((name: string) => name !== "constructor" && name.indexOf("__") === -1);
+  distinctDeepFunctions(x).filter(
+    (name: string) => name !== "constructor" && name.indexOf("__") === -1,
+  );

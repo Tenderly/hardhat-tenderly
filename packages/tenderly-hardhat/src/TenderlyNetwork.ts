@@ -2,7 +2,10 @@ import * as axios from "axios";
 
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { TenderlyService } from "tenderly";
-import { TenderlyForkContractUploadRequest, TenderlyVerifyContractsRequest } from "tenderly/types";
+import {
+  TenderlyForkContractUploadRequest,
+  TenderlyVerifyContractsRequest,
+} from "tenderly/types";
 import { getConfig, writeConfig } from "tenderly/utils/config";
 import { TENDERLY_JSON_RPC_BASE_URL } from "tenderly/common/constants";
 
@@ -10,7 +13,11 @@ import { convertToLogCompliantForkInitializeResponse } from "tenderly/utils/log-
 import { PLUGIN_NAME } from "./constants";
 import { ContractByName } from "./tenderly/types";
 import { NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG } from "./tenderly/errors";
-import { getCompilerDataFromContracts, getContracts, isTenderlyNetworkConfig } from "./utils/util";
+import {
+  getCompilerDataFromContracts,
+  getContracts,
+  isTenderlyNetworkConfig,
+} from "./utils/util";
 import { logger } from "./utils/logger";
 
 export class TenderlyNetwork {
@@ -23,7 +30,6 @@ export class TenderlyNetwork {
   public accounts: Record<string, string> | undefined;
   public env: HardhatRuntimeEnvironment;
   public devnetID: string | undefined;
-
 
   private tenderlyService = new TenderlyService(PLUGIN_NAME);
 
@@ -45,7 +51,7 @@ export class TenderlyNetwork {
       "url" in hre.network.config &&
       hre.network.config.url !== undefined
     ) {
-      if(hre.network.config.url.includes("devnet")) {
+      if (hre.network.config.url.includes("devnet")) {
         this.devnetID = hre.network.config.url.split("/").pop();
         logger.info("Devnet ID is:", this.devnetID);
       } else {
@@ -115,7 +121,7 @@ export class TenderlyNetwork {
         this.devnetID,
         this.env.config.tenderly.accessKey,
       );
-      return
+      return;
     }
 
     if (this.head === undefined && this.forkID === undefined) {
@@ -127,7 +133,7 @@ export class TenderlyNetwork {
       requestData,
       this.env.config.tenderly.project,
       this.env.config.tenderly.username,
-      this.forkID!
+      this.forkID!,
     );
   }
 
@@ -135,14 +141,14 @@ export class TenderlyNetwork {
     request: TenderlyVerifyContractsRequest,
     tenderlyProject: string,
     username: string,
-    forkID: string
+    forkID: string,
   ) {
     logger.info("Invoked fork verification via API.");
     await this.tenderlyService.verifyForkContractsMultiCompiler(
-      request, 
-      tenderlyProject, 
-      username, 
-      forkID
+      request,
+      tenderlyProject,
+      username,
+      forkID,
     );
   }
 
@@ -150,7 +156,7 @@ export class TenderlyNetwork {
     request: TenderlyVerifyContractsRequest,
     tenderlyProject: string,
     username: string,
-    devnetID: string
+    devnetID: string,
   ) {
     logger.info("Invoked devnet verification via API.");
     await this.tenderlyService.verifyDevnetContractsMultiCompiler(
@@ -165,10 +171,15 @@ export class TenderlyNetwork {
     request: TenderlyForkContractUploadRequest,
     tenderlyProject: string,
     username: string,
-    forkID: string
+    forkID: string,
   ) {
     logger.info("Invoked fork verification via API.");
-    await this.tenderlyService.verifyForkContracts(request, tenderlyProject, username, forkID);
+    await this.tenderlyService.verifyForkContracts(
+      request,
+      tenderlyProject,
+      username,
+      forkID,
+    );
   }
 
   public getHead(): string | undefined {
@@ -207,19 +218,27 @@ export class TenderlyNetwork {
       return;
     }
     if (this.env.config.tenderly?.forkNetwork === undefined) {
-      logger.error("There is no information about the fork network. Fork won't be initialized");
+      logger.error(
+        "There is no information about the fork network. Fork won't be initialized",
+      );
       return;
     }
 
     const username: string = this.env.config.tenderly.username;
     const projectID: string = this.env.config.tenderly.project;
-    logger.trace("ProjectID obtained from tenderly configuration:", { projectID });
+    logger.trace("ProjectID obtained from tenderly configuration:", {
+      projectID,
+    });
 
     try {
-      const resp = await this.tenderlyJsonRpc.post(`/account/${username}/project/${projectID}/fork`, {
-        network_id: this.env.config.tenderly.forkNetwork,
-      });
-      const logCompliantInitializeForkResponse = convertToLogCompliantForkInitializeResponse(resp);
+      const resp = await this.tenderlyJsonRpc.post(
+        `/account/${username}/project/${projectID}/fork`,
+        {
+          network_id: this.env.config.tenderly.forkNetwork,
+        },
+      );
+      const logCompliantInitializeForkResponse =
+        convertToLogCompliantForkInitializeResponse(resp);
       logger.trace("Initialized fork:", logCompliantInitializeForkResponse);
 
       this.head = resp.data.root_transaction.id;
@@ -245,25 +264,35 @@ export class TenderlyNetwork {
     writeConfig(tdlyGlobalConfig);
   }
 
-  private async _filterContracts(flatContracts: ContractByName[]): Promise<TenderlyForkContractUploadRequest | null> {
+  private async _filterContracts(
+    flatContracts: ContractByName[],
+  ): Promise<TenderlyForkContractUploadRequest | null> {
     logger.info("Processing data needed for fork verification.");
 
     let contract: ContractByName;
     let requestData: TenderlyForkContractUploadRequest;
     try {
       requestData = await this._getForkContractData(flatContracts);
-      logger.silly("Obtained request data needed for fork verification:", requestData);
+      logger.silly(
+        "Obtained request data needed for fork verification:",
+        requestData,
+      );
     } catch (e) {
-      logger.error("Caught and error while trying to obtain data needed for fork verification", e);
+      logger.error(
+        "Caught and error while trying to obtain data needed for fork verification",
+        e,
+      );
       return null;
     }
 
     for (contract of flatContracts) {
       const index = requestData.contracts.findIndex(
-        (requestContract) => requestContract.contractName === contract.name
+        (requestContract) => requestContract.contractName === contract.name,
       );
       if (index === -1) {
-        logger.error(`Couldn't find a contract '${contract.name}' among the obtained request data.`);
+        logger.error(
+          `Couldn't find a contract '${contract.name}' among the obtained request data.`,
+        );
         continue;
       }
 
@@ -280,15 +309,23 @@ export class TenderlyNetwork {
     return requestData;
   }
 
-  private async _getForkContractData(flatContracts: ContractByName[]): Promise<TenderlyForkContractUploadRequest> {
+  private async _getForkContractData(
+    flatContracts: ContractByName[],
+  ): Promise<TenderlyForkContractUploadRequest> {
     logger.trace("Getting contract data needed for fork verification.");
 
     const contracts = await getContracts(this.env, flatContracts);
     if (contracts.length === 0) {
-      throw new Error("Fork verification failed due to bad processing of data in /artifacts folder.");
+      throw new Error(
+        "Fork verification failed due to bad processing of data in /artifacts folder.",
+      );
     }
 
-    const solcConfig = getCompilerDataFromContracts(contracts, flatContracts, this.env.config);
+    const solcConfig = getCompilerDataFromContracts(
+      contracts,
+      flatContracts,
+      this.env.config,
+    );
     if (solcConfig === undefined) {
       logger.error(NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG);
     }
@@ -303,7 +340,7 @@ export class TenderlyNetwork {
   private _checkNetwork(): boolean {
     if (!isTenderlyNetworkConfig(this.env.network.config)) {
       logger.error(
-        `Warning in ${PLUGIN_NAME}: Network is not set to 'tenderly'. Please call the task again with --network tenderly`
+        `Warning in ${PLUGIN_NAME}: Network is not set to 'tenderly'. Please call the task again with --network tenderly`,
       );
       return false;
     }

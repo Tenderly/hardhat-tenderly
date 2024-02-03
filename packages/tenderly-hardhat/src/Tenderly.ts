@@ -13,7 +13,10 @@ import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";
 import { logger } from "./utils/logger";
 
 import { ContractByName, Metadata } from "./tenderly/types";
-import { CONTRACTS_NOT_DETECTED, NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG } from "./tenderly/errors";
+import {
+  CONTRACTS_NOT_DETECTED,
+  NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG,
+} from "./tenderly/errors";
 import {
   extractCompilerVersion,
   getCompilerDataFromContracts,
@@ -43,9 +46,15 @@ export class Tenderly {
   public async verify(...contracts: any[]): Promise<void> {
     logger.info("Verification invoked.");
 
-    const flatContracts: ContractByName[] = contracts.reduce((accumulator, value) => accumulator.concat(value), []);
+    const flatContracts: ContractByName[] = contracts.reduce(
+      (accumulator, value) => accumulator.concat(value),
+      [],
+    );
     const verificationType = this._getVerificationType();
-    const platformID = verificationType === VERIFICATION_TYPES.FORK ? this.tenderlyNetwork.forkID : this.tenderlyNetwork.devnetID
+    const platformID =
+      verificationType === VERIFICATION_TYPES.FORK
+        ? this.tenderlyNetwork.forkID
+        : this.tenderlyNetwork.devnetID;
 
     const requestData = await makeVerifyContractsRequest(
       this.env,
@@ -53,24 +62,30 @@ export class Tenderly {
       platformID,
     );
     if (requestData === null) {
-      logger.error("Verification failed due to bad processing of the data in /artifacts directory.");
+      logger.error(
+        "Verification failed due to bad processing of the data in /artifacts directory.",
+      );
       return;
     }
     if (this._isVerificationOnPlatform(verificationType)) {
-      logger.info(`Network parameter is set to '${this.getNetworkName()}', redirecting to ${verificationType} verification.`);
+      logger.info(
+        `Network parameter is set to '${this.getNetworkName()}', redirecting to ${verificationType} verification.`,
+      );
       await this._throwIfUsernameOrProjectNotSet();
 
       return this.tenderlyNetwork.verify(requestData);
     }
 
     if (verificationType === VERIFICATION_TYPES.PRIVATE) {
-      logger.info("Private verification flag is set to true, redirecting to private verification.");
+      logger.info(
+        "Private verification flag is set to true, redirecting to private verification.",
+      );
       await this._throwIfUsernameOrProjectNotSet();
 
       return this.tenderlyService.pushContractsMultiCompiler(
         requestData,
         this.env.config.tenderly.project,
-        this.env.config.tenderly.username
+        this.env.config.tenderly.username,
       );
     }
 
@@ -78,40 +93,44 @@ export class Tenderly {
     return this.tenderlyService.verifyContractsMultiCompiler(requestData);
   }
 
-  public async verifyMultiCompilerAPI(request: TenderlyVerifyContractsRequest): Promise<void> {
+  public async verifyMultiCompilerAPI(
+    request: TenderlyVerifyContractsRequest,
+  ): Promise<void> {
     logger.info("Invoked verification (multi compiler version) through API.");
     logger.trace("Request data:", request);
 
     switch (this._getVerificationType()) {
       case VERIFICATION_TYPES.FORK:
         logger.error(
-          `Error in ${PLUGIN_NAME}: Network parameter is set to 'tenderly' and verifyMultiCompilerAPI() is not available for fork deployments, please use verifyForkAPI().`
+          `Error in ${PLUGIN_NAME}: Network parameter is set to 'tenderly' and verifyMultiCompilerAPI() is not available for fork deployments, please use verifyForkAPI().`,
         );
         break;
       case VERIFICATION_TYPES.DEVNET:
         logger.error(
-          `Error in ${PLUGIN_NAME}: Network parameter is set to '${this.getNetworkName()}' and verifyMultiCompilerAPI() is not available for devnet deployments`
+          `Error in ${PLUGIN_NAME}: Network parameter is set to '${this.getNetworkName()}' and verifyMultiCompilerAPI() is not available for devnet deployments`,
         );
         break;
       case VERIFICATION_TYPES.PRIVATE:
         if (this.env.config.tenderly?.project === undefined) {
           logger.error(
-            `Error in ${PLUGIN_NAME}: Please provide the project field in the tenderly object in hardhat.config.js`
+            `Error in ${PLUGIN_NAME}: Please provide the project field in the tenderly object in hardhat.config.js`,
           );
           return;
         }
         if (this.env.config.tenderly?.username === undefined) {
           logger.error(
-            `Error in ${PLUGIN_NAME}: Please provide the username field in the tenderly object in hardhat.config.js`
+            `Error in ${PLUGIN_NAME}: Please provide the username field in the tenderly object in hardhat.config.js`,
           );
           return;
         }
 
-        logger.info("Private verification flag is set to true, redirecting to private verification.");
+        logger.info(
+          "Private verification flag is set to true, redirecting to private verification.",
+        );
         await this.tenderlyService.pushContractsMultiCompiler(
           request,
           this.env.config.tenderly.project,
-          this.env.config.tenderly.username
+          this.env.config.tenderly.username,
         );
         break;
       case VERIFICATION_TYPES.PUBLIC:
@@ -125,36 +144,50 @@ export class Tenderly {
     request: TenderlyVerifyContractsRequest,
     tenderlyProject: string,
     username: string,
-    forkID: string
+    forkID: string,
   ): Promise<void> {
-    logger.info("Invoked fork verification through API request. (Multi compiler version)");
+    logger.info(
+      "Invoked fork verification through API request. (Multi compiler version)",
+    );
     if (!isTenderlyNetworkConfig(this.env.network.config)) {
       logger.error(
-        `Error in ${PLUGIN_NAME}: Network parameter is not set to 'tenderly' and verifyForkAPI() is only available for tenderly fork deployments, please use --network tenderly.`
+        `Error in ${PLUGIN_NAME}: Network parameter is not set to 'tenderly' and verifyForkAPI() is only available for tenderly fork deployments, please use --network tenderly.`,
       );
       return;
     }
     await this._throwIfUsernameOrProjectNotSet();
 
-    await this.tenderlyNetwork.verifyMultiCompilerAPI(request, tenderlyProject, username, forkID);
+    await this.tenderlyNetwork.verifyMultiCompilerAPI(
+      request,
+      tenderlyProject,
+      username,
+      forkID,
+    );
   }
 
   public async verifyDevnetMultiCompilerAPI(
     request: TenderlyVerifyContractsRequest,
     tenderlyProject: string,
     username: string,
-    devnetID: string
+    devnetID: string,
   ): Promise<void> {
-    logger.info("Invoked devnet verification through API request. (Multi compiler version)");
+    logger.info(
+      "Invoked devnet verification through API request. (Multi compiler version)",
+    );
     if (!isTenderlyNetworkConfig(this.env.network.config)) {
       logger.error(
-        `Error in ${PLUGIN_NAME}: Network parameter is not set to 'devnet' and verifyDevnetMultiCompilerAPI() is only available for tenderly devnet deployments, please use --network devnet.`
+        `Error in ${PLUGIN_NAME}: Network parameter is not set to 'devnet' and verifyDevnetMultiCompilerAPI() is only available for tenderly devnet deployments, please use --network devnet.`,
       );
       return;
     }
     await this._throwIfUsernameOrProjectNotSet();
 
-    await this.tenderlyNetwork.verifyDevnetMultiCompilerAPI(request, tenderlyProject, username, devnetID);
+    await this.tenderlyNetwork.verifyDevnetMultiCompilerAPI(
+      request,
+      tenderlyProject,
+      username,
+      devnetID,
+    );
   }
 
   public network(): TenderlyNetwork {
@@ -162,7 +195,7 @@ export class Tenderly {
   }
 
   public getNetworkName(): string {
-    return this.env.network.name
+    return this.env.network.name;
   }
 
   public setNetwork(network: TenderlyNetwork): TenderlyNetwork {
@@ -174,11 +207,17 @@ export class Tenderly {
 
   private _getVerificationType(): string {
     if (isTenderlyNetworkConfig(this.env.network.config)) {
-      return this.tenderlyNetwork.devnetID !== undefined ? VERIFICATION_TYPES.DEVNET : VERIFICATION_TYPES.FORK
+      return this.tenderlyNetwork.devnetID !== undefined
+        ? VERIFICATION_TYPES.DEVNET
+        : VERIFICATION_TYPES.FORK;
     }
 
     const priv = this.env.config.tenderly?.privateVerification;
-    if (priv !== undefined && priv && !isTenderlyNetworkConfig(this.env.network.config)) {
+    if (
+      priv !== undefined &&
+      priv &&
+      !isTenderlyNetworkConfig(this.env.network.config)
+    ) {
       return VERIFICATION_TYPES.PRIVATE;
     }
 
@@ -192,28 +231,30 @@ export class Tenderly {
   private async _throwIfUsernameOrProjectNotSet(): Promise<void> {
     if (this.env.config.tenderly?.project === undefined) {
       throw Error(
-        `Error in ${PLUGIN_NAME}: Please provide the project field in the tenderly object in hardhat.config.js`
+        `Error in ${PLUGIN_NAME}: Please provide the project field in the tenderly object in hardhat.config.js`,
       );
     }
     if (this.env.config.tenderly?.username === undefined) {
       throw Error(
-        `Error in ${PLUGIN_NAME}: Please provide the username field in the tenderly object in hardhat.config.js`
+        `Error in ${PLUGIN_NAME}: Please provide the username field in the tenderly object in hardhat.config.js`,
       );
     }
   }
 
-  public async verifyAPI(request: TenderlyContractUploadRequest): Promise<void> {
+  public async verifyAPI(
+    request: TenderlyContractUploadRequest,
+  ): Promise<void> {
     logger.info("Invoked public verification through API request.");
 
     if (isTenderlyNetworkConfig(this.env.network.config)) {
-      if (this._getVerificationType() === VERIFICATION_TYPES.DEVNET){
+      if (this._getVerificationType() === VERIFICATION_TYPES.DEVNET) {
         logger.error(
-          `Error in ${PLUGIN_NAME}: Network parameter is set to '${this.getNetworkName()}' and verifyAPI() is not available for devnet deployments.`
+          `Error in ${PLUGIN_NAME}: Network parameter is set to '${this.getNetworkName()}' and verifyAPI() is not available for devnet deployments.`,
         );
-        return
+        return;
       }
       logger.error(
-        `Error in ${PLUGIN_NAME}: Network parameter is set to 'tenderly' and verifyAPI() is not available for fork deployments, please use verifyForkAPI().`
+        `Error in ${PLUGIN_NAME}: Network parameter is set to 'tenderly' and verifyAPI() is not available for fork deployments, please use verifyForkAPI().`,
       );
       return;
     }
@@ -225,40 +266,49 @@ export class Tenderly {
     request: TenderlyForkContractUploadRequest,
     tenderlyProject: string,
     username: string,
-    forkID: string
+    forkID: string,
   ): Promise<void> {
     logger.info("Invoked fork verification through API request.");
     if (this.env.network.name !== "tenderly") {
       logger.error(
-        `Error in ${PLUGIN_NAME}: Network parameter is not set to 'tenderly' and verifyForkAPI() is only available for tenderly fork deployments, please use --network tenderly.`
+        `Error in ${PLUGIN_NAME}: Network parameter is not set to 'tenderly' and verifyForkAPI() is only available for tenderly fork deployments, please use --network tenderly.`,
       );
       return;
     }
 
-    await this.tenderlyNetwork.verifyAPI(request, tenderlyProject, username, forkID);
+    await this.tenderlyNetwork.verifyAPI(
+      request,
+      tenderlyProject,
+      username,
+      forkID,
+    );
   }
 
   public async pushAPI(
     request: TenderlyContractUploadRequest,
     tenderlyProject: string,
-    username: string
+    username: string,
   ): Promise<void> {
     logger.info("Invoked pushing contracts through API.");
 
     if (isTenderlyNetworkConfig(this.env.network.config)) {
-      if (this._getVerificationType() === VERIFICATION_TYPES.DEVNET){
+      if (this._getVerificationType() === VERIFICATION_TYPES.DEVNET) {
         logger.error(
-          `Error in ${PLUGIN_NAME}: Network parameter is set to '${this.getNetworkName()}' and pushAPI() is not available for devnet deployments.`
+          `Error in ${PLUGIN_NAME}: Network parameter is set to '${this.getNetworkName()}' and pushAPI() is not available for devnet deployments.`,
         );
-        return
+        return;
       }
       logger.error(
-        `Error in ${PLUGIN_NAME}: Network parameter is set to 'tenderly' and pushAPI() is not available for fork deployments, please use verifyForkAPI().`
+        `Error in ${PLUGIN_NAME}: Network parameter is set to 'tenderly' and pushAPI() is not available for fork deployments, please use verifyForkAPI().`,
       );
       return;
     }
 
-    await this.tenderlyService.pushContracts(request, tenderlyProject, username);
+    await this.tenderlyService.pushContracts(
+      request,
+      tenderlyProject,
+      username,
+    );
   }
 
   public async persistArtifacts(...contracts: ContractByName[]) {
@@ -269,7 +319,10 @@ export class Tenderly {
     }
 
     const sourcePaths = await this.env.run("compile:solidity:get-source-paths");
-    const sourceNames = await this.env.run("compile:solidity:get-source-names", { sourcePaths });
+    const sourceNames = await this.env.run(
+      "compile:solidity:get-source-names",
+      { sourcePaths },
+    );
     const data = await this.env.run("compile:solidity:get-dependency-graph", {
       sourceNames,
     });
@@ -296,11 +349,12 @@ export class Tenderly {
               : contract.network;
           if (network === undefined) {
             console.log(
-              `Error in ${PLUGIN_NAME}: Please provide a network via the hardhat --network argument or directly in the contract`
+              `Error in ${PLUGIN_NAME}: Please provide a network via the hardhat --network argument or directly in the contract`,
             );
             continue;
           }
-          let chainID: string = NETWORK_NAME_CHAIN_ID_MAP[network!.toLowerCase()];
+          let chainID: string =
+            NETWORK_NAME_CHAIN_ID_MAP[network!.toLowerCase()];
           if (this.env.config.networks[network!].chainId !== undefined) {
             chainID = this.env.config.networks[network!].chainId!.toString();
           }
@@ -308,10 +362,13 @@ export class Tenderly {
           if (chainID === undefined) {
             chainID = DEFAULT_CHAIN_ID;
           }
-          const deploymentsFolder = this.env.config?.tenderly?.deploymentsDir ?? "deployments";
+          const deploymentsFolder =
+            this.env.config?.tenderly?.deploymentsDir ?? "deployments";
           const destPath = `${deploymentsFolder}${sep}${network!.toLowerCase()}_${chainID}${sep}`;
           const contractDataPath = `${this.env.config.paths.artifacts}${sep}${sourcePath}${sep}${name}.json`;
-          const contractData = JSON.parse(fs.readFileSync(contractDataPath).toString());
+          const contractData = JSON.parse(
+            fs.readFileSync(contractDataPath).toString(),
+          );
 
           const metadata: Metadata = {
             defaultCompiler: {
@@ -339,13 +396,18 @@ export class Tenderly {
 
           logger.trace("Processed artifact: ", artifact);
 
-          fs.outputFileSync(`${destPath}${name}.json`, JSON.stringify(artifact));
+          fs.outputFileSync(
+            `${destPath}${name}.json`,
+            JSON.stringify(artifact),
+          );
         }
       }
     });
   }
 
-  private async _filterContracts(flatContracts: ContractByName[]): Promise<TenderlyContractUploadRequest | null> {
+  private async _filterContracts(
+    flatContracts: ContractByName[],
+  ): Promise<TenderlyContractUploadRequest | null> {
     logger.info("Processing data needed for verification.");
 
     let contract: ContractByName;
@@ -354,7 +416,10 @@ export class Tenderly {
       requestData = await this._getContractData(flatContracts);
       logger.silly("Processed request data:", requestData);
     } catch (e) {
-      logger.error("Error caught while trying to process contracts by name: ", e);
+      logger.error(
+        "Error caught while trying to process contracts by name: ",
+        e,
+      );
       return null;
     }
 
@@ -365,17 +430,19 @@ export class Tenderly {
           : contract.network;
       if (network === undefined) {
         logger.error(
-          `Error in ${PLUGIN_NAME}: Please provide a network via the hardhat --network argument or directly in the contract`
+          `Error in ${PLUGIN_NAME}: Please provide a network via the hardhat --network argument or directly in the contract`,
         );
         return null;
       }
       logger.trace("Found network is:", network);
 
       const index = requestData.contracts.findIndex(
-        (requestContract) => requestContract.contractName === contract.name
+        (requestContract) => requestContract.contractName === contract.name,
       );
       if (index === -1) {
-        logger.error(`Contract '${contract.name}' was not found among the contracts in /artifacts.`);
+        logger.error(
+          `Contract '${contract.name}' was not found among the contracts in /artifacts.`,
+        );
         continue;
       }
       let chainID: string = NETWORK_NAME_CHAIN_ID_MAP[network!.toLowerCase()];
@@ -386,7 +453,7 @@ export class Tenderly {
 
       if (chainID === undefined) {
         logger.error(
-          `Error in ${PLUGIN_NAME}: Couldn't identify network. Please provide a chainId in the network config object`
+          `Error in ${PLUGIN_NAME}: Couldn't identify network. Please provide a chainId in the network config object`,
         );
         return null;
       }
@@ -403,10 +470,16 @@ export class Tenderly {
     return requestData;
   }
 
-  private async _getContractData(flatContracts: ContractByName[]): Promise<TenderlyContractUploadRequest> {
+  private async _getContractData(
+    flatContracts: ContractByName[],
+  ): Promise<TenderlyContractUploadRequest> {
     const contracts = await getContracts(this.env, flatContracts);
 
-    const config = getCompilerDataFromContracts(contracts, flatContracts, this.env.config);
+    const config = getCompilerDataFromContracts(
+      contracts,
+      flatContracts,
+      this.env.config,
+    );
     if (config === undefined) {
       logger.error(NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG);
     }
@@ -417,6 +490,9 @@ export class Tenderly {
     };
   }
   private _isVerificationOnPlatform(verificationType: string): boolean {
-    return verificationType === VERIFICATION_TYPES.DEVNET || verificationType === VERIFICATION_TYPES.FORK
+    return (
+      verificationType === VERIFICATION_TYPES.DEVNET ||
+      verificationType === VERIFICATION_TYPES.FORK
+    );
   }
 }

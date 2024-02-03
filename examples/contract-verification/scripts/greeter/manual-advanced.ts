@@ -5,7 +5,9 @@ import { ethers, tenderly } from "hardhat";
 export async function main() {
   console.log("🖖🏽[ethers] Deploying and Verifying Greeter in Tenderly");
   // deploy stuff but later pretend it's been deployed ages ago on Ropsten.
-  let greeter = await ethers.deployContract("Greeter", ["Hello, Manual Hardhat!"]);
+  let greeter = await ethers.deployContract("Greeter", [
+    "Hello, Manual Hardhat!",
+  ]);
 
   greeter = await greeter.waitForDeployment();
   const greeterAddress = await greeter.getAddress();
@@ -26,7 +28,10 @@ export async function main() {
           },
           "hardhat/console.sol": {
             name: "console",
-            code: readFileSync("node_modules/hardhat/console.sol", "utf-8").toString(),
+            code: readFileSync(
+              "node_modules/hardhat/console.sol",
+              "utf-8",
+            ).toString(),
           },
         },
         // solidity format compiler with a little modification at libraries param

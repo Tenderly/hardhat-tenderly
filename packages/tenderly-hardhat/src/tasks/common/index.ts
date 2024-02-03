@@ -13,7 +13,7 @@ export async function extractContractData(
   contracts: string[],
   network: string | undefined,
   config: HardhatConfig,
-  run: RunTaskFunction
+  run: RunTaskFunction,
 ): Promise<TenderlyContract[]> {
   logger.info("Extracting contract data.");
 
@@ -87,7 +87,7 @@ export async function extractContractData(
         }
         if (chainID === undefined) {
           logger.error(
-            `Error in ${PLUGIN_NAME}: Couldn't identify network. Please provide a chainID in the network config object`
+            `Error in ${PLUGIN_NAME}: Couldn't identify network. Please provide a chainID in the network config object`,
           );
           return [];
         }

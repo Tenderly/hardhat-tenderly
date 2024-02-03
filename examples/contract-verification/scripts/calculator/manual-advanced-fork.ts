@@ -5,7 +5,8 @@ import { HttpNetworkConfig } from "hardhat/types";
 import { deployCalculator, deployMaths } from "./maths-deployment-ethers";
 
 export async function main() {
-  const forkID = `${(network.config as HttpNetworkConfig).url}`.split("/").pop() ?? "";
+  const forkID =
+    `${(network.config as HttpNetworkConfig).url}`.split("/").pop() ?? "";
 
   // 📐 Maths
   const mathsAddress = await deployMaths();
@@ -26,15 +27,24 @@ export async function main() {
           sources: {
             "contracts/Calculator.sol": {
               name: "Calculator",
-              code: readFileSync("contracts/Calculator.sol", "utf-8").toString(),
+              code: readFileSync(
+                "contracts/Calculator.sol",
+                "utf-8",
+              ).toString(),
             },
             "hardhat/console.sol": {
               name: "console",
-              code: readFileSync("node_modules/hardhat/console.sol", "utf-8").toString(),
+              code: readFileSync(
+                "node_modules/hardhat/console.sol",
+                "utf-8",
+              ).toString(),
             },
             "contracts/libraries/Maths.sol": {
               name: "Maths",
-              code: readFileSync("contracts/libraries/Maths.sol", "utf-8").toString(),
+              code: readFileSync(
+                "contracts/libraries/Maths.sol",
+                "utf-8",
+              ).toString(),
             },
           },
           // solidity format compiler with a little modification at libraries param
@@ -66,7 +76,7 @@ export async function main() {
     },
     process.env.TENDERLY_PROJECT ?? "",
     process.env.TENDERLY_USERNAME ?? "",
-    forkID
+    forkID,
   );
 }
 

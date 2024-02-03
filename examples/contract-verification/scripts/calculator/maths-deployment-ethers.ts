@@ -20,6 +20,9 @@ export async function deployCalculator(mathsAddress: string) {
   });
   calculator = await calculator.waitForDeployment();
 
-  console.log("🧮[ethers] {Calculator} deployed to", await calculator.getAddress());
+  console.log(
+    "🧮[ethers] {Calculator} deployed to",
+    await calculator.getAddress(),
+  );
   return await calculator.getAddress();
 }
