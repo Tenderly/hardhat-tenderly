@@ -1,4 +1,8 @@
-import { deployTransparentUpgradeableProxy, deployUUPSProxy, deployBeaconProxy } from "./deployment";
+import {
+  deployTransparentUpgradeableProxy,
+  deployUUPSProxy,
+  deployBeaconProxy,
+} from "./deployment";
 
 export async function main() {
   // TransparentUpgradeableProxy
