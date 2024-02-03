@@ -1040,7 +1040,7 @@
   resolved "https://registry.yarnpkg.com/@solidity-parser/parser/-/parser-0.18.0.tgz#8e77a02a09ecce957255a2f48c9a7178ec191908"
   integrity sha512-yfORGUIPgLck41qyN7nbwJRAx17/jAIXCTanHOJZhB6PJ1iAk/84b/xlsVKFSyNyLXIj0dhppoE0+CRws7wlzA==
 
-"@tenderly/hardhat-tenderly@^2.1.0":
+"@tenderly/hardhat-tenderly@^2.1.1":
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/@tenderly/hardhat-tenderly/-/hardhat-tenderly-2.1.1.tgz#b79e271ee7de9309e58533785c2e417ec8e09cd1"
   integrity sha512-AnOllhGfqtEzyZLzRgli90JRV3Eq/qAsogtcHxZwAczgI33UzqfRn6Lz/RAd+FBsLqntsWNJ7SWJ7s+aBna2Tw==

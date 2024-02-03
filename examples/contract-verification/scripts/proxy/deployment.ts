@@ -10,25 +10,27 @@ export {
   deployBeaconProxy,
 };
 
-async function deployTransparentUpgradeableProxy() {
+async function deployTransparentUpgradeableProxy(): Promise<string> {
   console.log(
     "🖖🏽[ethers] Deploying TransparentUpgradeableProxy with VotingLogic as implementation on Tenderly.",
   );
 
   const VotingLogic = await ethers.getContractFactory("VotingLogic");
-  let votingLogic = await upgrades.deployProxy(VotingLogic);
-  votingLogic = await votingLogic.waitForDeployment();
+  let proxyContract = await upgrades.deployProxy(VotingLogic);
+  proxyContract = await proxyContract.waitForDeployment();
 
-  const votingLogicAddress = await votingLogic.getAddress();
+  const proxyAddress = await proxyContract.getAddress();
 
-  console.log("VotingLogic proxy deployed to:", votingLogicAddress);
+  console.log("VotingLogic proxy deployed to:", proxyAddress);
   console.log(
     "VotingLogic impl deployed to:",
-    await getImplementationAddress(ethers.provider, votingLogicAddress),
+    await getImplementationAddress(ethers.provider, proxyAddress),
   );
+
+  return proxyAddress;
 }
 
-async function deployUUPSProxy() {
+async function deployUUPSProxy(): Promise<string> {
   console.log(
     "🖖🏽[ethers] Deploying UUPSProxy with VotingLogic as implementation on Tenderly.",
   );
@@ -36,29 +38,23 @@ async function deployUUPSProxy() {
   const VotingLogicUpgradeable = await ethers.getContractFactory(
     "VotingLogicUpgradeable",
   );
-  let votingLogicUpgradeable = await upgrades.deployProxy(
-    VotingLogicUpgradeable,
-    { kind: "uups" },
-  );
-  votingLogicUpgradeable = await votingLogicUpgradeable.waitForDeployment();
+  let proxyContract = await upgrades.deployProxy(VotingLogicUpgradeable, {
+    kind: "uups",
+  });
+  proxyContract = await proxyContract.waitForDeployment();
 
-  const votingLogicUpgradeableAddress =
-    await votingLogicUpgradeable.getAddress();
+  const proxyAddress = await proxyContract.getAddress();
 
-  console.log(
-    "VotingLogicUpgradeable proxy deployed to:",
-    votingLogicUpgradeableAddress,
-  );
+  console.log("VotingLogicUpgradeable proxy deployed to:", proxyAddress);
   console.log(
     "VotingLogicUpgradeable impl deployed to:",
-    await getImplementationAddress(
-      ethers.provider,
-      votingLogicUpgradeableAddress,
-    ),
+    await getImplementationAddress(ethers.provider, proxyAddress),
   );
+
+  return proxyAddress;
 }
 
-async function deployBeaconProxy() {
+async function deployBeaconProxy(): Promise<string> {
   console.log(
     "🖖🏽[ethers] Deploying BeaconProxy with VotingLogic as implementation on Tenderly.",
   );
@@ -68,7 +64,6 @@ async function deployBeaconProxy() {
   console.log(
     `Beacon with VotingLogic as implementation is deployed to address: ${await votingLogicBeacon.getAddress()}`,
   );
-  // console.log("etherscan config:", JSON.stringify(config.etherscan, null, 2));
 
   let beaconProxy = await upgrades.deployBeaconProxy(
     await votingLogicBeacon.getAddress(),
@@ -85,4 +80,6 @@ async function deployBeaconProxy() {
       await votingLogicBeacon.getAddress(),
     ),
   );
+
+  return beaconProxy.getAddress();
 }

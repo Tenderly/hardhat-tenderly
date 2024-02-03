@@ -9,10 +9,10 @@ export async function main() {
   await deployTransparentUpgradeableProxy();
 
   // UUPSProxy
-  // await deployUUPSProxy();
+  await deployUUPSProxy();
 
   // Beacon Proxy
-  // await deployBeaconProxy();
+  await deployBeaconProxy();
 }
 
 main().catch((error) => {
