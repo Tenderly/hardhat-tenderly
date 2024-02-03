@@ -518,7 +518,7 @@ export const isTenderlyNetworkConfig = (nw: NetworkConfig): boolean => {
   return regex.test(nw.url);
 };
 
-function isHttpNetworkConfig(
+export function isHttpNetworkConfig(
   config: NetworkConfig,
 ): config is HttpNetworkConfig {
   return (config as HttpNetworkConfig).url !== undefined;

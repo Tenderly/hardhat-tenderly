@@ -14,6 +14,7 @@ import {
   DeployProxyOptions,
 } from "@openzeppelin/hardhat-upgrades/dist/utils";
 import { TenderlyPlugin } from "../type-extensions";
+import { logger } from "../utils/logger";
 import { TdlyContractFactory } from "./ethers/ContractFactory";
 import { TdlyContract } from "./ethers/Contract";
 import { TdlyProxyContract } from "./ethers/ProxyContract";
@@ -52,56 +53,6 @@ export function wrapEthers(
   return nativeEthers;
 }
 
-// export function wrapUpgrades(
-//   hre: HardhatRuntimeEnvironment,
-//   nativeUpgrades: typeof upgrades & HardhatEthersHelpers,
-//   tenderly: TenderlyPlugin
-// ): typeof upgrades & HardhatEthersHelpers {
-//   // Deploy Proxy
-//   nativeUpgrades.deployProxy = wrapDeployProxy(
-//     hre,
-//     nativeUpgrades.deployProxy,
-//     tenderly
-//   ) as typeof nativeUpgrades.deployProxy;
-//
-//   return nativeUpgrades;
-// }
-//
-// export interface DeployFunction {
-//   (ImplFactory: ContractFactory, args?: unknown[], opts?: DeployProxyOptions): Promise<Contract>;
-//   (ImplFactory: ContractFactory, opts?: DeployProxyOptions): Promise<Contract>;
-// }
-
-// function wrapDeployProxy(
-//   hre: HardhatRuntimeEnvironment,
-//   func: DeployFunction,
-//   tenderly: TenderlyPlugin
-// ): DeployFunction {
-//   return async function (
-//     implFactory: ContractFactory,
-//     args?: unknown[] | DeployProxyOptions,
-//     opts?: DeployProxyOptions
-//   ) {
-//     console.log("Entering wrapDeployProxy.");
-//
-//     console.log("getting real deployProxy.");
-//     let proxyContract;
-//     if (args !== undefined && args !== null) {
-//       proxyContract = await func(implFactory, args as unknown[], opts);
-//     } else {
-//       proxyContract = await func(implFactory, opts);
-//     }
-//     console.log("got real deployProxy.");
-//
-//     console.log("returning TdlyProxyContract.");
-//     return new TdlyProxyContract(
-//       hre,
-//       tenderly,
-//       proxyContract,
-//     ) as unknown as ethers.Contract;
-//   };
-// }
-
 export function wrapUpgrades(
   hre: HardhatRuntimeEnvironment,
   nativeUpgrades: typeof upgrades & HardhatEthersHelpers,
@@ -137,18 +88,15 @@ function wrapDeployProxy(
     argsOrOpts?: unknown[] | DeployProxyOptions,
     opts?: DeployProxyOptions
   ) {
-    console.log("Entering wrapDeployProxy.");
-
-    console.log("getting real deployProxy.");
+    logger.debug("Calling ethers.Contract.deployProxy");
     let proxyContract;
     if (opts !== undefined && opts !== null) {
       proxyContract = await func(implFactory, argsOrOpts as unknown[], opts);
     } else {
       proxyContract = await func(implFactory, argsOrOpts as DeployProxyOptions);
     }
-    console.log("got real deployProxy.");
 
-    console.log("returning TdlyProxyContract.");
+    logger.debug("Returning TdlyProxyContract instance");
     return new TdlyProxyContract(hre, tenderly, proxyContract) as unknown as ethers.Contract;
   };
 }
@@ -174,22 +122,17 @@ function wrapDeployBeaconProxy(
     argsOrOpts?: unknown[] | DeployBeaconProxyOptions,
     opts?: DeployBeaconProxyOptions
   ): Promise<Contract> {
-    console.log("Entering wrapDeployBeaconProxy.");
-
     if (isTdlyContractFactory(implFactory)) {
       implFactory = implFactory.getNativeContractFactory();
     }
 
-    console.log("getting real deployBeaconProxy.");
     let proxyContract;
     if (opts !== undefined && opts !== null) {
       proxyContract = await func(beacon, implFactory, argsOrOpts as unknown[], opts);
     } else {
       proxyContract = await func(beacon, implFactory, argsOrOpts as DeployBeaconProxyOptions);
     }
-    console.log("got real deployBeaconProxy.");
 
-    console.log("returning TdlyProxyContract.");
     return new TdlyProxyContract(hre, tenderly, proxyContract) as unknown as ethers.Contract;
   };
 }

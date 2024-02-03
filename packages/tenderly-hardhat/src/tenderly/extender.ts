@@ -1,4 +1,3 @@
-import "@nomicfoundation/hardhat-ethers";
 import "@openzeppelin/hardhat-upgrades";
 import { lazyObject } from "hardhat/plugins";
 import { extendConfig, extendEnvironment } from "hardhat/config";
@@ -19,13 +18,16 @@ import {
 
 import { ethers } from "ethers";
 import { upgrades } from "hardhat";
+import { getAccessToken } from "tenderly/utils/config";
 import { logger } from "../utils/logger";
 import { Tenderly } from "../Tenderly";
 import { TenderlyNetwork } from "../TenderlyNetwork";
 import { PLUGIN_NAME } from "../constants";
-import { isTenderlyNetworkConfig } from "../utils/util";
+import { isHttpNetworkConfig, isTenderlyNetworkConfig } from "../utils/util";
+import { composeApiURL, composeBrowserURL } from "../utils/url-composer";
 import { wrapEthers, wrapUpgrades } from "./ethers";
 import { wrapHHDeployments } from "./hardhat-deploy";
+import { getVnetTypeByEndpointId, VnetType } from "./vnet-type";
 
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
@@ -34,7 +36,7 @@ export function setup() {
   logger.settings.minLevel = 4;
   serviceLogger.settings.minLevel = 4;
 
-  extendEnvironment((hre: HardhatRuntimeEnvironment) => {
+  extendEnvironment(async (hre: HardhatRuntimeEnvironment) => {
     hre.tenderly = lazyObject(() => new Tenderly(hre));
 
     if (hre.hardhatArguments.verbose) {
@@ -71,6 +73,7 @@ export function setup() {
       extendHardhatDeploy(hre);
       logger.debug("Wrapping ethers library finished.");
     }
+    await populateHardhatVerifyConfig(hre);
 
     logger.debug("Setup finished.");
   });
@@ -185,7 +188,7 @@ const extendUpgrades = (hre: HardhatRuntimeEnvironment): void => {
     "tenderly" in hre &&
     hre.tenderly !== undefined
   ) {
-    console.log("extending upgrades.");
+    logger.debug("Extending upgrades library");
     Object.assign(
       hre.upgrades,
       wrapUpgrades(
@@ -196,6 +199,72 @@ const extendUpgrades = (hre: HardhatRuntimeEnvironment): void => {
     );
   }
 };
+
+// populateHardhatVerifyConfig will populate `hre.config.etherscan` configuration of the `@nomicfoundation/hardhat-verify` plugin.
+// This function should import `@nomicfoundation/hardhat-verify` type declaration expansion of the `HardhatConfig`, but can't since there will be double overloading task error if the client application also uses `@nomicfoundation/hardhat-verify` plugin.
+async function populateHardhatVerifyConfig(hre: HardhatRuntimeEnvironment): Promise<void> {
+  if (!isTenderlyNetworkConfig(hre.network.config) || !isHttpNetworkConfig(hre.network.config)) {
+    return;
+  }
+
+  const accessKey = getAccessToken();
+  if (accessKey === "") {
+    logger.error("Tenderly access key is not set. Please set TENDERLY_ACCESS_KEY environment variable.");
+    return;
+  }
+
+  if ((hre.config as any).etherscan === undefined || (hre.config as any).etherscan === null) {
+    console.log("usao ovde ove");
+    (hre.config as any).etherscan = {
+      apiKey: accessKey,
+      customChains: [],
+      // enabled: true,
+    };
+  }
+
+  if (
+    isRecord((hre.config as any).etherscan.apiKey) &&
+    (hre.config as any).etherscan.apiKey[hre.network.name] === undefined
+  ) {
+    (hre.config as any).etherscan.apiKey[hre.network.name] = accessKey;
+  } else if (typeof (hre.config as any).etherscan.apiKey === "string") {
+    (hre.config as any).etherscan.apiKey = accessKey;
+  }
+
+  const chainId = await getChainId(hre.network);
+
+  const endpointId = hre.network.config.url.split("/").pop();
+  if (endpointId === undefined) {
+    throw new Error("Could not locate the UUID at the end of a Tenderly RPC URL.");
+  }
+  const vnetType = await getVnetTypeByEndpointId(hre, endpointId);
+  if (vnetType === VnetType.NULL_TYPE) {
+    throw new Error("Couldn't recognize VnetType from endpoint id.");
+  }
+
+  (hre.config as any).etherscan.customChains.push({
+    network: hre.network.name,
+    chainId,
+    urls: {
+      apiURL: composeApiURL(vnetType),
+      browserURL: composeBrowserURL(vnetType),
+    },
+  });
+
+  // console.log("etherscan config from here:", JSON.stringify((hre.config as any).etherscan, null, 2));
+}
+
+function isRecord(value: any): value is Record<string, string> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+async function getChainId(network: Network): Promise<number> {
+  if (network.config.chainId !== undefined && network.config.chainId !== null) {
+    return network.config.chainId;
+  }
+
+  return Number(await network.provider.send("eth_chainId", []));
+}
 
 const extendHardhatDeploy = (hre: HardhatRuntimeEnvironment): void => {
   // ts-ignore is needed here because we want to avoid importing hardhat-deploy in order not to cause duplicated initialization of the .deployments field

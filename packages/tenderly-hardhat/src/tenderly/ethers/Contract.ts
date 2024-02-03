@@ -66,6 +66,14 @@ export class TdlyContract {
     return contract;
   }
 
+  public deploymentTransaction(): null | ethers.ContractTransactionResponse {
+    return this.nativeContract.deploymentTransaction();
+  }
+
+  public async getAddress(): Promise<string> {
+    return this.nativeContract.getAddress();
+  }
+
   private async _tdlyVerify(address: string) {
     const contPair: ContractByName = {
       name: this.contractName,
