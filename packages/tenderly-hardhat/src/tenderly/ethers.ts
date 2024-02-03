@@ -56,37 +56,43 @@ export function wrapEthers(
 export function wrapUpgrades(
   hre: HardhatRuntimeEnvironment,
   nativeUpgrades: typeof upgrades & HardhatEthersHelpers,
-  tenderly: TenderlyPlugin
+  tenderly: TenderlyPlugin,
 ): typeof upgrades & HardhatEthersHelpers {
   // Deploy Proxy
   nativeUpgrades.deployProxy = wrapDeployProxy(
     hre,
     nativeUpgrades.deployProxy,
-    tenderly
+    tenderly,
   ) as typeof nativeUpgrades.deployProxy;
+
+  // Deploy BeaconProxy
   nativeUpgrades.deployBeaconProxy = wrapDeployBeaconProxy(
     hre,
     nativeUpgrades.deployBeaconProxy,
-    tenderly
+    tenderly,
   ) as typeof nativeUpgrades.deployBeaconProxy;
 
   return nativeUpgrades;
 }
 
 export interface DeployFunction {
-  (ImplFactory: ContractFactory, args?: unknown[], opts?: DeployProxyOptions): Promise<Contract>;
+  (
+    ImplFactory: ContractFactory,
+    args?: unknown[],
+    opts?: DeployProxyOptions,
+  ): Promise<Contract>;
   (ImplFactory: ContractFactory, opts?: DeployProxyOptions): Promise<Contract>;
 }
 
 function wrapDeployProxy(
   hre: HardhatRuntimeEnvironment,
   func: DeployFunction,
-  tenderly: TenderlyPlugin
+  tenderly: TenderlyPlugin,
 ): DeployFunction {
   return async function (
     implFactory: ContractFactory,
     argsOrOpts?: unknown[] | DeployProxyOptions,
-    opts?: DeployProxyOptions
+    opts?: DeployProxyOptions,
   ) {
     logger.debug("Calling ethers.Contract.deployProxy");
     let proxyContract;
@@ -97,7 +103,11 @@ function wrapDeployProxy(
     }
 
     logger.debug("Returning TdlyProxyContract instance");
-    return new TdlyProxyContract(hre, tenderly, proxyContract) as unknown as ethers.Contract;
+    return new TdlyProxyContract(
+      hre,
+      tenderly,
+      proxyContract,
+    ) as unknown as ethers.Contract;
   };
 }
 
@@ -106,21 +116,25 @@ export interface DeployBeaconProxyFunction {
     beacon: ContractAddressOrInstance,
     attachTo: ContractFactory,
     args?: unknown[],
-    opts?: DeployBeaconProxyOptions
+    opts?: DeployBeaconProxyOptions,
   ): Promise<Contract>;
-  (beacon: ContractAddressOrInstance, attachTo: ContractFactory, opts?: DeployBeaconProxyOptions): Promise<Contract>;
+  (
+    beacon: ContractAddressOrInstance,
+    attachTo: ContractFactory,
+    opts?: DeployBeaconProxyOptions,
+  ): Promise<Contract>;
 }
 
 function wrapDeployBeaconProxy(
   hre: HardhatRuntimeEnvironment,
   func: DeployBeaconProxyFunction,
-  tenderly: TenderlyPlugin
+  tenderly: TenderlyPlugin,
 ): DeployBeaconProxyFunction {
   return async function (
     beacon: ContractAddressOrInstance,
     implFactory: ContractFactory,
     argsOrOpts?: unknown[] | DeployBeaconProxyOptions,
-    opts?: DeployBeaconProxyOptions
+    opts?: DeployBeaconProxyOptions,
   ): Promise<Contract> {
     if (isTdlyContractFactory(implFactory)) {
       implFactory = implFactory.getNativeContractFactory();
@@ -128,17 +142,34 @@ function wrapDeployBeaconProxy(
 
     let proxyContract;
     if (opts !== undefined && opts !== null) {
-      proxyContract = await func(beacon, implFactory, argsOrOpts as unknown[], opts);
+      proxyContract = await func(
+        beacon,
+        implFactory,
+        argsOrOpts as unknown[],
+        opts,
+      );
     } else {
-      proxyContract = await func(beacon, implFactory, argsOrOpts as DeployBeaconProxyOptions);
+      proxyContract = await func(
+        beacon,
+        implFactory,
+        argsOrOpts as DeployBeaconProxyOptions,
+      );
     }
 
-    return new TdlyProxyContract(hre, tenderly, proxyContract) as unknown as ethers.Contract;
+    return new TdlyProxyContract(
+      hre,
+      tenderly,
+      proxyContract,
+    ) as unknown as ethers.Contract;
   };
 }
 
-function isTdlyContractFactory(factory: ContractFactory | TdlyContractFactory): factory is TdlyContractFactory {
-  return (factory as TdlyContractFactory).getNativeContractFactory !== undefined;
+function isTdlyContractFactory(
+  factory: ContractFactory | TdlyContractFactory,
+): factory is TdlyContractFactory {
+  return (
+    (factory as TdlyContractFactory).getNativeContractFactory !== undefined
+  );
 }
 
 export declare function getContractFactoryName(
@@ -180,7 +211,10 @@ function wrapGetContractFactory(
       return wrapContractFactory(contractFactory, tenderly, nameOrAbi, libs);
     }
 
-    return (func as typeof getContractFactoryABI)(nameOrAbi, bytecodeOrFactoryOptions as ethers.BytesLike, signer,
+    return (func as typeof getContractFactoryABI)(
+      nameOrAbi,
+      bytecodeOrFactoryOptions as ethers.BytesLike,
+      signer,
     );
   };
 }
@@ -190,7 +224,9 @@ export declare function deployContract(
   signerOrOptions?: ethers.Signer | DeployContractOptions,
 ): Promise<ethers.Contract>;
 
-function wrapDeployContract(func: typeof deployContract, tenderly: TenderlyPlugin,
+function wrapDeployContract(
+  func: typeof deployContract,
+  tenderly: TenderlyPlugin,
 ): typeof deployContract {
   return async function (
     name: string,

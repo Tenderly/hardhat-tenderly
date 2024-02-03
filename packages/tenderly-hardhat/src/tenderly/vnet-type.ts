@@ -10,7 +10,11 @@ export enum VnetType {
   PUBLIC_NETWORK = "public-network",
 }
 
-export async function getVnetTypeByEndpointId(hre: HardhatRuntimeEnvironment, endpointId: string): Promise<VnetType> {
+// TODO(dusan): Call Tenderly API here and ask for the vnet type.
+export async function getVnetTypeByEndpointId(
+  hre: HardhatRuntimeEnvironment,
+  endpointId: string,
+): Promise<VnetType> {
   switch (hre.network.name) {
     case "fork":
       return VnetType.FORK_V2;

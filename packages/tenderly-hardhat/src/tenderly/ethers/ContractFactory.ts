@@ -9,9 +9,9 @@ export class TdlyContractFactory {
   [key: string]: any;
 
   private readonly contractName: string;
-  private libs: Libraries | undefined;
-  private nativeContractFactory: ContractFactory;
-  private tenderly: TenderlyPlugin;
+  private readonly libs: Libraries | undefined;
+  private readonly nativeContractFactory: ContractFactory;
+  private readonly tenderly: TenderlyPlugin;
 
   constructor(
     nativeContractFactory: ContractFactory,

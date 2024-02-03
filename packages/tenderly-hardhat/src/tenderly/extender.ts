@@ -5,6 +5,7 @@ import {
   HardhatRuntimeEnvironment,
   HttpNetworkConfig,
   HardhatConfig,
+  Network,
 } from "hardhat/types";
 import { HardhatEthersHelpers } from "@nomicfoundation/hardhat-ethers/types";
 import { TenderlyService } from "tenderly";
@@ -24,7 +25,7 @@ import { Tenderly } from "../Tenderly";
 import { TenderlyNetwork } from "../TenderlyNetwork";
 import { PLUGIN_NAME } from "../constants";
 import { isHttpNetworkConfig, isTenderlyNetworkConfig } from "../utils/util";
-import { composeApiURL, composeBrowserURL } from "../utils/url-composer";
+import * as URLComposer from "../utils/url-composer";
 import { wrapEthers, wrapUpgrades } from "./ethers";
 import { wrapHHDeployments } from "./hardhat-deploy";
 import { getVnetTypeByEndpointId, VnetType } from "./vnet-type";
@@ -73,6 +74,7 @@ export function setup() {
       extendHardhatDeploy(hre);
       logger.debug("Wrapping ethers library finished.");
     }
+    // TODO(dusan): Add .env var dependency here so users can choose if they want our plugin to populate the config or not.
     await populateHardhatVerifyConfig(hre);
 
     logger.debug("Setup finished.");
@@ -121,8 +123,9 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
     .then(async (_) => {
       hre.tenderly.setNetwork(tenderlyNetwork);
       const forkID = await hre.tenderly.network().getForkID();
-      (hre.network.config as HttpNetworkConfig).url =
-        `${TENDERLY_JSON_RPC_BASE_URL}/fork/${forkID ?? ""}`;
+      (
+        hre.network.config as HttpNetworkConfig
+      ).url = `${TENDERLY_JSON_RPC_BASE_URL}/fork/${forkID ?? ""}`;
       // hre.ethers.provider = new hre.ethers.BrowserProvider(hre.tenderly.network());
     })
     .catch((_) => {
@@ -194,26 +197,36 @@ const extendUpgrades = (hre: HardhatRuntimeEnvironment): void => {
       wrapUpgrades(
         hre,
         hre.upgrades as unknown as typeof upgrades & HardhatEthersHelpers,
-        hre.tenderly
-      ) as unknown as typeof hre.upgrades
+        hre.tenderly,
+      ) as unknown as typeof hre.upgrades,
     );
   }
 };
 
 // populateHardhatVerifyConfig will populate `hre.config.etherscan` configuration of the `@nomicfoundation/hardhat-verify` plugin.
 // This function should import `@nomicfoundation/hardhat-verify` type declaration expansion of the `HardhatConfig`, but can't since there will be double overloading task error if the client application also uses `@nomicfoundation/hardhat-verify` plugin.
-async function populateHardhatVerifyConfig(hre: HardhatRuntimeEnvironment): Promise<void> {
-  if (!isTenderlyNetworkConfig(hre.network.config) || !isHttpNetworkConfig(hre.network.config)) {
+async function populateHardhatVerifyConfig(
+  hre: HardhatRuntimeEnvironment,
+): Promise<void> {
+  if (
+    !isTenderlyNetworkConfig(hre.network.config) ||
+    !isHttpNetworkConfig(hre.network.config)
+  ) {
     return;
   }
 
   const accessKey = getAccessToken();
   if (accessKey === "") {
-    logger.error("Tenderly access key is not set. Please set TENDERLY_ACCESS_KEY environment variable.");
+    logger.error(
+      "Tenderly access key is not set. Please set TENDERLY_ACCESS_KEY environment variable.",
+    );
     return;
   }
 
-  if ((hre.config as any).etherscan === undefined || (hre.config as any).etherscan === null) {
+  if (
+    (hre.config as any).etherscan === undefined ||
+    (hre.config as any).etherscan === null
+  ) {
     console.log("usao ovde ove");
     (hre.config as any).etherscan = {
       apiKey: accessKey,
@@ -235,7 +248,9 @@ async function populateHardhatVerifyConfig(hre: HardhatRuntimeEnvironment): Prom
 
   const endpointId = hre.network.config.url.split("/").pop();
   if (endpointId === undefined) {
-    throw new Error("Could not locate the UUID at the end of a Tenderly RPC URL.");
+    throw new Error(
+      "Could not locate the UUID at the end of a Tenderly RPC URL.",
+    );
   }
   const vnetType = await getVnetTypeByEndpointId(hre, endpointId);
   if (vnetType === VnetType.NULL_TYPE) {
@@ -246,8 +261,8 @@ async function populateHardhatVerifyConfig(hre: HardhatRuntimeEnvironment): Prom
     network: hre.network.name,
     chainId,
     urls: {
-      apiURL: composeApiURL(vnetType),
-      browserURL: composeBrowserURL(vnetType),
+      apiURL: URLComposer.composeApiURL(vnetType),
+      browserURL: URLComposer.composeBrowserURL(vnetType),
     },
   });
 

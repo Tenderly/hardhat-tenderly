@@ -26,11 +26,8 @@ tdly.setup({ automaticVerifications });
 
 dotenv.config();
 
-// const tenderlyApiUrl = "https://api.tenderly.co/api/v1/";
-const tenderlyApiUrl = "http://localhost:8003/api/v1/";
-
 const config: HardhatUserConfig = {
-  solidity: "0.8.20",
+  solidity: "0.8.23",
   networks: {
     fork: {
       // or any other name
