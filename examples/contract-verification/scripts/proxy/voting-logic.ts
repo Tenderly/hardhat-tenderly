@@ -2,13 +2,13 @@ import { deployTransparentUpgradeableProxy, deployUUPSProxy, deployBeaconProxy }
 
 export async function main() {
   // TransparentUpgradeableProxy
-  // await deployTransparentUpgradeableProxy();
+  await deployTransparentUpgradeableProxy();
 
   // UUPSProxy
   // await deployUUPSProxy();
 
   // Beacon Proxy
-  await deployBeaconProxy();
+  // await deployBeaconProxy();
 }
 
 main().catch((error) => {
