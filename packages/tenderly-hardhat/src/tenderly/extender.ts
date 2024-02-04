@@ -145,8 +145,9 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
     .then(async (_) => {
       hre.tenderly.setNetwork(tenderlyNetwork);
       const forkID = await hre.tenderly.network().getForkID();
-      (hre.network.config as HttpNetworkConfig).url =
-        `${TENDERLY_JSON_RPC_BASE_URL}/fork/${forkID ?? ""}`;
+      (
+        hre.network.config as HttpNetworkConfig
+      ).url = `${TENDERLY_JSON_RPC_BASE_URL}/fork/${forkID ?? ""}`;
       // hre.ethers.provider = new hre.ethers.BrowserProvider(hre.tenderly.network());
     })
     .catch((_) => {
