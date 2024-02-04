@@ -27,7 +27,7 @@ export class TdlyProxyContract {
     const proxyContract = await this.proxyContract.waitForDeployment();
     const deploymentTransaction = this.proxyContract.deploymentTransaction();
     if (deploymentTransaction !== undefined && deploymentTransaction !== null) {
-      // verify:verify task should verify the proxy (regardless of proxy type) and the implementation.
+      // verify:verify task should verify the proxy (regardless of proxy type), implementation and all the related contracts.
       logger.debug("Running hardhat-verify's verify task ");
       await this.hre.run("verify:verify", {
         address: await proxyContract.getAddress(),

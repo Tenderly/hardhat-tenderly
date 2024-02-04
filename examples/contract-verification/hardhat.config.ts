@@ -25,24 +25,17 @@ console.log(
 const config: HardhatUserConfig = {
   solidity: "0.8.23",
   networks: {
-    fork: {
-      // or any other name
+    my_tenderly_fork_1: {
+      // or any other custom network name
       url: `${process.env.TENDERLY_FORK_RPC_URL ?? ""}`,
     },
-    "fork-v1": {
-      // or any other name
-      url: `${process.env.TENDERLY_FORK_V1_RPC_URL ?? ""}`,
-    },
-    devnet: {
-      // or any other name
-      url: `${process.env.TENDERLY_DEVNET_RPC_URL ?? ""}`,
-    },
-    "devnet-v1": {
-      // or any other name
+    my_tenderly_devnet_1: {
+      // or any other custom network name
       url: `${process.env.TENDERLY_DEVNET_V1_RPC_URL ?? ""}`,
     },
-    testnet: {
-      url: `${process.env.TENDERLY_TESTNET_RPC_URL ?? ""}`,
+    my_tenderly_devnet_2: {
+      // or any other custom network name
+      url: `${process.env.TENDERLY_DEVNET_RPC_URL_2 ?? ""}`,
     },
     sepolia: {
       url: `${process.env.SEPOLIA_URL ?? ""}`,

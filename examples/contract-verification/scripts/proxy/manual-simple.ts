@@ -9,6 +9,7 @@ import {
 export async function main() {
   // TransparentUpgradeableProxy
   const tupAddress = await deployTransparentUpgradeableProxy();
+  // Verify the proxy, implementation and all the related contracts with just the address.
   await tenderly.verify({
     // The name is not important, beneath is `@nomicfoundation/hardhat-verify` which doesn't need the name.
     name: ProxyPlaceholderName,
@@ -17,6 +18,7 @@ export async function main() {
 
   // UUPSProxy
   const uupsAddress = await deployUUPSProxy();
+  // Verify the proxy, implementation and all the related contracts with just the address.
   await tenderly.verify({
     // The name is not important, beneath is `@nomicfoundation/hardhat-verify` which doesn't need the name.
     name: ProxyPlaceholderName,
@@ -25,6 +27,7 @@ export async function main() {
 
   // Beacon Proxy
   const beaconProxyAddress = await deployBeaconProxy();
+  // Verify the proxy, implementation and all the related contracts with just the address.
   await tenderly.verify({
     // The name is not important, beneath is `@nomicfoundation/hardhat-verify` which doesn't need the name.
     name: ProxyPlaceholderName,

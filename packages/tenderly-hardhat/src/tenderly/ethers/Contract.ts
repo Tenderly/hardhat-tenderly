@@ -11,7 +11,7 @@ export class TdlyContract {
   private readonly contractName: string;
   private nativeContract: ethers.Contract;
   private tenderly: TenderlyPlugin;
-  private libraries: Libraries | undefined;
+  private readonly libraries: Libraries | undefined;
 
   constructor(
     nativeContract: ethers.Contract,
