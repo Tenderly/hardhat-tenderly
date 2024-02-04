@@ -12,7 +12,7 @@ export {
 
 async function deployTransparentUpgradeableProxy(): Promise<string> {
   console.log(
-    "🖖🏽[ethers] Deploying TransparentUpgradeableProxy with VotingLogic as implementation on Tenderly.",
+    "\n---------------\n🖖🏽[ethers] Deploying TransparentUpgradeableProxy with VotingLogic as implementation on Tenderly.",
   );
 
   const VotingLogic = await ethers.getContractFactory("VotingLogic");
@@ -32,7 +32,7 @@ async function deployTransparentUpgradeableProxy(): Promise<string> {
 
 async function deployUUPSProxy(): Promise<string> {
   console.log(
-    "🖖🏽[ethers] Deploying UUPSProxy with VotingLogic as implementation on Tenderly.",
+    "\n---------------\n🖖🏽[ethers] Deploying UUPSProxy with VotingLogic as implementation on Tenderly.",
   );
 
   const VotingLogicUpgradeable = await ethers.getContractFactory(
@@ -56,7 +56,7 @@ async function deployUUPSProxy(): Promise<string> {
 
 async function deployBeaconProxy(): Promise<string> {
   console.log(
-    "🖖🏽[ethers] Deploying BeaconProxy with VotingLogic as implementation on Tenderly.",
+    "\n---------------\n🖖🏽[ethers] Deploying BeaconProxy with VotingLogic as implementation on Tenderly.",
   );
   const VotingLogic = await ethers.getContractFactory("VotingLogic");
   let votingLogicBeacon = await upgrades.deployBeacon(VotingLogic);

@@ -24,7 +24,11 @@ import { logger } from "../utils/logger";
 import { Tenderly } from "../Tenderly";
 import { TenderlyNetwork } from "../TenderlyNetwork";
 import { PLUGIN_NAME } from "../constants";
-import { isHttpNetworkConfig, isTenderlyNetworkConfig } from "../utils/util";
+import {
+  isHttpNetworkConfig,
+  isTenderlyGatewayNetworkConfig,
+  isTenderlyNetworkConfig,
+} from "../utils/util";
 import * as URLComposer from "../utils/url-composer";
 import { wrapEthers, wrapUpgrades } from "./ethers";
 import { wrapHHDeployments } from "./hardhat-deploy";
@@ -74,8 +78,32 @@ export function setup() {
       extendHardhatDeploy(hre);
       logger.debug("Wrapping ethers library finished.");
     }
-    // TODO(dusan): Add .env var dependency here so users can choose if they want our plugin to populate the config or not.
-    await populateHardhatVerifyConfig(hre);
+    // If the user has selected automatic population of hardhat-verify `etherscan` configuration, and it in fact is some of the Tenderly networks.
+    // We should populate the configuration.
+    if (
+      process.env.AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG === "true" &&
+      (isTenderlyNetworkConfig(hre.network.config) ||
+        isTenderlyGatewayNetworkConfig(hre.network.config)) &&
+      isHttpNetworkConfig(hre.network.config)
+    ) {
+      logger.info(
+        "Automatic population of hardhat-verify `etherscan` configuration is enabled.",
+      );
+      // If the config already exists, we should not overwrite it, either remove it or turn off automatic population.
+      const etherscanConfig = await findEtherscanConfig(hre);
+      if (etherscanConfig !== undefined) {
+        throw new Error(
+          `Hardhat-verify's 'etherscan' configuration with network '${
+            hre.network.name
+          }' is already populated. Please remove the following configuration:\n${JSON.stringify(
+            etherscanConfig,
+            null,
+            2,
+          )}\nOr set 'AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG' environment variable to 'false'`,
+        );
+      }
+      await populateHardhatVerifyConfig(hre);
+    }
 
     logger.debug("Setup finished.");
   });
@@ -123,8 +151,9 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
     .then(async (_) => {
       hre.tenderly.setNetwork(tenderlyNetwork);
       const forkID = await hre.tenderly.network().getForkID();
-      (hre.network.config as HttpNetworkConfig).url =
-        `${TENDERLY_JSON_RPC_BASE_URL}/fork/${forkID ?? ""}`;
+      (
+        hre.network.config as HttpNetworkConfig
+      ).url = `${TENDERLY_JSON_RPC_BASE_URL}/fork/${forkID ?? ""}`;
       // hre.ethers.provider = new hre.ethers.BrowserProvider(hre.tenderly.network());
     })
     .catch((_) => {
@@ -208,7 +237,8 @@ async function populateHardhatVerifyConfig(
   hre: HardhatRuntimeEnvironment,
 ): Promise<void> {
   if (
-    !isTenderlyNetworkConfig(hre.network.config) ||
+    (!isTenderlyNetworkConfig(hre.network.config) &&
+      !isTenderlyGatewayNetworkConfig(hre.network.config)) ||
     !isHttpNetworkConfig(hre.network.config)
   ) {
     return;
@@ -226,11 +256,9 @@ async function populateHardhatVerifyConfig(
     (hre.config as any).etherscan === undefined ||
     (hre.config as any).etherscan === null
   ) {
-    console.log("usao ovde ove");
     (hre.config as any).etherscan = {
       apiKey: accessKey,
       customChains: [],
-      // enabled: true,
     };
   }
 
@@ -251,6 +279,7 @@ async function populateHardhatVerifyConfig(
       "Could not locate the UUID at the end of a Tenderly RPC URL.",
     );
   }
+
   const vnetType = await getVnetTypeByEndpointId(hre, endpointId);
   if (vnetType === VnetType.NULL_TYPE) {
     throw new Error("Couldn't recognize VnetType from endpoint id.");
@@ -260,12 +289,15 @@ async function populateHardhatVerifyConfig(
     network: hre.network.name,
     chainId,
     urls: {
-      apiURL: URLComposer.composeApiURL(vnetType),
-      browserURL: URLComposer.composeBrowserURL(vnetType),
+      apiURL: URLComposer.composeApiURL(hre, endpointId, chainId, vnetType),
+      browserURL: URLComposer.composeBrowserURL(
+        hre,
+        endpointId,
+        chainId,
+        vnetType,
+      ),
     },
   });
-
-  // console.log("etherscan config from here:", JSON.stringify((hre.config as any).etherscan, null, 2));
 }
 
 function isRecord(value: any): value is Record<string, string> {
@@ -278,6 +310,23 @@ async function getChainId(network: Network): Promise<number> {
   }
 
   return Number(await network.provider.send("eth_chainId", []));
+}
+
+async function findEtherscanConfig(
+  hre: HardhatRuntimeEnvironment,
+): Promise<any | undefined> {
+  if ((hre.config as any).etherscan === undefined) {
+    return undefined;
+  }
+  if ((hre.config as any).etherscan.customChains === undefined) {
+    return undefined;
+  }
+
+  return ((hre.config as any).etherscan.customChains as any[]).find(
+    (chainConfig) => {
+      return chainConfig.network === hre.network.name;
+    },
+  );
 }
 
 const extendHardhatDeploy = (hre: HardhatRuntimeEnvironment): void => {

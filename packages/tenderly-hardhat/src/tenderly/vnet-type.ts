@@ -1,4 +1,8 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { TENDERLY_API_BASE_URL } from "tenderly/common/constants";
+import { TenderlyApiService } from "tenderly/internal/core/services";
+import { logger } from "../utils/logger";
+import { isTenderlyGatewayNetworkConfig } from "../utils/util";
 
 export enum VnetType {
   NULL_TYPE = "null-type",
@@ -10,22 +14,28 @@ export enum VnetType {
   PUBLIC_NETWORK = "public-network",
 }
 
-// TODO(dusan): Call Tenderly API here and ask for the vnet type.
 export async function getVnetTypeByEndpointId(
   hre: HardhatRuntimeEnvironment,
   endpointId: string,
 ): Promise<VnetType> {
-  switch (hre.network.name) {
-    case "fork":
-      return VnetType.FORK_V2;
-    case "fork-v1":
-      return VnetType.FORK_V1;
-    case "testnet":
-      return VnetType.TESTNET;
-    case "devnet":
-      return VnetType.DEVNET_V2;
-    case "devnet-v1":
-      return VnetType.DEVNET_V1;
+  if (isTenderlyGatewayNetworkConfig(hre.network.config)) {
+    return VnetType.PUBLIC_NETWORK;
   }
-  return VnetType.NULL_TYPE;
+
+  try {
+    const axiosInstance = TenderlyApiService.configureInstance();
+    const resp = await axiosInstance.get<GetVnetTypeByEndpointIdResponse>(
+      `${TENDERLY_API_BASE_URL}/api/v1/vnet-type/${endpointId}`,
+    );
+    return resp.data.vnetType;
+  } catch (error) {
+    logger.error(
+      `Failed to get vnet type for endpoint ${endpointId}: ${error}`,
+    );
+    return VnetType.NULL_TYPE;
+  }
+}
+
+interface GetVnetTypeByEndpointIdResponse {
+  vnetType: VnetType;
 }
