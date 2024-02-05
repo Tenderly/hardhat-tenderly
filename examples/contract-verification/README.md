@@ -105,4 +105,12 @@ yarn run private:greeter:manual-simple --network sepolia
 yarn run fork:calculatr:manual-advanced --network my_tenderly_fork_1
 ```
 
+## Proxy contract verification
+
+Like with the commands above, we have created a set of commands that will help you quickly start verifying proxy contracts. The commands are:
+```bash
+yarn fork:proxy:automatic --network my_tenderly_fork_1
+yarn private:proxy:manual-simple --network sepolia
+```
+
 When running against a specific network, you must add `--network <NETWORK_NAME>`. 
