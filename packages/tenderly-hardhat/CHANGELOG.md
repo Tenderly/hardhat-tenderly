@@ -23,6 +23,17 @@
 - Updated dependencies [[`b96d3a8f9a1c934f90ed488260956b826f5c5a20`](https://github.com/Tenderly/hardhat-tenderly/commit/b96d3a8f9a1c934f90ed488260956b826f5c5a20)]:
   - tenderly@0.9.0
 
+## 2.2.0-beta.0
+
+### Minor Changes
+
+- Implement manual and automatic verification of proxies deployed with `@openzeppelin/hardhat-upgrades`.
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tenderly@0.9.0-beta.0
+
 ## 2.1.1
 
 ### Patch Changes
