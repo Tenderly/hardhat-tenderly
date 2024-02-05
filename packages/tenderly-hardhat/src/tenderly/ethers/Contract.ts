@@ -1,4 +1,4 @@
-import {Contract, ContractTransactionReceipt, ethers} from "ethers";
+import { Contract, ethers } from "ethers";
 import { BigNumber } from "@ethersproject/bignumber";
 import { Libraries } from "@nomicfoundation/hardhat-ethers/types";
 
@@ -11,9 +11,14 @@ export class TdlyContract {
   private readonly contractName: string;
   private nativeContract: ethers.Contract;
   private tenderly: TenderlyPlugin;
-  private libraries: Libraries | undefined;
+  private readonly libraries: Libraries | undefined;
 
-  constructor(nativeContract: ethers.Contract, tenderly: TenderlyPlugin, contractName: string, libs?: Libraries) {
+  constructor(
+    nativeContract: ethers.Contract,
+    tenderly: TenderlyPlugin,
+    contractName: string,
+    libs?: Libraries,
+  ) {
     this.contractName = contractName;
     this.nativeContract = nativeContract;
     this.tenderly = tenderly;
@@ -26,19 +31,27 @@ export class TdlyContract {
 
       if (key === "deploymentTransaction") {
         const deploymentTransaction = nativeContract[key]();
-        if (deploymentTransaction === undefined || deploymentTransaction === null) {
+        if (
+          deploymentTransaction === undefined ||
+          deploymentTransaction === null
+        ) {
           return;
         }
 
         const wait = deploymentTransaction.wait;
 
-        deploymentTransaction.wait = async (confirmations?: number | undefined): Promise<null | ContractTransactionReceipt> => {
+        deploymentTransaction.wait = async (
+          confirmations?: number | undefined,
+        ): Promise<null | ethers.ContractTransactionReceipt> => {
           const receipt = await wait(confirmations);
           if (receipt === undefined || receipt === null) {
             return null;
           }
 
-          if (receipt.contractAddress === undefined || receipt.contractAddress === null) {
+          if (
+            receipt.contractAddress === undefined ||
+            receipt.contractAddress === null
+          ) {
             return receipt;
           }
           await this._tdlyVerify(receipt.contractAddress);
@@ -59,6 +72,14 @@ export class TdlyContract {
     }
 
     return contract;
+  }
+
+  public deploymentTransaction(): null | ethers.ContractTransactionResponse {
+    return this.nativeContract.deploymentTransaction();
+  }
+
+  public async getAddress(): Promise<string> {
+    return this.nativeContract.getAddress();
   }
 
   private async _tdlyVerify(address: string) {

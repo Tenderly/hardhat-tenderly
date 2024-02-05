@@ -89,7 +89,9 @@ export interface TenderlyPlugin {
    *   ]
    * });
    */
-  verifyMultiCompilerAPI: (request: TenderlyVerifyContractsRequest) => Promise<void>;
+  verifyMultiCompilerAPI: (
+    request: TenderlyVerifyContractsRequest,
+  ) => Promise<void>;
 
   /** *
    * @description
@@ -151,7 +153,7 @@ export interface TenderlyPlugin {
     request: TenderlyVerifyContractsRequest,
     tenderlyProject: string,
     username: string,
-    forkID: string
+    forkID: string,
   ) => Promise<void>;
 
   /** *
@@ -214,8 +216,8 @@ export interface TenderlyPlugin {
     request: TenderlyVerifyContractsRequest,
     tenderlyProject: string,
     username: string,
-    devnetID: string
-  ): Promise<void>
+    devnetID: string,
+  ): Promise<void>;
 
   /** *
    * @description
@@ -320,7 +322,7 @@ export interface TenderlyPlugin {
     request: TenderlyForkContractUploadRequest,
     tenderlyProject: string,
     username: string,
-    forkID: string
+    forkID: string,
   ) => Promise<void>;
   /** *
    * @description Persisting contract deployment data needed for verification purposes using hre.
@@ -370,7 +372,11 @@ export interface TenderlyPlugin {
    *   ]
    * }, "project", "tenderly");
    */
-  pushAPI: (request: TenderlyContractUploadRequest, tenderlyProject: string, username: string) => Promise<void>;
+  pushAPI: (
+    request: TenderlyContractUploadRequest,
+    tenderlyProject: string,
+    username: string,
+  ) => Promise<void>;
   /** *
    * @deprecated
    * @description
@@ -397,14 +403,14 @@ declare module "hardhat/types/runtime" {
           method: string;
           params?: any[];
         },
-        callback: (error: any, response: any) => void
+        callback: (error: any, response: any) => void,
       ) => void;
       verify: (...contracts: any[]) => Promise<void>;
       verifyAPI: (
         request: TenderlyForkContractUploadRequest,
         tenderlyProject: string,
         username: string,
-        forkID: string
+        forkID: string,
       ) => Promise<void>;
       resetFork: () => string | undefined;
       getHead: () => string | undefined;

@@ -30,11 +30,17 @@ export async function main() {
           },
           "hardhat/console.sol": {
             name: "console",
-            code: readFileSync("node_modules/hardhat/console.sol", "utf-8").toString(),
+            code: readFileSync(
+              "node_modules/hardhat/console.sol",
+              "utf-8",
+            ).toString(),
           },
           "contracts/libraries/Maths.sol": {
             name: "Maths",
-            code: readFileSync("contracts/libraries/Maths.sol", "utf-8").toString(),
+            code: readFileSync(
+              "contracts/libraries/Maths.sol",
+              "utf-8",
+            ).toString(),
           },
         },
         // solidity format compiler with a little modification at libraries param

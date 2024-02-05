@@ -63,3 +63,4 @@ typings/
 .idea
 .vscode
 **/.DS_Store
+examples/contract-verification/.openzeppelin

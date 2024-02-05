@@ -1,4 +1,8 @@
-import { TenderlyContract, TenderlyContractConfig, TenderlyVerificationContract } from "./Contract";
+import {
+  TenderlyContract,
+  TenderlyContractConfig,
+  TenderlyVerificationContract,
+} from "./Contract";
 
 export interface TenderlyContractUploadRequest {
   config: TenderlyContractConfig;

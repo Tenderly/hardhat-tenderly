@@ -3,11 +3,14 @@ import { network, ethers, tenderly } from "hardhat";
 import { HttpNetworkConfig } from "hardhat/types";
 
 export async function main() {
-  const forkID = `${(network.config as HttpNetworkConfig).url}`.split("/").pop() ?? "";
+  const forkID =
+    `${(network.config as HttpNetworkConfig).url}`.split("/").pop() ?? "";
 
   console.log("🖖🏽[ethers] Deploying and Verifying Greeter in Tenderly");
 
-  let greeter = await ethers.deployContract("Greeter", ["Hello, Manual Hardhat on Fork !"]);
+  let greeter = await ethers.deployContract("Greeter", [
+    "Hello, Manual Hardhat on Fork !",
+  ]);
 
   greeter = await greeter.waitForDeployment();
   const greeterAddress = await greeter.getAddress();
@@ -25,7 +28,10 @@ export async function main() {
             },
             "hardhat/console.sol": {
               name: "console",
-              code: readFileSync("node_modules/hardhat/console.sol", "utf-8").toString(),
+              code: readFileSync(
+                "node_modules/hardhat/console.sol",
+                "utf-8",
+              ).toString(),
             },
           },
           // solidity format compiler with a little modification at libraries param
@@ -48,7 +54,7 @@ export async function main() {
     },
     process.env.TENDERLY_PROJECT ?? "",
     process.env.TENDERLY_USERNAME ?? "",
-    forkID
+    forkID,
   );
 }
 

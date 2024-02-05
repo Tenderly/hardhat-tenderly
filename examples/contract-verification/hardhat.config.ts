@@ -1,31 +1,40 @@
 import * as tdly from "@tenderly/hardhat-tenderly";
-import "@nomicfoundation/hardhat-ethers";
+import "@openzeppelin/hardhat-upgrades";
+import "@nomicfoundation/hardhat-toolbox";
 
-import { HardhatUserConfig } from "hardhat/config";
 import * as dotenv from "dotenv";
+import { HardhatUserConfig } from "hardhat/types/config";
 
-const { TENDERLY_PRIVATE_VERIFICATION, TENDERLY_AUTOMATIC_VERIFICATION } = process.env;
+const { TENDERLY_PRIVATE_VERIFICATION, TENDERLY_AUTOMATIC_VERIFICATION } =
+  process.env;
 
 const privateVerification = TENDERLY_PRIVATE_VERIFICATION === "true";
 const automaticVerifications = TENDERLY_AUTOMATIC_VERIFICATION === "true";
-
-console.log("Using private verification? ", privateVerification, TENDERLY_PRIVATE_VERIFICATION);
-console.log("Using automatic verification? ", automaticVerifications, TENDERLY_AUTOMATIC_VERIFICATION);
 
 tdly.setup({ automaticVerifications });
 
 dotenv.config();
 
+console.log("Using private verification?", privateVerification);
+console.log("Using automatic verification?", automaticVerifications);
+console.log(
+  "Using automatic population of hardhat-verify `etherscan` configuration? ",
+  process.env.AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG === "true",
+);
+
 const config: HardhatUserConfig = {
-  solidity: "0.8.17",
+  solidity: "0.8.23",
   networks: {
-    my_tenderly_fork_1: { // or any other name
+    my_tenderly_fork_1: {
+      // or any other custom network name
       url: `${process.env.TENDERLY_FORK_RPC_URL ?? ""}`,
     },
-    my_tenderly_devnet_1: { // or any other name
-      url: `${process.env.TENDERLY_DEVNET_RPC_URL_1 ?? ""}`,
+    my_tenderly_devnet_1: {
+      // or any other custom network name
+      url: `${process.env.TENDERLY_DEVNET_V1_RPC_URL ?? ""}`,
     },
-    my_tenderly_devnet_2: { // or any other name
+    my_tenderly_devnet_2: {
+      // or any other custom network name
       url: `${process.env.TENDERLY_DEVNET_RPC_URL_2 ?? ""}`,
     },
     sepolia: {
@@ -33,7 +42,6 @@ const config: HardhatUserConfig = {
       accounts: [process.env.SEPOLIA_PRIVATE_KEY ?? ""],
     },
   },
-
   tenderly: {
     project: process.env.TENDERLY_PROJECT ?? "",
     username: process.env.TENDERLY_USERNAME ?? "",

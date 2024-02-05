@@ -9,15 +9,15 @@ export class TdlyContractFactory {
   [key: string]: any;
 
   private readonly contractName: string;
-  private libs: Libraries | undefined;
-  private nativeContractFactory: ContractFactory;
-  private tenderly: TenderlyPlugin;
+  private readonly libs: Libraries | undefined;
+  private readonly nativeContractFactory: ContractFactory;
+  private readonly tenderly: TenderlyPlugin;
 
   constructor(
     nativeContractFactory: ContractFactory,
     tenderly: TenderlyPlugin,
     contractName: string,
-    libs?: Libraries
+    libs?: Libraries,
   ) {
     this.nativeContractFactory = nativeContractFactory;
     this.tenderly = tenderly;
@@ -42,12 +42,34 @@ export class TdlyContractFactory {
   public async deploy(...args: any[]): Promise<Contract> {
     const contract = await this.nativeContractFactory.deploy(...args);
 
-    return new TdlyContract(contract as Contract, this.tenderly, this.contractName, this.libs) as unknown as Contract;
+    return new TdlyContract(
+      contract as Contract,
+      this.tenderly,
+      this.contractName,
+      this.libs,
+    ) as unknown as Contract;
   }
 
   public connect(signer: Signer) {
     const contractFactory = this.nativeContractFactory.connect(signer);
 
-    return new TdlyContractFactory(contractFactory, this.tenderly, this.contractName, this.libs);
+    return new TdlyContractFactory(
+      contractFactory,
+      this.tenderly,
+      this.contractName,
+      this.libs,
+    );
+  }
+
+  public getLibs(): Libraries | undefined {
+    return this.libs;
+  }
+
+  public getContractName(): string {
+    return this.contractName;
+  }
+
+  public getNativeContractFactory(): ContractFactory {
+    return this.nativeContractFactory;
   }
 }

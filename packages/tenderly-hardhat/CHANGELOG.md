@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 2.1.1
+
+### Patch Changes
+
+- [#173](https://github.com/Tenderly/hardhat-tenderly/pull/173) [`7fd53a1`](https://github.com/Tenderly/hardhat-tenderly/commit/7fd53a1759c2443322ef2b729617d79c0b183e7f) Thanks [@dule-git](https://github.com/dule-git)! - Expand the recognition of RPC url for Tenderly networks
+
 ## 2.1.1-beta.0
 
 ### Patch Changes
