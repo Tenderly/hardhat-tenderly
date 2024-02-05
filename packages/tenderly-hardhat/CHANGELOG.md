@@ -1,5 +1,16 @@
 # @tenderly/hardhat-tenderly
 
+## 2.2.0-beta.0
+
+### Minor Changes
+
+- Implement manual and automatic verification of proxies deployed with `@openzeppelin/hardhat-upgrades`.
+
+### Patch Changes
+
+- Updated dependencies []:
+  - tenderly@0.9.0-beta.0
+
 ## 2.1.1
 
 ### Patch Changes

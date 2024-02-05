@@ -1,5 +1,11 @@
 # tenderly
 
+## 0.9.0-beta.0
+
+### Minor Changes
+
+- Implement manual and automatic verification of proxies deployed with `@openzeppelin/hardhat-upgrades`.
+
 ## 0.8.1-beta.0
 
 ### Patch Changes
