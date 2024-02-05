@@ -31,7 +31,7 @@ const config: HardhatUserConfig = {
     },
     my_tenderly_devnet_1: {
       // or any other custom network name
-      url: `${process.env.TENDERLY_DEVNET_V1_RPC_URL ?? ""}`,
+      url: `${process.env.TENDERLY_DEVNET_RPC_URL_1 ?? ""}`,
     },
     my_tenderly_devnet_2: {
       // or any other custom network name
