@@ -1,5 +1,11 @@
 # tenderly
 
+## 0.9.0
+
+### Minor Changes
+
+- [#176](https://github.com/Tenderly/hardhat-tenderly/pull/176) [`b96d3a8f9a1c934f90ed488260956b826f5c5a20`](https://github.com/Tenderly/hardhat-tenderly/commit/b96d3a8f9a1c934f90ed488260956b826f5c5a20) Thanks [@dule-git](https://github.com/dule-git)! - Implement manual and automatic verification of proxies deployed with `@openzeppelin/hardhat-upgrades`.
+
 ## 0.8.0
 
 ### Minor Changes
