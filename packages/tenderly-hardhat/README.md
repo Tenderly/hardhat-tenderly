@@ -21,6 +21,8 @@ Also, there are three ways of how you can actually do the verification based on 
 - **Manual verification approach** - You will have to manually verify the contracts via plugin method calls.
 - **Task verification approach** - Verify your contracts via `tenderly:verify` hardhat task.
 
+You can also verify proxy contracts supported by `@openzeppelin/hardhat-upgrades` plugin. For more information on that, you can check out the chapter about [Proxy Contract Verification](#proxy-contract-verification).
+
 ## Installation
 
 ```bash
@@ -262,6 +264,24 @@ You can also verify your contracts via exposed API calls. Although this is not r
 - `verifyDevnetMultiCompilerAPI(request: TenderlyVerifyContractsRequest)`
 
 For more information on how to use these methods, you can check out their javadocs.
+
+# Proxy contract verification
+
+This plugin supports verification of proxy contracts, their implementation and all the related contracts.
+In order to successfully verify a proxy contract, please read the chapters about [Verification Modes](#verification-modes) and [Verification Approaches](#verification-approaches) first.
+This will lead you to setup the configuration the right way, so you can verify your proxy contracts and their implementation on Tenderly.
+
+After you have successfully configured `hardhat.config.ts`, you need to populate the configuration in the format that `@nomicfoundation/hardhat-verify` plugin expects, given that this plugin uses their verification beneath for verifying proxies.
+But luckily, we have provided a way to automatically populate the configuration for you, you just need to set the `AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG=true` environment variable.
+
+In order to see how this all plays out, you can clone our [@tenderly/hardhat-tenderly](https://github.com/Tenderly/hardhat-tenderly) repo and navigate to the [examples/contract-verification](https://github.com/Tenderly/hardhat-tenderly/tree/master/examples/contract-verification) directory.
+This directory contains all the possibilities that you can explore in order to verify your proxy contracts.
+Right now we support, both manual and automatic verification of the following proxy contracts:
+- BeaconProxy
+- TransparentUpgradeableProxy
+- UUPSUpgradeableProxy
+
+And we support them on all type of verification modes (e.g. **devnet**, **fork**, **public**, **private**).
 
 # Troubleshooting
 If you are having trouble with the plugin and want to contact support, you can run the deploy script with the following ```--verbose``` flag as so:
