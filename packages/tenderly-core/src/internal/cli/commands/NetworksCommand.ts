@@ -24,7 +24,8 @@ export const NetworksCommand = new commander.Command("networks")
     const filteredNetworks = networks.filter(isNotExcluded);
     filteredNetworks.sort((a, b) => a.sort_order - b.sort_order);
 
-    const logCompliantNetworks = convertToLogCompliantNetworks(filteredNetworks);
+    const logCompliantNetworks =
+      convertToLogCompliantNetworks(filteredNetworks);
     logger.silly("Obtained filtered public networks:", logCompliantNetworks);
 
     const table = new Table({
@@ -36,13 +37,15 @@ export const NetworksCommand = new commander.Command("networks")
       ...(await Promise.all(
         filteredNetworks.map(async (network) => {
           if (verbose) {
-            const blockNumber = await tenderlyService.getLatestBlockNumber(network.ethereum_network_id);
+            const blockNumber = await tenderlyService.getLatestBlockNumber(
+              network.ethereum_network_id,
+            );
             return [network.ethereum_network_id, network.name, blockNumber];
           } else {
             return [network.ethereum_network_id, network.name];
           }
-        })
-      ))
+        }),
+      )),
     );
     logger.silly("Networks table:", table);
 
@@ -50,5 +53,8 @@ export const NetworksCommand = new commander.Command("networks")
   });
 
 function isNotExcluded(element: TenderlyNetwork): boolean {
-  return element.metadata.exclude_from_listing === undefined || element.metadata.exclude_from_listing === false;
+  return (
+    element.metadata.exclude_from_listing === undefined ||
+    element.metadata.exclude_from_listing === false
+  );
 }

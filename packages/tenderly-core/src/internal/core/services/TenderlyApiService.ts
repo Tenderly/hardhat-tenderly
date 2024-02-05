@@ -2,32 +2,37 @@ import * as axios from "axios";
 
 import { logger } from "../../../utils/logger";
 import { getConfig, isAccessTokenSet } from "../../../utils/config";
-import { TENDERLY_API_BASE_URL, TENDERLY_JSON_RPC_BASE_URL } from "../../../common/constants";
-import {HARDHAT_TENDERLY_VERSION} from "./hardhat-tenderly-version";
+import {
+  TENDERLY_API_BASE_URL,
+  TENDERLY_JSON_RPC_BASE_URL,
+} from "../../../common/constants";
+import { HARDHAT_TENDERLY_VERSION } from "./hardhat-tenderly-version";
 
 export class TenderlyApiService {
-  public static configureInstance(providedAccessKey?: string): axios.AxiosInstance {
+  public static configureInstance(
+    providedAccessKey?: string,
+  ): axios.AxiosInstance {
     logger.debug("Configuring instance.");
 
-    let accessKey: string
+    let accessKey: string;
     if (!!providedAccessKey) {
-      accessKey = providedAccessKey
+      accessKey = providedAccessKey;
     } else {
       const tdlyConfig = getConfig();
-      accessKey = tdlyConfig.access_key
+      accessKey = tdlyConfig.access_key;
     }
     const params = {
       baseURL: TENDERLY_API_BASE_URL,
-      headers: { 
+      headers: {
         "x-access-key": accessKey,
-        "x-user-agent": `@tenderly/hardhat-tenderly/${HARDHAT_TENDERLY_VERSION}`
+        "x-user-agent": `@tenderly/hardhat-tenderly/${HARDHAT_TENDERLY_VERSION}`,
       },
     };
 
     logger.debug("Configured instance with parameters:", {
       baseURL: TENDERLY_API_BASE_URL,
       access_key:
-      accessKey !== undefined && accessKey !== null && accessKey !== ""
+        accessKey !== undefined && accessKey !== null && accessKey !== ""
           ? "super secret access_key is set in 'access_key' field"
           : "undefined or null or empty string",
     });
@@ -58,7 +63,9 @@ export class TenderlyApiService {
     logger.debug("Configured tenderly rpc instance with parameters:", {
       baseURL: TENDERLY_JSON_RPC_BASE_URL,
       access_key:
-        tdlyConfig.access_key !== undefined && tdlyConfig.access_key !== null && tdlyConfig.access_key !== ""
+        tdlyConfig.access_key !== undefined &&
+        tdlyConfig.access_key !== null &&
+        tdlyConfig.access_key !== ""
           ? "super secret access_key is set in 'access_key' field"
           : "undefined or null or empty string",
     });

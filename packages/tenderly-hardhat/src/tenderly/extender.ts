@@ -1,7 +1,11 @@
 import "@nomicfoundation/hardhat-ethers";
 import { lazyObject } from "hardhat/plugins";
 import { extendConfig, extendEnvironment } from "hardhat/config";
-import { HardhatRuntimeEnvironment, HttpNetworkConfig, HardhatConfig } from "hardhat/types";
+import {
+  HardhatRuntimeEnvironment,
+  HttpNetworkConfig,
+  HardhatConfig,
+} from "hardhat/types";
 import { HardhatEthersHelpers } from "@nomicfoundation/hardhat-ethers/types";
 import { TenderlyService } from "tenderly";
 import { logger as serviceLogger } from "tenderly/utils/logger";
@@ -36,10 +40,12 @@ export function setup() {
       serviceLogger.settings.minLevel = 1; // trace level
     }
     logger.info(
-      `Setting up hardhat-tenderly plugin. Log level of hardhat tenderly plugin set to: ${logger.settings.minLevel}`
+      `Setting up hardhat-tenderly plugin. Log level of hardhat tenderly plugin set to: ${logger.settings.minLevel}`,
     );
     // serviceLogger is used here just for initialization, nothing else, it will be used in TenderlyService.ts
-    serviceLogger.info(`Log level of tenderly service set to: ${serviceLogger.settings.minLevel}`);
+    serviceLogger.info(
+      `Log level of tenderly service set to: ${serviceLogger.settings.minLevel}`,
+    );
 
     const pjson = require("../../package.json");
     logger.info("@tenderly/hardhat-tenderly version:", pjson.version);
@@ -55,7 +61,9 @@ export function setup() {
     extendProvider(hre);
     populateNetworks();
     if (process.env.AUTOMATIC_VERIFICATION_ENABLED === "true") {
-      logger.debug("Automatic verification is enabled, proceeding to extend ethers library.");
+      logger.debug(
+        "Automatic verification is enabled, proceeding to extend ethers library.",
+      );
       extendEthers(hre);
       extendHardhatDeploy(hre);
       logger.debug("Wrapping ethers library finished.");
@@ -79,7 +87,9 @@ extendConfig((resolvedConfig: HardhatConfig) => {
 
 const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
   if (!isTenderlyNetworkConfig(hre.network.config)) {
-    logger.info(`Used network is not 'tenderly' so there is no extending of the provider.`);
+    logger.info(
+      `Used network is not 'tenderly' so there is no extending of the provider.`,
+    );
     return;
   }
 
@@ -87,7 +97,10 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
     if (hre.network.config.url.includes("devnet")) {
       const devnetID = hre.network.config.url.split("/").pop();
       hre.tenderly.network().setDevnetID(devnetID);
-      logger.info(`There is a devnet url in the '${hre.network.name}' network`, { devnetID });
+      logger.info(
+        `There is a devnet url in the '${hre.network.name}' network`,
+        { devnetID },
+      );
       return;
     }
     const forkID = hre.network.config.url.split("/").pop();
@@ -102,11 +115,14 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
     .then(async (_) => {
       hre.tenderly.setNetwork(tenderlyNetwork);
       const forkID = await hre.tenderly.network().getForkID();
-      (hre.network.config as HttpNetworkConfig).url = `${TENDERLY_JSON_RPC_BASE_URL}/fork/${forkID ?? ""}`;
+      (hre.network.config as HttpNetworkConfig).url =
+        `${TENDERLY_JSON_RPC_BASE_URL}/fork/${forkID ?? ""}`;
       // hre.ethers.provider = new hre.ethers.BrowserProvider(hre.tenderly.network());
     })
     .catch((_) => {
-      logger.error(`Error happened while trying to initialize fork ${PLUGIN_NAME}. Check your tenderly configuration`);
+      logger.error(
+        `Error happened while trying to initialize fork ${PLUGIN_NAME}. Check your tenderly configuration`,
+      );
     });
 };
 
@@ -120,7 +136,8 @@ const populateNetworks = (): void => {
         NETWORK_NAME_CHAIN_ID_MAP[network.slug] = network.ethereum_network_id;
 
         if (network?.metadata?.slug !== undefined) {
-          NETWORK_NAME_CHAIN_ID_MAP[network.metadata.slug] = network.ethereum_network_id;
+          NETWORK_NAME_CHAIN_ID_MAP[network.metadata.slug] =
+            network.ethereum_network_id;
         }
 
         CHAIN_ID_NETWORK_NAME_MAP[network.ethereum_network_id] = network.slug;
@@ -129,7 +146,10 @@ const populateNetworks = (): void => {
           NETWORK_NAME_CHAIN_ID_MAP[slug] = network.ethereum_network_id;
         }
       }
-      logger.silly("Obtained supported public networks: ", NETWORK_NAME_CHAIN_ID_MAP);
+      logger.silly(
+        "Obtained supported public networks: ",
+        NETWORK_NAME_CHAIN_ID_MAP,
+      );
     })
     .catch((_) => {
       logger.error("Error encountered while fetching public networks");
@@ -148,8 +168,8 @@ const extendEthers = (hre: HardhatRuntimeEnvironment): void => {
       hre.ethers,
       wrapEthers(
         hre.ethers as unknown as typeof ethers & HardhatEthersHelpers,
-        hre.tenderly
-      ) as unknown as typeof hre.ethers
+        hre.tenderly,
+      ) as unknown as typeof hre.ethers,
     );
   }
 };

@@ -9,8 +9,16 @@ module.exports = {
     plugins: [
       "eslint-plugin-import",
       "@typescript-eslint",
+      "prettier",
     ],
     rules: {
+      "prettier/prettier": [
+        "error",
+        {
+          "printWidth": 80,
+          "trailingComma": "all"
+        }
+      ],
       "@typescript-eslint/adjacent-overload-signatures": "error",
       "@typescript-eslint/array-type": [
         "error",

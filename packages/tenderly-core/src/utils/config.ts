@@ -16,13 +16,16 @@ export function getConfig(): TenderlyConfig {
 
     const tenderlyConfig = yaml.load(fileData.toString()) as TenderlyConfig;
 
-    const logCompliantTenderlyConfig = convertToLogCompliantTenderlyConfig(tenderlyConfig);
+    const logCompliantTenderlyConfig =
+      convertToLogCompliantTenderlyConfig(tenderlyConfig);
     logger.trace("Checking config:", logCompliantTenderlyConfig);
 
     return tenderlyConfig;
   }
 
-  logger.warn("Tenderly config doesn't exist, empty string values are returned instead.");
+  logger.warn(
+    "Tenderly config doesn't exist, empty string values are returned instead.",
+  );
   return {
     access_key: "",
     access_key_id: "",
@@ -34,9 +37,12 @@ export function getConfig(): TenderlyConfig {
 }
 
 export function writeConfig(config: TenderlyConfig): void {
-  logger.trace(`Writing tenderly config to a file @ ${configDir}/${configFilePath}`);
+  logger.trace(
+    `Writing tenderly config to a file @ ${configDir}/${configFilePath}`,
+  );
 
-  const logCompliantTenderlyConfig = convertToLogCompliantTenderlyConfig(config);
+  const logCompliantTenderlyConfig =
+    convertToLogCompliantTenderlyConfig(config);
   logger.trace("Checking config:", logCompliantTenderlyConfig);
 
   fs.mkdirSync(configDir, { recursive: true });
@@ -46,7 +52,9 @@ export function writeConfig(config: TenderlyConfig): void {
 export function configExists(): boolean {
   logger.trace("Checking if tenderly config exists.");
   const exists = fs.existsSync(configFilePath);
-  logger.trace(exists ? "Tenderly config exists." : "Tenderly config doesn't exist.");
+  logger.trace(
+    exists ? "Tenderly config exists." : "Tenderly config doesn't exist.",
+  );
 
   return exists;
 }
@@ -55,7 +63,10 @@ export function isAccessTokenSet(): boolean {
   logger.trace("Determining if access token in tenderly config file is set.");
   const config = getConfig();
 
-  const isSet = config.access_key !== undefined && config.access_key !== null && config.access_key !== "";
+  const isSet =
+    config.access_key !== undefined &&
+    config.access_key !== null &&
+    config.access_key !== "";
   logger.trace(isSet ? "Access key is set." : "Access key is not set.");
 
   return isSet;

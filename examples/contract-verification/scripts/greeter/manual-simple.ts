@@ -4,7 +4,9 @@ import { ethers, tenderly } from "hardhat";
 async function main() {
   console.log("🖖🏽[ethers] Deploying and Verifying Greeter in Tenderly");
 
-  let greeter = await ethers.deployContract("Greeter", ["Hello, Manual Hardhat!"]);
+  let greeter = await ethers.deployContract("Greeter", [
+    "Hello, Manual Hardhat!",
+  ]);
 
   greeter = await greeter.waitForDeployment();
   const address = await greeter.getAddress();

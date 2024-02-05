@@ -28,9 +28,12 @@ export function convertToLogCompliantApiError(err: any) {
   }
 }
 
-export function convertToLogCompliantForkVerificationResponse(res: ContractResponse) {
+export function convertToLogCompliantForkVerificationResponse(
+  res: ContractResponse,
+) {
   const logCompliantContracts = convertToLogCompliantContracts(res.contracts);
-  const logCompliantBytecodeMismatchErrors = convertToLogCompliantBytecodeMismatchErrors(res.bytecode_mismatch_errors);
+  const logCompliantBytecodeMismatchErrors =
+    convertToLogCompliantBytecodeMismatchErrors(res.bytecode_mismatch_errors);
 
   return {
     contracts: logCompliantContracts,
@@ -76,7 +79,9 @@ export function convertToLogCompliantContracts(contracts: ApiContract[]) {
   return logCompliantContracts;
 }
 
-export function convertToLogCompliantBytecodeMismatchErrors(bytecodeMismatchErrors: BytecodeMismatchError[]) {
+export function convertToLogCompliantBytecodeMismatchErrors(
+  bytecodeMismatchErrors: BytecodeMismatchError[],
+) {
   if (bytecodeMismatchErrors === undefined || bytecodeMismatchErrors === null) {
     return undefined;
   }
@@ -94,9 +99,14 @@ export function convertToLogCompliantBytecodeMismatchErrors(bytecodeMismatchErro
   return logCompliantBytecodeMismatchErrors;
 }
 
-export function convertToLogCompliantVerificationResponse(res: VerifyContractsResponse) {
-  const logCompliantCompilationErrors = convertToLogCompliantCompilationErrors(res?.compilation_errors);
-  const logCompliantVerificationResults = convertToLogCompliantVerificationResults(res?.results);
+export function convertToLogCompliantVerificationResponse(
+  res: VerifyContractsResponse,
+) {
+  const logCompliantCompilationErrors = convertToLogCompliantCompilationErrors(
+    res?.compilation_errors,
+  );
+  const logCompliantVerificationResults =
+    convertToLogCompliantVerificationResults(res?.results);
 
   return {
     results: logCompliantVerificationResults,
@@ -105,7 +115,9 @@ export function convertToLogCompliantVerificationResponse(res: VerifyContractsRe
   };
 }
 
-function convertToLogCompliantVerificationResults(results: VerificationResult[]) {
+function convertToLogCompliantVerificationResults(
+  results: VerificationResult[],
+) {
   if (results === undefined || results === null) {
     return undefined;
   }
@@ -114,7 +126,10 @@ function convertToLogCompliantVerificationResults(results: VerificationResult[])
   const logCompliantBytecodeMismatchErrors = [];
 
   for (const res of results) {
-    if (res.bytecode_mismatch_error !== undefined && res.bytecode_mismatch_error !== null) {
+    if (
+      res.bytecode_mismatch_error !== undefined &&
+      res.bytecode_mismatch_error !== null
+    ) {
       logCompliantBytecodeMismatchErrors.push({
         contract_id: res.bytecode_mismatch_error.contract_id,
         expected: res.bytecode_mismatch_error.expected,
@@ -159,7 +174,9 @@ function convertToLogCompliantVerificationResults(results: VerificationResult[])
   };
 }
 
-function convertToLogCompliantCompilationErrors(compilationErrors: CompilationError[]) {
+function convertToLogCompliantCompilationErrors(
+  compilationErrors: CompilationError[],
+) {
   if (compilationErrors === undefined || compilationErrors === null) {
     return undefined;
   }
@@ -249,15 +266,21 @@ export function convertToLogCompliantTenderlyConfig(config: TenderlyConfig) {
         : "undefined or null or empty string",
     account_id: config.account_id,
     username:
-      config.username !== undefined && config.username !== null && config.username !== ""
+      config.username !== undefined &&
+      config.username !== null &&
+      config.username !== ""
         ? "set in 'username' field"
         : "undefined or null or empty string",
     access_key:
-      config.access_key !== undefined && config.access_key !== null && config.access_key !== ""
+      config.access_key !== undefined &&
+      config.access_key !== null &&
+      config.access_key !== ""
         ? "super secret access_key is set in 'access_key' field"
         : "undefined or null or empty string",
     access_key_id:
-      config.access_key_id !== undefined && config.access_key_id !== null && config.access_key_id !== ""
+      config.access_key_id !== undefined &&
+      config.access_key_id !== null &&
+      config.access_key_id !== ""
         ? "super secret access_key_id is set in 'access_key' field"
         : "undefined or null or empty string",
   };
