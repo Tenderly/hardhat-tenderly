@@ -6,6 +6,6 @@
     "@tenderly/hardhat-tenderly": "2.1.0"
   },
   "changesets": [
-    "calm-seahorses-heal"
+    "olive-scissors-battle"
   ]
 }
