@@ -1,4 +1,4 @@
-import { Contract, ContractTransactionReceipt, ethers } from "ethers";
+import { Contract, ethers } from "ethers";
 import { BigNumber } from "@ethersproject/bignumber";
 import { Libraries } from "@nomicfoundation/hardhat-ethers/types";
 
@@ -11,7 +11,7 @@ export class TdlyContract {
   private readonly contractName: string;
   private nativeContract: ethers.Contract;
   private tenderly: TenderlyPlugin;
-  private libraries: Libraries | undefined;
+  private readonly libraries: Libraries | undefined;
 
   constructor(
     nativeContract: ethers.Contract,
@@ -42,7 +42,7 @@ export class TdlyContract {
 
         deploymentTransaction.wait = async (
           confirmations?: number | undefined,
-        ): Promise<null | ContractTransactionReceipt> => {
+        ): Promise<null | ethers.ContractTransactionReceipt> => {
           const receipt = await wait(confirmations);
           if (receipt === undefined || receipt === null) {
             return null;
@@ -72,6 +72,14 @@ export class TdlyContract {
     }
 
     return contract;
+  }
+
+  public deploymentTransaction(): null | ethers.ContractTransactionResponse {
+    return this.nativeContract.deploymentTransaction();
+  }
+
+  public async getAddress(): Promise<string> {
+    return this.nativeContract.getAddress();
   }
 
   private async _tdlyVerify(address: string) {

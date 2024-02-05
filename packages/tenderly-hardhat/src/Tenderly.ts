@@ -27,6 +27,7 @@ import {
 } from "./utils/util";
 import { DEFAULT_CHAIN_ID, PLUGIN_NAME, VERIFICATION_TYPES } from "./constants";
 import { TenderlyNetwork } from "./TenderlyNetwork";
+import { ProxyPlaceholderName } from "./index";
 
 export class Tenderly {
   public env: HardhatRuntimeEnvironment;
@@ -46,10 +47,33 @@ export class Tenderly {
   public async verify(...contracts: any[]): Promise<void> {
     logger.info("Verification invoked.");
 
+    // If there are proxy contracts, we can run the task without further processing.
+    const proxyContracts = contracts.filter(
+      (contract) => contract.name === ProxyPlaceholderName,
+    );
+    for (const proxyContract of proxyContracts) {
+      await this.env.run("verify:verify", {
+        address: proxyContract.address,
+        constructorArguments: [],
+      });
+    }
+
     const flatContracts: ContractByName[] = contracts.reduce(
-      (accumulator, value) => accumulator.concat(value),
+      (accumulator, value) => {
+        if (value.address !== ProxyPlaceholderName) {
+          accumulator.concat(value);
+        }
+      },
       [],
     );
+    if (
+      flatContracts === undefined ||
+      flatContracts === null ||
+      flatContracts.length === 0
+    ) {
+      return;
+    }
+
     const verificationType = this._getVerificationType();
     const platformID =
       verificationType === VERIFICATION_TYPES.FORK
@@ -489,10 +513,15 @@ export class Tenderly {
       config: config!,
     };
   }
+
   private _isVerificationOnPlatform(verificationType: string): boolean {
     return (
       verificationType === VERIFICATION_TYPES.DEVNET ||
       verificationType === VERIFICATION_TYPES.FORK
     );
+  }
+
+  private _existsProxyVerification(contracts: any[]): boolean {
+    return contracts.some((contract) => contract.name === ProxyPlaceholderName);
   }
 }

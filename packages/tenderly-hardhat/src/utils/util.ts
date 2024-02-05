@@ -518,7 +518,19 @@ export const isTenderlyNetworkConfig = (nw: NetworkConfig): boolean => {
   return regex.test(nw.url);
 };
 
-function isHttpNetworkConfig(
+export function isTenderlyGatewayNetworkConfig(nw: NetworkConfig): boolean {
+  if (nw === undefined || nw === null) {
+    return false;
+  }
+  if (!isHttpNetworkConfig(nw)) {
+    return false;
+  }
+
+  const regex = /^https?:\/\/[\w-]+\.gateway\.tenderly\.co\/.*$/;
+  return regex.test(nw.url);
+}
+
+export function isHttpNetworkConfig(
   config: NetworkConfig,
 ): config is HttpNetworkConfig {
   return (config as HttpNetworkConfig).url !== undefined;
