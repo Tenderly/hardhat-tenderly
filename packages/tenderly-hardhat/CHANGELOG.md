@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 2.2.1
+
+### Patch Changes
+
+- [#179](https://github.com/Tenderly/hardhat-tenderly/pull/179) [`676045c3adf883c046d79af0a5d8bf34f2d9f165`](https://github.com/Tenderly/hardhat-tenderly/commit/676045c3adf883c046d79af0a5d8bf34f2d9f165) Thanks [@dule-git](https://github.com/dule-git)! - Fix empty array to verify
+
 ## 2.2.0
 
 ### Minor Changes
