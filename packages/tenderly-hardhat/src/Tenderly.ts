@@ -60,9 +60,10 @@ export class Tenderly {
 
     const flatContracts: ContractByName[] = contracts.reduce(
       (accumulator, value) => {
-        if (value.address !== ProxyPlaceholderName) {
-          accumulator.concat(value);
+        if (value.name !== ProxyPlaceholderName) {
+          accumulator = accumulator.concat(value);
         }
+        return accumulator;
       },
       [],
     );
