@@ -272,7 +272,7 @@ In order to successfully verify a proxy contract, please read the chapters about
 This will lead you to setup the configuration the right way, so you can verify your proxy contracts and their implementation on Tenderly.
 
 After you have successfully configured `hardhat.config.ts`, you need to populate the configuration in the format that `@nomicfoundation/hardhat-verify` plugin expects, given that this plugin uses their verification beneath for verifying proxies.
-But luckily, we have provided a way to automatically populate the configuration for you, you just need to set the `AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG=true` environment variable.
+But luckily, we have provided a way to automatically populate the configuration for you, you just need to set the `TENDERLY_AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG=true` environment variable.
 
 In order to see how this all plays out, you can clone our [@tenderly/hardhat-tenderly](https://github.com/Tenderly/hardhat-tenderly) repo and navigate to the [examples/contract-verification](https://github.com/Tenderly/hardhat-tenderly/tree/master/examples/contract-verification) directory.
 This directory contains all the possibilities that you can explore in order to verify your proxy contracts.
