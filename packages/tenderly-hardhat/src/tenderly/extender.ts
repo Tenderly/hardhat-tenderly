@@ -78,14 +78,8 @@ export function setup() {
       extendHardhatDeploy(hre);
       logger.debug("Wrapping ethers library finished.");
     }
-    // If the user has selected automatic population of hardhat-verify `etherscan` configuration, and it in fact is some of the Tenderly networks.
-    // We should populate the configuration.
-    if (
-      process.env.AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG === "true" &&
-      (isTenderlyNetworkConfig(hre.network.config) ||
-        isTenderlyGatewayNetworkConfig(hre.network.config)) &&
-      isHttpNetworkConfig(hre.network.config)
-    ) {
+
+    if (shouldPopulateHardhatVerifyConfig(hre)) {
       logger.info(
         "Automatic population of hardhat-verify `etherscan` configuration is enabled.",
       );
@@ -229,6 +223,21 @@ const extendUpgrades = (hre: HardhatRuntimeEnvironment): void => {
     );
   }
 };
+
+// Returns true if the user has selected automatic population of hardhat-verify `etherscan` configuration through the TENDERLY_AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG env variable,
+// and the network is some of the Tenderly networks.
+function shouldPopulateHardhatVerifyConfig(
+  hre: HardhatRuntimeEnvironment,
+): boolean {
+  return (
+    // Must cover both since AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG is the legacy because we didn't use the TENDERLY_ prefix.
+    (process.env.TENDERLY_AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG === "true" ||
+      process.env.AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG === "true") &&
+    (isTenderlyNetworkConfig(hre.network.config) ||
+      isTenderlyGatewayNetworkConfig(hre.network.config)) &&
+    isHttpNetworkConfig(hre.network.config)
+  );
+}
 
 // populateHardhatVerifyConfig will populate `hre.config.etherscan` configuration of the `@nomicfoundation/hardhat-verify` plugin.
 // This function should import `@nomicfoundation/hardhat-verify` type declaration expansion of the `HardhatConfig`, but can't since there will be double overloading task error if the client application also uses `@nomicfoundation/hardhat-verify` plugin.
