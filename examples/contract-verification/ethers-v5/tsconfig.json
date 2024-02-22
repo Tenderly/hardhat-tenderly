@@ -8,6 +8,10 @@
     "skipLibCheck": true,
     "outDir": "dist"
   },
-  "include": ["src/**/*", "test/**/*", "scripts/**/*"],
-  "files": ["hardhat.config.ts"]
+  "include": ["src/**/*", "test/**/*",
+    "ethers-v5/scripts/**/*"
+  ],
+  "files": [
+    "hardhat.config.ts"
+  ]
 }

@@ -4,13 +4,13 @@ import { ethers, tenderly } from "hardhat";
 
 export async function main() {
   console.log("🖖🏽[ethers] Deploying and Verifying Greeter in Tenderly");
-  // deploy stuff but later pretend it's been deployed ages ago on Ropsten.
-  let greeter = await ethers.deployContract("Greeter", [
-    "Hello, Manual Hardhat!",
-  ]);
-
-  greeter = await greeter.waitForDeployment();
-  const greeterAddress = await greeter.getAddress();
+  
+  // deploy stuff but later pretend it's been deployed ages ago on Sepolia.
+  const Greeter = await ethers.getContractFactory("Greeter");
+  let greeter = await Greeter.deploy("Hello, Manual Hardhat!");
+  greeter = await greeter.deployed();
+  
+  const greeterAddress = await greeter.address;
   console.log("Manual Advanced: {Greeter} deployed to", greeterAddress);
 
   // pretend it's been deployed ages ago on Sepolia in a different deployment.
@@ -36,7 +36,7 @@ export async function main() {
         },
         // solidity format compiler with a little modification at libraries param
         compiler: {
-          version: "0.8.17",
+          version: "0.8.23",
           settings: {
             optimizer: {
               enabled: false,
