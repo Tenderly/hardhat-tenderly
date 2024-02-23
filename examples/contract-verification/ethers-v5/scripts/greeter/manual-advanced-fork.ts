@@ -8,12 +8,11 @@ export async function main() {
 
   console.log("🖖🏽[ethers] Deploying and Verifying Greeter in Tenderly");
 
-  let greeter = await ethers.deployContract("Greeter", [
-    "Hello, Manual Hardhat on Fork !",
-  ]);
-
-  greeter = await greeter.waitForDeployment();
-  const greeterAddress = await greeter.getAddress();
+  const Greeter = await ethers.getContractFactory("Greeter");
+  let greeter = await Greeter.deploy("Hello, Manual Hardhat on Fork !");
+  greeter = await greeter.deployed();
+  
+  const greeterAddress = await greeter.address;
   console.log("Manual Advanced (fork): {Greeter} deployed to", greeterAddress);
 
   await tenderly.verifyForkMultiCompilerAPI(
@@ -36,12 +35,13 @@ export async function main() {
           },
           // solidity format compiler with a little modification at libraries param
           compiler: {
-            version: "0.8.17",
+            version: "0.8.23",
             settings: {
               optimizer: {
                 enabled: false,
                 runs: 200,
               },
+              evmVersion: "paris",
             },
           },
           networks: {

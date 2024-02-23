@@ -49,12 +49,12 @@ hardhat run scripts/greeter/automatic.ts --network sepolia
 
 The `/scripts/greeter` contains 4 deployment scripts that illustrate the 3 approaches of verification (automatic, manual simple, manual advanced) and verification of a contract deployed on a Tenderly Fork. The `scripts/calculator` example has the same structure.
 
-| Verification method    | Script                             |
-| ---------------------- | ---------------------------------- |
-| Automatic verification | `scripts/greeter/automatic.ts`     |
-| Manual simple          | `scripts/greeter/manual-simple.ts` |
-| Manual advanced        | `scripts/greeter/manual-simple.ts` |
-| Fork                   | `scripts/greeter/fork.ts`          |
+| Verification method    | Script                               |
+| ---------------------- |--------------------------------------|
+| Automatic verification | `scripts/greeter/automatic.ts`       |
+| Manual simple          | `scripts/greeter/manual-simple.ts`   |
+| Manual advanced        | `scripts/greeter/manual-advanced.ts` |
+| Fork                   | `scripts/greeter/fork.ts`            |
 
 For example, to run the automatic verification example, you have to run it with [`TENDERLY_AUTOMATIC_VERIFICATION`](#modes-of-verification-public-private-and-fork) variable:
 
@@ -76,14 +76,14 @@ Don't worry, we generated [Run scripts](#run-scripts) to speed things up.
 ### Modes of verification: `public`, `private`, and `fork`
 
 - To easily switch between private and public verification use `TENDERLY_PRIVATE_VERIFICATION`.
-- Default: `false`, contracts are verified publically.
+- Default: `false`, contracts are verified publicly.
 - To run a private verification set `TENDERLY_PRIVATE_VERIFICATION=true`. Any other value is considered not true.
 
 ### Tenderly Plugin verification approaches: automatic and manual
 
-- Tenderly Hardhat plugin runs with automatic verifications **enabled by default** unless explicitly configured otherwise. See hardhat config line 31.
+- Tenderly Hardhat plugin runs with automatic verifications **enabled by default** unless explicitly configured otherwise.
 - To control if you're automatic or manual verification, use `TENDERLY_AUTOMATIC_VERIFICATION`.
-- Default: `false`
+- By default, the `TENDERLY_AUTOMATIC_VERIFICATION` will not be set, so the automatic verification won't be turned on.
 - To run an automatic verification set `TENDERLY_AUTOMATIC_VERIFICATION=true`
 
 ## Run scripts
@@ -102,15 +102,5 @@ To run `private` verification of the `Greeter` using `manual-simple` method, you
 
 ```
 yarn run private:greeter:manual-simple --network sepolia
-yarn run fork:calculatr:manual-advanced --network my_tenderly_fork_1
+yarn run fork:calculator:manual-advanced --network tenderly
 ```
-
-## Proxy contract verification
-
-Like with the commands above, we have created a set of commands that will help you quickly start verifying proxy contracts. The commands are:
-```bash
-yarn fork:proxy:automatic --network my_tenderly_fork_1
-yarn private:proxy:manual-simple --network sepolia
-```
-
-When running against a specific network, you must add `--network <NETWORK_NAME>`. 
