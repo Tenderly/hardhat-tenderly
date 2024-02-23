@@ -1,5 +1,14 @@
 # @tenderly/hardhat-tenderly
 
+## 2.2.2-beta.0
+
+### Patch Changes
+
+- Added hardhat example project for ethers-5 and changed AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG to TENDERLY_AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG.
+
+- Updated dependencies []:
+  - tenderly@0.9.1-beta.0
+
 ## 2.2.1
 
 ### Patch Changes
