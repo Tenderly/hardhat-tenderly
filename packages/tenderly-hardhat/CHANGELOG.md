@@ -6,6 +6,15 @@
 
 - [#184](https://github.com/Tenderly/hardhat-tenderly/pull/184) [`2485b9c568a5520ed42928d2f6b99fa86c58b54b`](https://github.com/Tenderly/hardhat-tenderly/commit/2485b9c568a5520ed42928d2f6b99fa86c58b54b) Thanks [@dule-git](https://github.com/dule-git)! - Added hardhat example project for ethers-5 and changed AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG to TENDERLY_AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG
 
+## 2.2.2-beta.0
+
+### Patch Changes
+
+- Added hardhat example project for ethers-5 and changed AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG to TENDERLY_AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG.
+
+- Updated dependencies []:
+  - tenderly@0.9.1-beta.0
+
 ## 2.2.1
 
 ### Patch Changes
