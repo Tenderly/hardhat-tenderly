@@ -1,0 +1,17 @@
+/artifacts
+/cache
+/deployments
+/dist
+/node_modules
+/build-test
+/builtin-tasks
+/common
+/internal
+/types
+/utils
+/*.d.ts
+/*.d.ts.map
+/*.js
+/*.js.map
+/.nyc_output
+CHANGELOG.md

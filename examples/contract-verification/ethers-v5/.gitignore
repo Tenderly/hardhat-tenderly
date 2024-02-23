@@ -1,6 +1,5 @@
 .DS_Store
 
-node_modules
 # Logs
 logs
 *.log
@@ -59,6 +58,7 @@ typechain-types
 cache
 artifacts
 deployments
+.openzeppelin
 
 # ts
 dist

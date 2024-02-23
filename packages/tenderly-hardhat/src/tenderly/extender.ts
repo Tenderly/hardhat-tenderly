@@ -93,7 +93,7 @@ export function setup() {
             etherscanConfig,
             null,
             2,
-          )}\nOr set 'AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG' environment variable to 'false'`,
+          )}\nOr set 'TENDERLY_AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG' environment variable to 'false'`,
         );
       }
       await populateHardhatVerifyConfig(hre);

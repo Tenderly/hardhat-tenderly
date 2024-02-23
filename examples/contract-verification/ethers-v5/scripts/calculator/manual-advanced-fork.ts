@@ -49,12 +49,13 @@ export async function main() {
           },
           // solidity format compiler with a little modification at libraries param
           compiler: {
-            version: "0.8.17",
+            version: "0.8.23",
             settings: {
               optimizer: {
                 enabled: false,
                 runs: 200,
               },
+              evmVersion: "paris",
               libraries: {
                 "contracts/libraries/Maths.sol": {
                   // WARNING: Beware of the addresses parameter
