@@ -834,15 +834,15 @@
     "@nomicfoundation/solidity-analyzer-win32-ia32-msvc" "0.1.1"
     "@nomicfoundation/solidity-analyzer-win32-x64-msvc" "0.1.1"
 
-"@openzeppelin/contracts-upgradeable@^5.0.1":
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-5.0.1.tgz#ebc163cbed2de6b8b69bff628261d18deb912a81"
-  integrity sha512-MvaLoPnVcoZr/qqZP+4cl9piuR4gg0iIGgxVSZ/AL1iId3M6IdEHzz9Naw5Lirl4KKBI6ciTVnX07yL4dOMIJg==
+"@openzeppelin/contracts-upgradeable@^5.0.2":
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-5.0.2.tgz#3e5321a2ecdd0b206064356798c21225b6ec7105"
+  integrity sha512-0MmkHSHiW2NRFiT9/r5Lu4eJq5UJ4/tzlOgYXNAIj/ONkQTVnz22pLxDvp4C4uZ9he7ZFvGn3Driptn1/iU7tQ==
 
-"@openzeppelin/contracts@^5.0.1":
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-5.0.1.tgz#93da90fc209a0a4ff09c1deb037fbb35e4020890"
-  integrity sha512-yQJaT5HDp9hYOOp4jTYxMsR02gdFZFXhewX5HW9Jo4fsqSVqqyIO/xTHdWDaKX5a3pv1txmf076Lziz+sO7L1w==
+"@openzeppelin/contracts@^5.0.2":
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-5.0.2.tgz#b1d03075e49290d06570b2fd42154d76c2a5d210"
+  integrity sha512-ytPc6eLGcHHnapAZ9S+5qsdomhjo6QBHTDRRBFfTxXIpsicMhVPouPgmUPebZZZGX7vt9USA+Z+0M0dSVtSUEA==
 
 "@openzeppelin/defender-admin-client@^1.52.0":
   version "1.54.1"
@@ -1040,18 +1040,20 @@
   resolved "https://registry.yarnpkg.com/@solidity-parser/parser/-/parser-0.18.0.tgz#8e77a02a09ecce957255a2f48c9a7178ec191908"
   integrity sha512-yfORGUIPgLck41qyN7nbwJRAx17/jAIXCTanHOJZhB6PJ1iAk/84b/xlsVKFSyNyLXIj0dhppoE0+CRws7wlzA==
 
-"@tenderly/hardhat-tenderly@^2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@tenderly/hardhat-tenderly/-/hardhat-tenderly-2.1.1.tgz#b79e271ee7de9309e58533785c2e417ec8e09cd1"
-  integrity sha512-AnOllhGfqtEzyZLzRgli90JRV3Eq/qAsogtcHxZwAczgI33UzqfRn6Lz/RAd+FBsLqntsWNJ7SWJ7s+aBna2Tw==
+"@tenderly/hardhat-tenderly@^2.2.1":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@tenderly/hardhat-tenderly/-/hardhat-tenderly-2.2.2.tgz#e9ff3e149af2244a8448e0ff968717f6f1ba602f"
+  integrity sha512-JZINDVHW0ob+tCtNppgXMKiVcpbtcdEeHGaIsRFDXGeVQ1061asouf1lILvyWSfhv5ZeIkEX/LmeOo9IlC7rkw==
   dependencies:
     "@ethersproject/bignumber" "^5.7.0"
     "@nomicfoundation/hardhat-ethers" "^3.0.4"
-    axios "^0.27.2"
+    "@openzeppelin/hardhat-upgrades" "^3.0.1"
+    "@openzeppelin/upgrades-core" "^1.32.2"
+    axios "^1.6.7"
     ethers "^6.8.1"
     fs-extra "^10.1.0"
     hardhat-deploy "^0.11.43"
-    tenderly "^0.8.0"
+    tenderly "^0.9.1"
     ts-node "^10.9.1"
     tslog "^4.3.1"
     typescript "^5.2.2"
@@ -1643,7 +1645,7 @@ axios@^0.27.2:
     follow-redirects "^1.14.9"
     form-data "^4.0.0"
 
-axios@^1.4.0, axios@^1.5.1:
+axios@^1.4.0, axios@^1.5.1, axios@^1.6.7:
   version "1.6.7"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.6.7.tgz#7b48c2e27c96f9c68a2f8f31e2ab19f59b06b0a7"
   integrity sha512-/hDJGff6/c7u0hDkvkGxR/oy6CbCs8ziCsC7SqmhjfozqiJGc8Z11wrv9z9lYfY4K8l+H9TpjcMDX0xOZmx+RA==
@@ -5111,10 +5113,10 @@ table@^6.8.0:
     string-width "^4.2.3"
     strip-ansi "^6.0.1"
 
-tenderly@^0.8.0:
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/tenderly/-/tenderly-0.8.0.tgz#ffda1f40597b91470e728900e3bdfe6a4f152ec5"
-  integrity sha512-4Faw9jkwMuBOva82lAtvhTa9isc503GkWwVWSsR8ONm+i3SeFatv7hNyYPZIifQBeuU9GOVNkWHCAXon6NE/aw==
+tenderly@^0.9.1:
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/tenderly/-/tenderly-0.9.1.tgz#de988bc5b65a106c2e1f84faf17863ba9bb81173"
+  integrity sha512-EGhYYbOgIC0EUebrMIwCRIL9NrGrC8q3gTY/3JNSqvQrNX4RLUgMHungTG4bkgGAwJoehC57vsAeKqR1PVIyjw==
   dependencies:
     axios "^0.27.2"
     cli-table3 "^0.6.2"
