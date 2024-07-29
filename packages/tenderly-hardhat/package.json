@@ -4,7 +4,7 @@
   "license": "MIT",
   "homepage": "https://tenderly.co",
   "description": "Hardhat plugin for integration with Tenderly",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
@@ -42,14 +42,15 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "hardhat": "^2.19.0",
+    "hardhat": "^2.22.6",
     "prettier": "^2.7.1",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.5.4"
   },
   "dependencies": {
     "@ethersproject/bignumber": "^5.7.0",
-    "@nomicfoundation/hardhat-ethers": "^3.0.4",
+    "@nomicfoundation/hardhat-ignition": "^0.15.5",
+    "@nomicfoundation/hardhat-verify": "^2.0.8",
     "@openzeppelin/hardhat-upgrades": "^3.0.1",
     "@openzeppelin/upgrades-core": "^1.32.2",
     "axios": "^1.6.7",
@@ -59,10 +60,10 @@
     "tenderly": "^0.9.1",
     "ts-node": "^10.9.1",
     "tslog": "^4.3.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.5.4"
   },
   "peerDependencies": {
     "ethers": "^6.8.1",
-    "hardhat": "^2.19.0"
+    "hardhat": "^2.22.6"
   }
 }
