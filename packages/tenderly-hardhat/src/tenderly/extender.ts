@@ -313,7 +313,7 @@ function isRecord(value: any): value is Record<string, string> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-async function getChainId(network: Network): Promise<number> {
+export async function getChainId(network: Network): Promise<number> {
   if (network.config.chainId !== undefined && network.config.chainId !== null) {
     return network.config.chainId;
   }
