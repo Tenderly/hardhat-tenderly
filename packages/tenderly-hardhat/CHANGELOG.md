@@ -1,5 +1,16 @@
 # @tenderly/hardhat-tenderly
 
+## 2.3.0-beta.0
+
+### Minor Changes
+
+- [#192](https://github.com/Tenderly/hardhat-tenderly/pull/192) [`9e8e509535392b3149c8f3d7f9106c392c9436b6`](https://github.com/Tenderly/hardhat-tenderly/commit/9e8e509535392b3149c8f3d7f9106c392c9436b6) Thanks [@ElaNej](https://github.com/ElaNej)! - Support hardhat-ignition
+
+### Patch Changes
+
+- Updated dependencies [[`9e8e509535392b3149c8f3d7f9106c392c9436b6`](https://github.com/Tenderly/hardhat-tenderly/commit/9e8e509535392b3149c8f3d7f9106c392c9436b6)]:
+  - tenderly@0.10.0-beta.0
+
 ## 2.2.2
 
 ### Patch Changes
