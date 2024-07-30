@@ -6,6 +6,7 @@
     "@tenderly/hardhat-tenderly": "2.1.0"
   },
   "changesets": [
+    "mighty-tables-ring",
     "olive-scissors-battle",
     "shiny-parrots-flow",
     "tall-ladybugs-pump"
