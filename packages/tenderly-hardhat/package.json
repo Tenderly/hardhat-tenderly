@@ -50,7 +50,6 @@
   "dependencies": {
     "@ethersproject/bignumber": "^5.7.0",
     "@nomicfoundation/hardhat-ignition": "^0.15.5",
-    "@nomicfoundation/hardhat-verify": "^2.0.8",
     "@openzeppelin/hardhat-upgrades": "^3.0.1",
     "@openzeppelin/upgrades-core": "^1.32.2",
     "axios": "^1.6.7",
