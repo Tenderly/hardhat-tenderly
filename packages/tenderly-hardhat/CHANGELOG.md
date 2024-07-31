@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 2.3.0
+
+### Minor Changes
+
+- [#191](https://github.com/Tenderly/hardhat-tenderly/pull/191) [`81d05944900fa16e42c3a786514b8afcd38ac82c`](https://github.com/Tenderly/hardhat-tenderly/commit/81d05944900fa16e42c3a786514b8afcd38ac82c) Thanks [@ElaNej](https://github.com/ElaNej)! - Support hardhat-ignition
+
 ## 2.2.2
 
 ### Patch Changes
