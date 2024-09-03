@@ -204,7 +204,7 @@ export class TenderlyNetwork {
     return this.vnetID;
   }
 
-  public setVnetID(fork: string | undefined): void {
+  public setVnetID(vnet: string | undefined): void {
     if (!this._checkNetwork()) {
       return;
     }
