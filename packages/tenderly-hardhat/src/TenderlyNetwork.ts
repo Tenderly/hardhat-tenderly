@@ -25,7 +25,7 @@ export class TenderlyNetwork {
   public connected: boolean;
   public accessKey: string;
   public head: string | undefined;
-  public forkID: string | undefined;
+  public vnetID: string | undefined;
   public tenderlyJsonRpc: axios.AxiosInstance;
   public accounts: Record<string, string> | undefined;
   public env: HardhatRuntimeEnvironment;
@@ -55,8 +55,8 @@ export class TenderlyNetwork {
         this.devnetID = hre.network.config.url.split("/").pop();
         logger.info("Devnet ID is:", this.devnetID);
       } else {
-        this.forkID = hre.network.config.url.split("/").pop();
-        logger.info("Fork ID is:", this.forkID);
+        this.vnetID = hre.network.config.url.split("/").pop();
+        logger.info("VNET ID is:", this.vnetID);
       }
     }
   }
@@ -124,16 +124,16 @@ export class TenderlyNetwork {
       return;
     }
 
-    if (this.head === undefined && this.forkID === undefined) {
+    if (this.head === undefined && this.vnetID === undefined) {
       logger.warn("Head or fork are not initialized.");
       await this.initializeFork();
     }
 
-    await this.tenderlyService.verifyForkContractsMultiCompiler(
+    await this.tenderlyService.verifyVnetContractsMultiCompiler(
       requestData,
       this.env.config.tenderly.project,
       this.env.config.tenderly.username,
-      this.forkID!,
+      this.vnetID!,
     );
   }
 
@@ -144,7 +144,7 @@ export class TenderlyNetwork {
     forkID: string,
   ) {
     logger.info("Invoked fork verification via API.");
-    await this.tenderlyService.verifyForkContractsMultiCompiler(
+    await this.tenderlyService.verifyVnetContractsMultiCompiler(
       request,
       tenderlyProject,
       username,
@@ -196,19 +196,19 @@ export class TenderlyNetwork {
     this.head = head;
   }
 
-  public async getForkID(): Promise<string | undefined> {
+  public async getVnetID(): Promise<string | undefined> {
     if (!this._checkNetwork()) {
       return;
     }
 
-    return this.forkID;
+    return this.vnetID;
   }
 
-  public setFork(fork: string | undefined): void {
+  public setVnetID(fork: string | undefined): void {
     if (!this._checkNetwork()) {
       return;
     }
-    this.forkID = fork;
+    this.vnetID = fork;
   }
 
   public async initializeFork() {
@@ -243,7 +243,7 @@ export class TenderlyNetwork {
 
       this.head = resp.data.root_transaction.id;
       this.accounts = resp.data.simulation_fork.accounts;
-      this.forkID = resp.data.simulation_fork.id;
+      this.vnetID = resp.data.simulation_fork.id;
 
       logger.debug("Successfully initialized tenderly fork.");
     } catch (err) {
@@ -298,7 +298,7 @@ export class TenderlyNetwork {
 
       logger.trace("Currently processing contract:", contract.name);
       requestData.contracts[index].networks = {
-        [this.forkID!]: {
+        [this.vnetID!]: {
           address: contract.address,
           links: contract.libraries,
         },

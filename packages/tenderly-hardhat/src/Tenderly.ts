@@ -78,7 +78,7 @@ export class Tenderly {
     const verificationType = this._getVerificationType();
     const platformID =
       verificationType === VERIFICATION_TYPES.FORK
-        ? this.tenderlyNetwork.forkID
+        ? this.tenderlyNetwork.vnetID
         : this.tenderlyNetwork.devnetID;
 
     const requestData = await makeVerifyContractsRequest(

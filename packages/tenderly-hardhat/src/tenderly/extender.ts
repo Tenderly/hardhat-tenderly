@@ -133,9 +133,9 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
       );
       return;
     }
-    const forkID = hre.network.config.url.split("/").pop();
-    hre.tenderly.network().setFork(forkID);
-    logger.info(`There is a fork url in the 'tenderly' network`, { forkID });
+    const vnetID = hre.network.config.url.split("/").pop();
+    hre.tenderly.network().setVnetID(vnetID);
+    logger.info(`There is a vnet url in the 'tenderly' network`, { vnetID });
     return;
   }
 
@@ -144,15 +144,15 @@ const extendProvider = (hre: HardhatRuntimeEnvironment): void => {
     .initializeFork()
     .then(async (_) => {
       hre.tenderly.setNetwork(tenderlyNetwork);
-      const forkID = await hre.tenderly.network().getForkID();
+      const vnetID = await hre.tenderly.network().getVnetID();
       (
         hre.network.config as HttpNetworkConfig
-      ).url = `${TENDERLY_JSON_RPC_BASE_URL}/fork/${forkID ?? ""}`;
+      ).url = `${TENDERLY_JSON_RPC_BASE_URL}/fork/${vnetID ?? ""}`;
       // hre.ethers.provider = new hre.ethers.BrowserProvider(hre.tenderly.network());
     })
     .catch((_) => {
       logger.error(
-        `Error happened while trying to initialize fork ${PLUGIN_NAME}. Check your tenderly configuration`,
+        `Error happened while trying to initialize vnet ${PLUGIN_NAME}. Check your tenderly configuration`,
       );
     });
 };

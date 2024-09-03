@@ -493,13 +493,13 @@ export class TenderlyService {
     }
   }
 
-  public async verifyForkContractsMultiCompiler(
+  public async verifyVnetContractsMultiCompiler(
     request: TenderlyVerifyContractsRequest,
     tenderlyProject: string,
     username: string,
-    forkID: string,
+    vnetID: string,
   ): Promise<void> {
-    logger.info("Verifying contracts on fork. (Multi compiler version)");
+    logger.info("Verifying contracts on Vnet...");
 
     if (!TenderlyApiService.isAuthenticated()) {
       logger.error(
@@ -511,12 +511,12 @@ export class TenderlyService {
     const tenderlyApi = TenderlyApiService.configureInstance();
     try {
       const res = await tenderlyApi.post(
-        `api/v1/account/${username}/project/${tenderlyProject}/fork/${forkID}/contracts/verify`,
+        `api/v1/account/${username}/project/${tenderlyProject}/fork/${vnetID}/contracts/verify`,
         { ...request },
       );
       if (res.data === undefined || res.data === null) {
         logger.error(
-          "There was an error while verifying contracts on fork (Multi compiler version). Obtained response is invalid.",
+          "There was an error while verifying contracts on vnet (Multi compiler version). Obtained response is invalid.",
         );
       }
       const response = convertToLogCompliantVerificationResponse(res.data);
@@ -557,13 +557,12 @@ export class TenderlyService {
         response.results.verified_contracts !== null
       ) {
         for (const verifiedContract of response.results.verified_contracts) {
-          const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/${username}/${tenderlyProject}/fork/${forkID}`;
-          let logMsg = `Contract ${verifiedContract.address} verified. You can view the contract at the fork: ${contractLink}`;
+          let logMsg = `Contract ${verifiedContract.address} verified.`;
           if (
             response.display_link != undefined &&
             response.display_link != ""
           ) {
-            logMsg = `Contract ${verifiedContract.address} verified. You can view the contract at: ${response.display_link}`;
+            logMsg = logMsg + `You can view the contract at: ${response.display_link}`;
           }
           console.log(logMsg);
           logger.trace(logMsg);
@@ -748,9 +747,8 @@ export class TenderlyService {
       ) {
         for (const verifiedContract of response.results.verified_contracts) {
           const contractLink = response.display_link;
-          const logMsg = `Contract ${verifiedContract.address} verified. You can view the contract at the devnet: ${contractLink}`;
+          const logMsg = `Contract ${verifiedContract.address} verified. You can view the contract at: ${contractLink}`;
           console.log(logMsg);
-          logger.trace(logMsg);
         }
       }
     } catch (err) {
