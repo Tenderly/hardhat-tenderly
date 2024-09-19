@@ -5,10 +5,10 @@ import {
   TenderlyContractUploadRequest,
   TenderlyForkContractUploadRequest,
   TenderlyVerifyContractsRequest,
-} from "tenderly/types";
+} from "src/tenderly/types";
 
-import { ContractByName, TenderlyConfig } from "./tenderly/types";
-import { TenderlyNetwork } from "./TenderlyNetwork";
+import { ContractByName, TenderlyConfig } from "../tenderly/types";
+import { TenderlyNetwork } from "../TenderlyNetwork";
 
 export interface TenderlyPlugin {
   /** *

@@ -1,4 +1,4 @@
-import "./type-extensions";
+import "./hre-extender/type-extensions";
 import "./tasks";
 
 import * as tenderlyExtender from "./tenderly/extender";

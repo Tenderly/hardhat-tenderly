@@ -13,7 +13,7 @@ import {
   DeployBeaconProxyOptions,
   DeployProxyOptions,
 } from "@openzeppelin/hardhat-upgrades/dist/utils";
-import { TenderlyPlugin } from "../type-extensions";
+import { TenderlyPlugin } from "../hre-extender/type-extensions";
 import { logger } from "../utils/logger";
 import { TdlyContractFactory } from "./ethers/ContractFactory";
 import { TdlyContract } from "./ethers/Contract";

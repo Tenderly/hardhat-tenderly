@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { TenderlyPlugin } from "../../type-extensions";
+import { TenderlyPlugin } from "../../hre-extender/type-extensions";
 import { logger } from "../../utils/logger";
 
 export class TdlyProxyContract {

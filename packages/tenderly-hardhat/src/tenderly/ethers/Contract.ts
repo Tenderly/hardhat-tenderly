@@ -2,7 +2,7 @@ import { Contract, ethers } from "ethers";
 import { BigNumber } from "@ethersproject/bignumber";
 import { Libraries } from "@nomicfoundation/hardhat-ethers/types";
 
-import { TenderlyPlugin } from "../../type-extensions";
+import { TenderlyPlugin } from "../../hre-extender/type-extensions";
 import { ContractByName } from "../types";
 
 export class TdlyContract {
