@@ -13,11 +13,11 @@ import {
   DeployBeaconProxyOptions,
   DeployProxyOptions,
 } from "@openzeppelin/hardhat-upgrades/dist/utils";
-import { TenderlyPlugin } from "../hre-extender/type-extensions";
+import { TenderlyPlugin } from "./type-extensions";
 import { logger } from "../utils/logger";
-import { TdlyContractFactory } from "./ethers/ContractFactory";
-import { TdlyContract } from "./ethers/Contract";
-import { TdlyProxyContract } from "./ethers/ProxyContract";
+import { TdlyContractFactory } from "../tenderly/ethers/ContractFactory";
+import { TdlyContract } from "../tenderly/ethers/Contract";
+import { TdlyProxyContract } from "../tenderly/ethers/ProxyContract";
 
 export function wrapEthers(
   nativeEthers: typeof ethers & HardhatEthersHelpers,

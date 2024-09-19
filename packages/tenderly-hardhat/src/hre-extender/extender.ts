@@ -32,7 +32,7 @@ import {
 import * as URLComposer from "../utils/url-composer";
 import { wrapEthers, wrapUpgrades } from "./ethers";
 import { wrapHHDeployments } from "./hardhat-deploy";
-import { getVnetTypeByEndpointId, VnetType } from "./vnet-type";
+import { getVnetTypeByEndpointId, VnetType } from "../tenderly/vnet-type";
 
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
 

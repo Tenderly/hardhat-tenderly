@@ -1,7 +1,7 @@
 import "./hre-extender/type-extensions";
 import "./tasks";
 
-import * as tenderlyExtender from "./tenderly/extender";
+import * as tenderlyExtender from "./hre-extender/extender";
 
 export function setup(
   cfg: { automaticVerifications: boolean } = { automaticVerifications: true },

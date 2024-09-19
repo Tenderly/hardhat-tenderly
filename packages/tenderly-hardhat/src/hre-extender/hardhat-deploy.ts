@@ -4,7 +4,7 @@ import {
   DeployResult,
 } from "hardhat-deploy/types";
 
-import { TenderlyPlugin } from "../hre-extender/type-extensions";
+import { TenderlyPlugin } from "./type-extensions";
 
 export function wrapHHDeployments(
   deployments: DeploymentsExtension,
