@@ -13,7 +13,7 @@
   },
   "scripts": {
     "build": "rm -rf build-test && node version-generator.js && tsc --build .",
-    "clean": "rm -rf node_modules && rm -rf build-test && rm -rf common && rm -rf internal && rm -rf types && rm -rf utils",
+    "clean": "rm -rf node_modules && rm -rf build-test && rm -rf common && rm -rf internal && rm -rf types && rm -rf utils && rm tsconfig.tsbuildinfo",    
     "lint": "yarn run prettier --check && yarn run eslint",
     "lint:fix": "yarn run prettier --write && yarn run eslint --fix",
     "eslint": "eslint 'src/**/*.ts'",
