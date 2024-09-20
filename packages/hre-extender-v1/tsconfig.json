@@ -1,0 +1,18 @@
+{
+  "extends": "../../config/typescript/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "composite": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["./dist", "./node_modules"],
+  "references": [
+    {
+      "path": "../tenderly-hardhat"
+    },
+    {
+      "path": "../tenderly-core"
+    }
+  ]
+}
