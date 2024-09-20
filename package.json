@@ -8,8 +8,8 @@
         "packages/*"
     ],
     "scripts": {
-        "build": "yarn --cwd packages/tenderly-core run build && yarn --cwd packages/tenderly-hardhat run build",
-        "clean": "yarn --cwd packages/tenderly-core run clean && yarn --cwd packages/tenderly-hardhat run clean && rm -rf node_modules",
+        "build": "yarn --cwd packages/tenderly-core run build && yarn --cwd packages/tenderly-hardhat run build && yarn --cwd packages/hre-extender-v2 run build && yarn --cwd packages/hre-extender-v1 run build",
+        "clean": "yarn --cwd packages/tenderly-core run clean && yarn --cwd packages/tenderly-hardhat run clean && yarn --cwd packages/hre-extender-v1 run clean && yarn --cwd packages/hre-extender-v2 run clean && rm -rf node_modules",
         "lint:fix": "wsrun --exclude-missing --stages lint:fix && yarn prettier --write",
         "prettier": "prettier *.md \"{docs,.github}/**/*.{md,yml}\"",
         "format": "prettier --write \"**/*.{ts,tsx}\"",
