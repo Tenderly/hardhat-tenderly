@@ -1,17 +1,11 @@
-import "./hre-extender/type-extensions";
 import "./tasks";
+import { logger } from "./utils/logger";
 
-import * as tenderlyExtender from "./hre-extender/extender";
+logger.settings.minLevel = 4; // info level
 
-export function setup(
-  cfg: { automaticVerifications: boolean } = { automaticVerifications: true },
-): void {
-  process.env.AUTOMATIC_VERIFICATION_ENABLED = cfg.automaticVerifications
-    ? "true"
-    : "false";
-
-  tenderlyExtender.setup();
-}
+export { Tenderly } from "./Tenderly";
+export { TenderlyNetwork } from "./TenderlyNetwork";
+export * from "./type-extensions";
 
 // ProxyPlaceholderName is used for the `name` parameter in the `tenderly.verify` method because the name is actually not important.
 // Beneath we use `@nomicfoundation/hardhat-verify` task in order to verify the proxy, and it doesn't need a name.
