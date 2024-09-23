@@ -2,8 +2,10 @@
 import { Command } from "commander";
 import { NetworksCommand, LoginCommand } from "./commands";
 
-process.openStdin().on("keypress", (chunk, key) => {
-  if (key && key.name === "c" && key.ctrl) {
+process.stdin.setRawMode(true);
+process.stdin.resume();
+process.stdin.on("keypress", (chunk, key) => {
+  if (key &&key.name === "c" && key.ctrl) {
     process.exit();
   }
 });
