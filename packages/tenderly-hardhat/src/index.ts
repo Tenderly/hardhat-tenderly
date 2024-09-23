@@ -1,7 +1,5 @@
 import "./tasks";
-import { logger } from "./utils/logger";
-
-logger.settings.minLevel = 4; // info level
+import "./utils/logger";
 
 export { Tenderly } from "./Tenderly";
 export { TenderlyNetwork } from "./TenderlyNetwork";

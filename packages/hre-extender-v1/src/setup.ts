@@ -5,7 +5,6 @@ import {
   HttpNetworkConfig,
   HardhatConfig,
 } from "hardhat/types";
-import { logger as serviceLogger } from "@tenderly/api-client/utils/logger";
 import {
   CHAIN_ID_NETWORK_NAME_MAP,
   NETWORK_NAME_CHAIN_ID_MAP, PLUGIN_NAME,
@@ -24,24 +23,8 @@ import { isTenderlyNetworkConfig } from "./extenders/tenderly-network-resolver";
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
 export function setup() {
-  // set to loggers to error level by default
-  logger.settings.minLevel = 4;
-  serviceLogger.settings.minLevel = 4;
-
   extendEnvironment(async (hre: HardhatRuntimeEnvironment) => {
     hre.tenderly = lazyObject(() => new Tenderly(hre));
-
-    if (hre.hardhatArguments.verbose) {
-      logger.settings.minLevel = 1; // trace level
-      serviceLogger.settings.minLevel = 1; // trace level
-    }
-    logger.info(
-      `Setting up hardhat-tenderly plugin. Log level of hardhat tenderly plugin set to: ${logger.settings.minLevel}`,
-    );
-    // serviceLogger is used here just for initialization, nothing else, it will be used in TenderlyService.ts
-    serviceLogger.info(
-      `Log level of tenderly service set to: ${serviceLogger.settings.minLevel}`,
-    );
 
     const pjson = require("../package.json");
     logger.info("@tenderly/hardhat-tenderly version:", pjson.version);
