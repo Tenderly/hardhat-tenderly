@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 1.9.0-beta.4
+
+### Minor Changes
+
+- Restructured the package
+
 ## 1.9.0-beta.3
 
 ### Minor Changes
