@@ -1,5 +1,14 @@
 # @tenderly/hardhat-tenderly
 
+## 1.0.1-beta.0
+
+### Patch Changes
+
+- Restructured the package
+
+- Updated dependencies []:
+  - @tenderly/api-client@1.0.1-beta.0
+
 ## 2.3.0
 
 ### Minor Changes

@@ -4,7 +4,7 @@
   "license": "MIT",
   "homepage": "https://tenderly.co",
   "description": "Package for overloading some of the HardhatRuntimeEnvironment components",
-  "version": "1.9.0-beta.1",
+  "version": "1.9.0-beta.2",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
@@ -37,6 +37,6 @@
     "ethers": "^5.7.2",
     "@nomiclabs/hardhat-ethers": "^2.1.1",
     "dotenv": "^16.4.5",
-    "@tenderly/hardhat-integration": "^1.0.0"
+    "@tenderly/hardhat-integration": "^1.0.1-beta.0"
   }
 }

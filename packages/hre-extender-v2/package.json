@@ -43,6 +43,6 @@
     "@openzeppelin/upgrades-core": "^1.32.2",
     "ethers": "^6.8.1",
     "dotenv": "^16.4.5",
-    "@tenderly/hardhat-integration": "^1.0.0"
+    "@tenderly/hardhat-integration": "^1.0.1-beta.0"
   }
 }

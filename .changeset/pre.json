@@ -9,6 +9,7 @@
     "@tenderly/hardhat-integration": "1.0.0"
   },
   "changesets": [
+    "afraid-eggs-join",
     "dull-crews-pump",
     "soft-insects-suffer"
   ]
