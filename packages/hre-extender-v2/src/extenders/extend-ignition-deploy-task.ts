@@ -1,8 +1,8 @@
 import {scope} from "hardhat/config";
-import {logger} from "../utils/logger";
+import {logger} from "../logger";
 import path from "path";
 import {HardhatPluginError} from "hardhat/plugins";
-import {PLUGIN_NAME} from "../constants";
+import {PLUGIN_NAME} from "@tenderly/hardhat-integration/dist/constants";
 import {getVerificationInformation, IgnitionError} from "@nomicfoundation/ignition-core";
 import {ChainConfig} from "@nomicfoundation/hardhat-verify/types";
 
