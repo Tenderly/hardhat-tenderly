@@ -6,10 +6,10 @@ import {
   isTenderlyGatewayNetworkConfig,
   isTenderlyNetworkConfig,
 } from "./tenderly-network-resolver";
-import { getAccessToken } from "tenderly/utils/config";
+import { getAccessToken } from "@tenderly/api-client/utils/config";
 import { logger } from "../logger";
-import { getVnetTypeByEndpointId, VnetType } from "@tenderly/hardhat-tenderly/dist/tenderly/vnet-type";
-import * as URLComposer from "@tenderly/hardhat-tenderly/dist/utils/url-composer";
+import { getVnetTypeByEndpointId, VnetType } from "@tenderly/hardhat-integration/dist/tenderly/vnet-type";
+import * as URLComposer from "@tenderly/hardhat-integration/dist/utils/url-composer";
 
 export function shouldPopulateHardhatVerifyConfig(
   hre: HardhatRuntimeEnvironment,

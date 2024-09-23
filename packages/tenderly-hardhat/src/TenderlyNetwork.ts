@@ -1,15 +1,15 @@
 import * as axios from "axios";
 
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { TenderlyService } from "tenderly";
+import { TenderlyService } from "@tenderly/api-client";
 import {
   TenderlyForkContractUploadRequest,
   TenderlyVerifyContractsRequest,
-} from "tenderly/types";
-import { getConfig, writeConfig } from "tenderly/utils/config";
-import { TENDERLY_JSON_RPC_BASE_URL } from "tenderly/common/constants";
+} from "@tenderly/api-client/types";
+import { getConfig, writeConfig } from "@tenderly/api-client/utils/config";
+import { TENDERLY_JSON_RPC_BASE_URL } from "@tenderly/api-client/common/constants";
 
-import { convertToLogCompliantForkInitializeResponse } from "tenderly/utils/log-compliance";
+import { convertToLogCompliantForkInitializeResponse } from "@tenderly/api-client/utils/log-compliance";
 import { PLUGIN_NAME } from "./constants";
 import { ContractByName } from "./tenderly/types";
 import { NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG } from "./tenderly/errors";
