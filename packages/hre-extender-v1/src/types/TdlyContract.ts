@@ -5,7 +5,7 @@ import { Provider, TransactionReceipt } from "@ethersproject/abstract-provider";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Signer } from "@ethersproject/abstract-signer";
 
-import { TenderlyPlugin } from "@tenderly/hardhat-tenderly";
+import { TenderlyPlugin } from "@tenderly/hardhat-integration";
 import { ContractByName } from "./ContractByName";
 
 export class TdlyContract extends Contract {

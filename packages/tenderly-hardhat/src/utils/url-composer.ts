@@ -1,5 +1,5 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { TENDERLY_API_BASE_URL } from "tenderly/common/constants";
+import { TENDERLY_API_BASE_URL } from "@tenderly/api-client/common/constants";
 import { VnetType } from "../tenderly/vnet-type";
 
 export function composeApiURL(

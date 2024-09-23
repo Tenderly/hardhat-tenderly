@@ -5,7 +5,7 @@ import {
   TenderlyContractUploadRequest,
   TenderlyForkContractUploadRequest,
   TenderlyVerifyContractsRequest,
-} from "tenderly/types";
+} from "@tenderly/api-client/types";
 
 import { ContractByName } from "./tenderly/types";
 import { HardhatTenderlyConfig } from "./tenderly/types";
@@ -54,7 +54,7 @@ export interface TenderlyPlugin {
    * <p>contractToVerify should have the name of the contract that you wish to verify. The name must belong to one of source names.</p>
    * <p>compiler complies with the structure of solidity compiler.
    * <p>In order to provide a network id as a key in the <i>networks</i> you can import the NETWORK_NAME_CHAIN_ID_MAP map as:</p>
-   * <p><code>import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";</code></p>
+   * <p><code>import { NETWORK_NAME_CHAIN_ID_MAP } from "@tenderly/api-client/common/constants";</code></p>
    * <p>and then do</p>
    * <code>NETWORK_NAME_CHAIN_ID_MAP["sepolia"]</code>
    * @example
@@ -109,7 +109,7 @@ export interface TenderlyPlugin {
    * <p>contractToVerify should have the name of the contract that you wish to verify. The name must belong to one of source names.</p>
    * <p>compiler complies with the structure of solidity compiler.
    * <p>In order to provide a network id as a key in the <i>networks</i> you can import the NETWORK_NAME_CHAIN_ID_MAP map as:</p>
-   * <p><code>import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";</code></p>
+   * <p><code>import { NETWORK_NAME_CHAIN_ID_MAP } from "@tenderly/api-client/common/constants";</code></p>
    * <p>and then do</p>
    * <code>NETWORK_NAME_CHAIN_ID_MAP["sepolia"]</code>
    * @param tenderlyProject - Tenderly project name
@@ -172,7 +172,7 @@ export interface TenderlyPlugin {
    * <p>contractToVerify should have the name of the contract that you wish to verify. The name must belong to one of source names.</p>
    * <p>compiler complies with the structure of solidity compiler.
    * <p>In order to provide a network id as a key in the <i>networks</i> you can import the NETWORK_NAME_CHAIN_ID_MAP map as:</p>
-   * <p><code>import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";</code></p>
+   * <p><code>import { NETWORK_NAME_CHAIN_ID_MAP } from "@tenderly/api-client/common/constants";</code></p>
    * <p>and then do</p>
    * <code>NETWORK_NAME_CHAIN_ID_MAP["sepolia"]</code>
    * @param tenderlyProject - Tenderly project name
@@ -231,7 +231,7 @@ export interface TenderlyPlugin {
    * @param request
    * <p>Request object that will be sent to the platform.</p>
    * <p>In order to provide a network id as a key in the <i>networks</i> you can import the NETWORK_NAME_CHAIN_ID_MAP map as:</p>
-   * <p><code>import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";</code></p>
+   * <p><code>import { NETWORK_NAME_CHAIN_ID_MAP } from "@tenderly/api-client/common/constants";</code></p>
    * <p>and then do</p>
    * <code>NETWORK_NAME_CHAIN_ID_MAP["sepolia"]</code>
    * @example
@@ -276,7 +276,7 @@ export interface TenderlyPlugin {
    * @param request
    * <p>Request object that will be sent to the platform.</p>
    * <p>In order to provide a network id as a key in the <i>networks</i> you can import the NETWORK_NAME_CHAIN_ID_MAP map as:</p>
-   * <p><code>import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";</code></p>
+   * <p><code>import { NETWORK_NAME_CHAIN_ID_MAP } from "@tenderly/api-client/common/constants";</code></p>
    * <p>and then do</p>
    * <code>NETWORK_NAME_CHAIN_ID_MAP["sepolia"]</code>
    * <p>Root parameter inside the request represents the transaction id from which the contract deployment will be searched.</p>
@@ -343,7 +343,7 @@ export interface TenderlyPlugin {
    * @param request
    * <p>Request object that will be sent to the platform.</p>
    * <p>In order to provide a network id as a key in the <i>networks</i> you can import the network_name_to_id map as:</p>
-   * <p><code>import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";</code></p>
+   * <p><code>import { NETWORK_NAME_CHAIN_ID_MAP } from "@tenderly/api-client/common/constants";</code></p>
    * <p>and then do</p>
    * <code>NETWORK_NAME_CHAIN_ID_MAP["rinkeby"]</code>
    * @param tenderlyProject - Tenderly project name

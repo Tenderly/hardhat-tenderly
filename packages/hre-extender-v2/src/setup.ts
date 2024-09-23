@@ -6,18 +6,18 @@ import {
   HttpNetworkConfig,
   HardhatConfig,
 } from "hardhat/types";
-import { logger as serviceLogger } from "tenderly/utils/logger";
+import { logger as serviceLogger } from "@tenderly/api-client/utils/logger";
 import {
   CHAIN_ID_NETWORK_NAME_MAP,
   NETWORK_NAME_CHAIN_ID_MAP, PLUGIN_NAME,
   TENDERLY_JSON_RPC_BASE_URL,
-} from "tenderly/common/constants";
+} from "@tenderly/api-client/common/constants";
 
-import{ TenderlyNetwork as TenderlyNetworkInterface } from "tenderly/types";
+import{ TenderlyNetwork as TenderlyNetworkInterface } from "@tenderly/api-client/types";
 
 import { logger } from "./logger";
-import { TenderlyService } from "tenderly";
-import { Tenderly, TenderlyNetwork } from "@tenderly/hardhat-tenderly";
+import { TenderlyService } from"@tenderly/api-client";
+import { Tenderly, TenderlyNetwork } from "@tenderly/hardhat-integration";
 import { extendEthers } from "./extenders/extend-ethers";
 import { extendUpgrades } from "./extenders/extend-upgrades";
 import { extendHardhatDeploy } from "./extenders/extend-hardhat-deploy";

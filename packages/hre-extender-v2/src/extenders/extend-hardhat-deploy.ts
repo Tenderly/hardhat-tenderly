@@ -4,7 +4,7 @@ import {
   DeployResult,
 } from "hardhat-deploy/types";
 
-import { TenderlyPlugin } from "@tenderly/hardhat-tenderly";
+import { TenderlyPlugin } from "@tenderly/hardhat-integration";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 export function extendHardhatDeploy(hre: HardhatRuntimeEnvironment): void {

@@ -1,7 +1,7 @@
 import { Contract, ContractFactory, Signer } from "ethers";
 import { Libraries } from "@nomicfoundation/hardhat-ethers/types";
 
-import { TenderlyPlugin } from "@tenderly/hardhat-tenderly";
+import { TenderlyPlugin } from "@tenderly/hardhat-integration";
 import { TdlyContract } from "./TdlyContract";
 
 export class TdlyContractFactory {

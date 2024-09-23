@@ -1,7 +1,7 @@
 import { HardhatPluginError } from "hardhat/plugins";
 import { RunTaskFunction, HardhatConfig } from "hardhat/types";
-import { TenderlyContract } from "tenderly/types";
-import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";
+import { TenderlyContract } from "@tenderly/api-client/types";
+import { NETWORK_NAME_CHAIN_ID_MAP } from "@tenderly/api-client/common/constants";
 
 import { logger } from "../../utils/logger";
 import { PLUGIN_NAME } from "../../constants";

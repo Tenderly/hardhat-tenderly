@@ -14,9 +14,9 @@ import {
   TenderlyVerificationContract,
   TenderlyVerifyContractsRequest,
   TenderlyVerifyContractsSource,
-} from "tenderly/types";
+} from "@tenderly/api-client/types";
 
-import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";
+import { NETWORK_NAME_CHAIN_ID_MAP } from "@tenderly/api-client/common/constants";
 import {
   TASK_COMPILE_SOLIDITY_GET_COMPILATION_JOB_FOR_FILE,
   TASK_COMPILE_SOLIDITY_GET_DEPENDENCY_GRAPH,

@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { TenderlyPlugin } from "@tenderly/hardhat-tenderly";
+import { TenderlyPlugin } from "@tenderly/hardhat-integration";
 
 export class TdlyProxyContract {
   [key: string]: any;

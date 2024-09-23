@@ -1,6 +1,6 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { TENDERLY_API_BASE_URL } from "tenderly/common/constants";
-import { TenderlyApiService } from "tenderly/internal/core/services";
+import { TENDERLY_API_BASE_URL } from "@tenderly/api-client/common/constants";
+import { TenderlyApiService } from "@tenderly/api-client/internal/core/services";
 import { logger } from "../utils/logger";
 import { isTenderlyGatewayNetworkConfig } from "../utils/util";
 
