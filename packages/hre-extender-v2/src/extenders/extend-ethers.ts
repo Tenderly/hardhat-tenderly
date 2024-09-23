@@ -5,7 +5,7 @@ import {
   HardhatEthersHelpers,
   Libraries,
 } from "@nomicfoundation/hardhat-ethers/types";
-import { TenderlyPlugin } from "@tenderly/hardhat-tenderly";
+import { TenderlyPlugin } from "@tenderly/hardhat-integration";
 import { Artifact, HardhatRuntimeEnvironment } from "hardhat/types";
 import { TdlyContract } from "../types/TdlyContract";
 import { TdlyContractFactory } from "../types/TdlyContractFactory";

@@ -1,5 +1,5 @@
 {
-  "name": "tenderly",
+  "name": "@tenderly/api-client",
   "author": "Tenderly",
   "license": "MIT",
   "homepage": "https://tenderly.co",

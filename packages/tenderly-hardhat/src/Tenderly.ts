@@ -2,14 +2,14 @@ import { sep } from "path";
 import * as fs from "fs-extra";
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { TenderlyService } from "tenderly";
+import { TenderlyService } from "@tenderly/api-client";
 import {
   TenderlyArtifact,
   TenderlyContractUploadRequest,
   TenderlyForkContractUploadRequest,
   TenderlyVerifyContractsRequest,
-} from "tenderly/types";
-import { NETWORK_NAME_CHAIN_ID_MAP } from "tenderly/common/constants";
+} from "@tenderly/api-client/types";
+import { NETWORK_NAME_CHAIN_ID_MAP } from "@tenderly/api-client/common/constants";
 import { logger } from "./utils/logger";
 
 import { ContractByName, Metadata } from "./tenderly/types";

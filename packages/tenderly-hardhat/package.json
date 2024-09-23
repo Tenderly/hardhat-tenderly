@@ -1,5 +1,5 @@
 {
-  "name": "@tenderly/hardhat-tenderly-core",
+  "name": "@tenderly/hardhat-integration",
   "author": "Tenderly",
   "license": "MIT",
   "homepage": "https://tenderly.co",
@@ -51,7 +51,6 @@
     "axios": "^1.6.7",
     "fs-extra": "^10.1.0",
     "hardhat-deploy": "^0.11.43",
-    "tenderly": "^0.9.1",
     "ts-node": "^10.9.1",
     "tslog": "^4.3.1",
     "typescript": "^5.5.4"

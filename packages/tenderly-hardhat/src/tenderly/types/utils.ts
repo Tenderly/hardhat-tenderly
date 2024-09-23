@@ -1,4 +1,4 @@
-import { ContractCompiler } from "tenderly/types";
+import { ContractCompiler } from "@tenderly/api-client/types";
 
 export interface BytecodeMismatchError {
   contract_id: string;
