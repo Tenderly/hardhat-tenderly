@@ -6,11 +6,13 @@
     "@tenderly/hardhat-tenderly": "2.1.0",
     "@tenderly/hre-extender-v2": "2.3.0",
     "@tenderly/api-client": "1.0.0",
-    "@tenderly/hardhat-integration": "1.0.0"
+    "@tenderly/hardhat-integration": "1.0.0",
+    "@tenderly/hre-extender-v1": "1.9.0-beta.3"
   },
   "changesets": [
     "afraid-eggs-join",
     "dull-crews-pump",
+    "lovely-oranges-kick",
     "soft-insects-suffer",
     "tricky-tips-smile"
   ]
