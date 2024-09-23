@@ -4,6 +4,7 @@
     "author": "Tenderly",
     "license": "SEE LICENSE IN EACH PACKAGE'S LICENSE FILE",
     "private": true,
+    "type": "module",
     "workspaces": [
         "packages/*"
     ],
@@ -15,13 +16,17 @@
         "format": "prettier --write \"**/*.{ts,tsx}\"",
         "changeset": "changeset",
         "release": "changeset publish",
-        "version-packages": "changeset version"
+        "version-packages": "changeset version",
+        "set-release-version": "node --loader ts-node/esm scripts/set-release-version.ts"
     },
     "devDependencies": {
         "@changesets/changelog-github": "^0.4.7",
         "@changesets/cli": "^2.25.0",
         "prettier": "^3.2.4",
-        "wsrun": "^5.2.4"
+        "wsrun": "^5.2.4", 
+        "ts-node": "^10.9.2",
+        "typescript": "^5.6.2",
+        "@types/node": "^22.5.5"
     },
     "dependencies": {
       "ethers": "^6.8.1",
