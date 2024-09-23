@@ -1,6 +1,4 @@
-import { logger } from "./logger";
-
-logger.settings.minLevel = 4;
+import "./logger";
 
 export * from "@tenderly/hardhat-integration";
 export { setup } from "./setup";
