@@ -55,7 +55,8 @@
     "js-yaml": "^4.1.0",
     "open": "^8.4.0",
     "prompts": "^2.4.2",
-    "tslog": "^4.4.0"
+    "tslog": "^4.4.0",
+    "dotenv": "^16.4.5"
   },
   "peerDependencies": {
     "ts-node": "*",
