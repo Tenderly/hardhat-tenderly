@@ -1,0 +1,41 @@
+{
+  "name": "@tenderly/hardhat-tenderly",
+  "author": "Tenderly",
+  "license": "MIT",
+  "homepage": "https://tenderly.co",
+  "description": "Package for overloading some of the HardhatRuntimeEnvironment components",
+  "version": "1.8.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tenderly/hardhat-tenderly.git"
+  },
+  "keywords": [
+    "ethereum",
+    "smart-contracts",
+    "hardhat",
+    "hardhat-plugin",
+    "tenderly"
+  ],
+  "files": [
+    "dist/",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "rm -rf ./dist && rm -f tsconfig.tsbuildinfo && tsc --build .",
+    "clean": "rm -rf node_modules && rm -rf dist && rm -f tsconfig.tsbuildinfo",
+    "lint": "yarn run prettier --check && yarn run eslint",
+    "lint:fix": "yarn run prettier --write && yarn run eslint --fix",
+    "eslint": "eslint 'src/**/*.ts'",
+    "prettier": "prettier \"**/*.{js,md,json}\"",
+    "prepublishOnly": "yarn run build"
+  },
+  "dependencies": {
+    "hardhat": "^2.22.10",
+    "@ethersproject/bignumber": "^5.7.0",
+    "ethers": "^5.7.2",
+    "@nomiclabs/hardhat-ethers": "^2.1.1"
+  }
+}
