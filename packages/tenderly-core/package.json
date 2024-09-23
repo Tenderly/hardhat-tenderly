@@ -4,7 +4,7 @@
   "license": "MIT",
   "homepage": "https://tenderly.co",
   "description": "",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "internal/lib/tenderly-lib.js",
   "types": "internal/lib/tenderly-lib.d.ts",
   "repository": {
@@ -13,7 +13,7 @@
   },
   "scripts": {
     "build": "rm -rf build-test && rm -f tsconfig.tsbuildinfo && tsc --build .",
-    "clean": "rm -rf node_modules && rm -rf build-test && rm -rf common && rm -rf internal && rm -rf types && rm -rf utils && rm -f tsconfig.tsbuildinfo",    
+    "clean": "rm -rf node_modules && rm -rf build-test && rm -rf common && rm -rf internal && rm -rf types && rm -rf utils && rm -f tsconfig.tsbuildinfo",
     "lint": "yarn run prettier --check && yarn run eslint",
     "lint:fix": "yarn run prettier --write && yarn run eslint --fix",
     "eslint": "eslint 'src/**/*.ts'",
