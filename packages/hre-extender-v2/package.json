@@ -35,7 +35,6 @@
   },
   "devDependencies": {},
   "dependencies": {
-    "hardhat": "^2.22.10",
     "@ethersproject/bignumber": "^5.7.0",
     "@nomicfoundation/hardhat-ignition": "^0.15.5",
     "@nomicfoundation/hardhat-verify": "^2.0.8",
