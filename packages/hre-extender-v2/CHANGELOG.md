@@ -1,5 +1,11 @@
 # @tenderly/hre-extender-v2
 
+## 2.4.0-beta.2
+
+### Minor Changes
+
+- Restructured the package
+
 ## 2.4.0-beta.1
 
 ### Minor Changes
