@@ -6,7 +6,7 @@ export interface BytecodeMismatchError {
   got: string;
 }
 
-export interface TenderlyConfig {
+export interface HardhatTenderlyConfig {
   project: string;
   username: string;
   forkNetwork?: string;

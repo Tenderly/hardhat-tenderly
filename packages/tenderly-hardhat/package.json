@@ -1,10 +1,10 @@
 {
-  "name": "@tenderly/hardhat-tenderly",
+  "name": "@tenderly/hardhat-tenderly-core",
   "author": "Tenderly",
   "license": "MIT",
   "homepage": "https://tenderly.co",
   "description": "Hardhat plugin for integration with Tenderly",
-  "version": "2.3.0",
+  "version": "0.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
@@ -24,8 +24,8 @@
     "README.md"
   ],
   "scripts": {
-    "build": "rm -rf ./dist && tsc --build .",
-    "clean": "rm -rf node_modules && rm -rf dist",
+    "build": "rm -rf ./dist && rm -f tsconfig.tsbuildinfo && tsc --build .",
+    "clean": "rm -rf node_modules && rm -rf dist && rm -f tsconfig.tsbuildinfo",
     "lint": "yarn run prettier --check && yarn run eslint",
     "lint:fix": "yarn run prettier --write && yarn run eslint --fix",
     "eslint": "eslint 'src/**/*.ts'",
@@ -48,13 +48,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@ethersproject/bignumber": "^5.7.0",
-    "@nomicfoundation/hardhat-ignition": "^0.15.5",
-    "@nomicfoundation/hardhat-verify": "^2.0.8",
-    "@openzeppelin/hardhat-upgrades": "^3.0.1",
-    "@openzeppelin/upgrades-core": "^1.32.2",
     "axios": "^1.6.7",
-    "ethers": "^6.8.1",
     "fs-extra": "^10.1.0",
     "hardhat-deploy": "^0.11.43",
     "tenderly": "^0.9.1",
@@ -63,7 +57,6 @@
     "typescript": "^5.5.4"
   },
   "peerDependencies": {
-    "ethers": "^6.8.1",
     "hardhat": "^2.22.6"
   }
 }

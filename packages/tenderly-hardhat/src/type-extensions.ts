@@ -5,10 +5,11 @@ import {
   TenderlyContractUploadRequest,
   TenderlyForkContractUploadRequest,
   TenderlyVerifyContractsRequest,
-} from "src/tenderly/types";
+} from "tenderly/types";
 
-import { ContractByName, TenderlyConfig } from "../tenderly/types";
-import { TenderlyNetwork } from "../TenderlyNetwork";
+import { ContractByName } from "./tenderly/types";
+import { HardhatTenderlyConfig } from "./tenderly/types";
+import { TenderlyNetwork } from "./TenderlyNetwork";
 
 export interface TenderlyPlugin {
   /** *
@@ -424,10 +425,10 @@ declare module "hardhat/types/runtime" {
 
 declare module "hardhat/types/config" {
   export interface HardhatUserConfig {
-    tenderly?: TenderlyConfig;
+    tenderly?: HardhatTenderlyConfig;
   }
 
   export interface HardhatConfig {
-    tenderly: TenderlyConfig;
+    tenderly: HardhatTenderlyConfig;
   }
 }
