@@ -1,6 +1,7 @@
 {
-  "name": "@tenderly/hre-extender-v2",
+  "name": "@tenderly/hardhat-tenderly",
   "author": "Tenderly",
+  "private": false,
   "license": "MIT",
   "homepage": "https://tenderly.co",
   "description": "Package for overloading some of the HardhatRuntimeEnvironment components",
