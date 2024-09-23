@@ -3,12 +3,15 @@
   "tag": "beta",
   "initialVersions": {
     "tenderly": "0.8.0",
-    "@tenderly/hardhat-tenderly": "2.1.0"
+    "@tenderly/hardhat-tenderly": "2.1.0",
+    "@tenderly/hre-extender-v2": "2.3.0",
+    "@tenderly/api-client": "1.0.0",
+    "@tenderly/hardhat-integration": "1.0.0"
   },
   "changesets": [
     "mighty-tables-ring",
     "olive-scissors-battle",
-    "shiny-parrots-flow",
+    "soft-insects-suffer",
     "tall-ladybugs-pump"
   ]
 }
