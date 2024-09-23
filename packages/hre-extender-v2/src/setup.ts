@@ -31,8 +31,9 @@ const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
 export function setup(cfg: { automaticVerifications: boolean } = { automaticVerifications: true }) {
   extendEnvironment(async (hre: HardhatRuntimeEnvironment) => {
-    process.env.TENDERLY_AUTOMATIC_VERIFICATION = cfg.automaticVerifications
-    process.env.AUTOMATIC_VERIFICATION_ENABLED = cfg.automaticVerifications
+    process.env.TENDERLY_AUTOMATIC_VERIFICATION = cfg.automaticVerifications ? "true": "false"
+    process.env.AUTOMATIC_VERIFICATION_ENABLED = cfg.automaticVerifications ? "true": "false"
+    process.env.HARDHAT_TENDERLY_VERSION = require("../package.json").version;
     
     hre.tenderly = lazyObject(() => new Tenderly(hre));
 
