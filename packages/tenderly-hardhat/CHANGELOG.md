@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 1.0.1-beta.1
+
+### Patch Changes
+
+- Restructured the package
+
 ## 1.0.1-beta.0
 
 ### Patch Changes
