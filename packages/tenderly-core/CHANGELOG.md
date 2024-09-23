@@ -1,5 +1,11 @@
 # tenderly
 
+## 1.0.1-beta.2
+
+### Patch Changes
+
+- Restructured the package
+
 ## 1.0.1-beta.1
 
 ### Patch Changes
