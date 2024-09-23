@@ -12,7 +12,6 @@ require("hardhat/config");
 require("hardhat/plugins");
 require("path");
 
-
 const ignitionScope = scope(
   "ignition",
   "Deploy your smart contracts using Hardhat Ignition"
@@ -31,7 +30,7 @@ ignitionScope
     ) => {
       await runSuper();
 
-      const shouldVerify = process.env.AUTOMATIC_VERIFICATION_ENABLED;
+      const shouldVerify = process.env.AUTOMATIC_VERIFICATION_ENABLED || process.env.TENDERLY_AUTOMATIC_VERIFICATION;
       if (!shouldVerify)
         return;
 
@@ -40,7 +39,7 @@ ignitionScope
       if (deploymentId === undefined || deploymentId === "") {
         throw new HardhatPluginError(
           PLUGIN_NAME,
-          "No deployment ID provided, exiting."
+          "No deployment ID provided, Refer to the following link and search `hardhat-ignition`: https://docs.tenderly.co/faq/contract-verification"
         );
       }
 
