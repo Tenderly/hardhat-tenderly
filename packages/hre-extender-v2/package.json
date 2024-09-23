@@ -1,6 +1,7 @@
 {
-  "name": "@tenderly/hre-extender-v2",
+  "name": "@tenderly/hardhat-tenderly",
   "author": "Tenderly",
+  "private": false,
   "license": "MIT",
   "homepage": "https://tenderly.co",
   "description": "Package for overloading some of the HardhatRuntimeEnvironment components",
@@ -34,14 +35,14 @@
   },
   "devDependencies": {},
   "dependencies": {
-    "hardhat": "^2.22.10",
     "@ethersproject/bignumber": "^5.7.0",
-    "@nomicfoundation/hardhat-ignition": "^0.15.5",
     "@nomicfoundation/hardhat-verify": "^2.0.8",
-    "@openzeppelin/hardhat-upgrades": "^3.0.1",
+    "@nomicfoundation/hardhat-ethers": "^3.0.0",
+    "@openzeppelin/hardhat-upgrades": "^3.3.0",
     "@openzeppelin/upgrades-core": "^1.32.2",
     "ethers": "^6.8.1",
     "dotenv": "^16.4.5",
+    "@nomicfoundation/hardhat-ignition": "^0.15.5",
     "@tenderly/hardhat-integration": "^1.0.0"
   }
 }
