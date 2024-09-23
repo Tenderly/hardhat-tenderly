@@ -6,7 +6,7 @@ import {
   TENDERLY_API_BASE_URL,
   TENDERLY_JSON_RPC_BASE_URL,
 } from "../../../common/constants";
-import { HARDHAT_TENDERLY_VERSION } from "./hardhat-tenderly-version";
+import * as dotenv from "dotenv";
 
 export class TenderlyApiService {
   public static configureInstance(
@@ -21,11 +21,16 @@ export class TenderlyApiService {
       const tdlyConfig = getConfig();
       accessKey = tdlyConfig.access_key;
     }
+
+    dotenv.config();
+    const hardhatTenderlyVersion = process.env.HARDHAT_TENDERLY_VERSION;
+    console.log("hardhatTenderlyVersion", hardhatTenderlyVersion);
+    
     const params = {
       baseURL: TENDERLY_API_BASE_URL,
       headers: {
         "x-access-key": accessKey,
-        "x-user-agent": `@tenderly/hardhat-tenderly/${HARDHAT_TENDERLY_VERSION}`,
+        "x-user-agent": `@tenderly/hardhat-tenderly/${hardhatTenderlyVersion}`,
       },
     };
 
