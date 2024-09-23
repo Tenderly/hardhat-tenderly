@@ -12,7 +12,7 @@
     "url": "https://github.com/Tenderly/hardhat-tenderly.git"
   },
   "scripts": {
-    "build": "rm -rf build-test && rm -f tsconfig.tsbuildinfo && node version-generator.js && tsc --build .",
+    "build": "rm -rf build-test && rm -f tsconfig.tsbuildinfo && tsc --build .",
     "clean": "rm -rf node_modules && rm -rf build-test && rm -rf common && rm -rf internal && rm -rf types && rm -rf utils && rm -f tsconfig.tsbuildinfo",
     "lint": "yarn run prettier --check && yarn run eslint",
     "lint:fix": "yarn run prettier --write && yarn run eslint --fix",
