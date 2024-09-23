@@ -22,8 +22,11 @@ import { isTenderlyNetworkConfig } from "./extenders/tenderly-network-resolver";
 
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
-export function setup() {
+export function setup(cfg: { automaticVerifications: boolean } = { automaticVerifications: true }) {
   extendEnvironment(async (hre: HardhatRuntimeEnvironment) => {
+    process.env.TENDERLY_AUTOMATIC_VERIFICATION = cfg.automaticVerifications
+    process.env.AUTOMATIC_VERIFICATION_ENABLED = cfg.automaticVerifications
+    
     hre.tenderly = lazyObject(() => new Tenderly(hre));
 
     const pjson = require("../package.json");
