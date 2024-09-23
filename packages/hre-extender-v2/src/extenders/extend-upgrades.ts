@@ -14,7 +14,7 @@ import {
   DeployBeaconProxyOptions,
   DeployProxyOptions,
 } from "@openzeppelin/hardhat-upgrades/dist/utils";
-import { TenderlyPlugin } from "@tenderly/hardhat-tenderly";
+import { TenderlyPlugin } from "@tenderly/hardhat-integration";
 import { logger } from "../logger";
 import { TdlyContractFactory } from "../types/TdlyContractFactory";
 import { TdlyProxyContract } from "../types/TdlyProxyContract";
