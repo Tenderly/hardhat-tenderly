@@ -9,9 +9,6 @@
     "@tenderly/hardhat-integration": "1.0.0"
   },
   "changesets": [
-    "mighty-tables-ring",
-    "olive-scissors-battle",
-    "soft-insects-suffer",
-    "tall-ladybugs-pump"
+    "soft-insects-suffer"
   ]
 }
