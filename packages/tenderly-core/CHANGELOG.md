@@ -1,40 +1,10 @@
 # tenderly
 
-## 1.0.1-beta.3
+## 1.0.1
 
 ### Patch Changes
 
-- Restructured the package
-
-## 1.0.1-beta.2
-
-### Patch Changes
-
-- Restructured the package
-
-## 1.0.1-beta.1
-
-### Patch Changes
-
-- Restructured the package
-
-## 1.0.1-beta.0
-
-### Patch Changes
-
-- Restructured the package
-
-## 0.10.0-beta.1
-
-### Patch Changes
-
-- [#192](https://github.com/Tenderly/hardhat-tenderly/pull/192) [`e056c90e7870ac02eb1f6fd07a1f4bf6972c0821`](https://github.com/Tenderly/hardhat-tenderly/commit/e056c90e7870ac02eb1f6fd07a1f4bf6972c0821) Thanks [@ElaNej](https://github.com/ElaNej)! - Support for hardhat-ignition
-
-## 0.10.0-beta.0
-
-### Minor Changes
-
-- [#192](https://github.com/Tenderly/hardhat-tenderly/pull/192) [`9e8e509535392b3149c8f3d7f9106c392c9436b6`](https://github.com/Tenderly/hardhat-tenderly/commit/9e8e509535392b3149c8f3d7f9106c392c9436b6) Thanks [@ElaNej](https://github.com/ElaNej)! - Support hardhat-ignition
+- [#214](https://github.com/Tenderly/hardhat-tenderly/pull/214) [`3ccd4eb97085a2f7c0fd4a1a6dfc7db3ec8aca95`](https://github.com/Tenderly/hardhat-tenderly/commit/3ccd4eb97085a2f7c0fd4a1a6dfc7db3ec8aca95) Thanks [@dule-git](https://github.com/dule-git)! - Restructured internal packages
 
 ## 0.9.1
 

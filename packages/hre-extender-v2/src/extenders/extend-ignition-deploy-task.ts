@@ -39,7 +39,7 @@ ignitionScope
       if (deploymentId === undefined || deploymentId === "") {
         throw new HardhatPluginError(
           PLUGIN_NAME,
-          "No deployment ID provided, Refer to the following link and search `hardhat-ignition: https://docs.tenderly.co/faq/contract-verification"
+          "No deployment ID provided, Refer to the following link and search `hardhat-ignition`: https://docs.tenderly.co/faq/contract-verification"
         );
       }
 

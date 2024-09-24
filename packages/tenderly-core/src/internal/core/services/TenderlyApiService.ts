@@ -24,7 +24,6 @@ export class TenderlyApiService {
 
     dotenv.config();
     const hardhatTenderlyVersion = process.env.HARDHAT_TENDERLY_VERSION;
-    console.log("hardhatTenderlyVersion", hardhatTenderlyVersion);
     
     const params = {
       baseURL: TENDERLY_API_BASE_URL,

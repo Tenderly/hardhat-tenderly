@@ -1,36 +1,7 @@
 # @tenderly/hardhat-tenderly
 
-## 1.9.0-beta.4
+## 1.9.0
 
 ### Minor Changes
 
-- Restructured the package
-
-## 1.9.0-beta.3
-
-### Minor Changes
-
-- Restructured the package
-
-## 1.9.0-beta.2
-
-### Minor Changes
-
-- Restructured the package
-
-### Patch Changes
-
-- Updated dependencies []:
-  - @tenderly/hardhat-integration@1.0.1-beta.0
-
-## 1.9.0-beta.1
-
-### Minor Changes
-
-- Restructured package
-
-## 1.9.0-beta.0
-
-### Minor Changes
-
-- Restructured the package
+- [#216](https://github.com/Tenderly/hardhat-tenderly/pull/216) [`4c24f3ff6950aa033880bf57aee40a39f7c5171f`](https://github.com/Tenderly/hardhat-tenderly/commit/4c24f3ff6950aa033880bf57aee40a39f7c5171f) Thanks [@dule-git](https://github.com/dule-git)! - Custom network name in hardhat.config.ts and restructured internal packages
