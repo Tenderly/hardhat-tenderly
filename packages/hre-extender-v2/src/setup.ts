@@ -16,7 +16,7 @@ import{ TenderlyNetwork as TenderlyNetworkInterface } from "@tenderly/api-client
 
 import { logger } from "./logger";
 import { TenderlyService } from"@tenderly/api-client";
-import { Tenderly, TenderlyNetwork } from "@tenderly/hardhat-integration";
+import { Tenderly, TenderlyNetwork, VersionCompatibilityChecker } from "@tenderly/hardhat-integration";
 import { extendEthers } from "./extenders/extend-ethers";
 import { extendUpgrades } from "./extenders/extend-upgrades";
 import { extendHardhatDeploy } from "./extenders/extend-hardhat-deploy";
@@ -33,12 +33,13 @@ export function setup(cfg: { automaticVerifications: boolean } = { automaticVeri
   extendEnvironment(async (hre: HardhatRuntimeEnvironment) => {
     process.env.TENDERLY_AUTOMATIC_VERIFICATION = cfg.automaticVerifications ? "true": "false"
     process.env.AUTOMATIC_VERIFICATION_ENABLED = cfg.automaticVerifications ? "true": "false"
-    process.env.HARDHAT_TENDERLY_VERSION = require("../package.json").version;
+    
+    const hardhatTenderlyVersion = require("../package.json").version;
+    process.env.HARDHAT_TENDERLY_VERSION = hardhatTenderlyVersion;
     
     hre.tenderly = lazyObject(() => new Tenderly(hre));
 
-    const pjson = require("../package.json");
-    logger.info("@tenderly/hardhat-tenderly version:", pjson.version);
+    logger.info("@tenderly/hardhat-tenderly version:", hardhatTenderlyVersion);
 
     logger.info("Tenderly running configuration: ", {
       username: hre.config.tenderly?.username,
@@ -47,6 +48,23 @@ export function setup(cfg: { automaticVerifications: boolean } = { automaticVeri
       privateVerification: hre.config.tenderly?.privateVerification,
       networkName: hre.network.name,
     });
+    
+    // check if the ethers and hardhat-tenderly versions are compatible
+    const versionCompatibilityChecker = new VersionCompatibilityChecker();
+    const [areCompatible, ethersVersion] = versionCompatibilityChecker.areEthersAndHardhatTenderlyVersionsCompatible(
+      hre,
+      hardhatTenderlyVersion,
+    );
+    if (!areCompatible) {
+      const compatibleHardhatTenderlyVersion = versionCompatibilityChecker.compatibleHardhatTenderlyVersionForEthersVersion(
+        ethersVersion,
+      );
+      console.log(
+        "\x1b[31m%s%s\x1b[0m",
+        `Wrong '@tenderly/hardhat-tenderly' version '${hardhatTenderlyVersion}' used with ethers version '${ethersVersion}'.\n`,
+        `Please use the correct version of latest '@tenderly/hardhat-tenderly@${compatibleHardhatTenderlyVersion}' plugin.\n`
+      );
+    }
 
     extendProvider(hre);
     populateNetworks();
