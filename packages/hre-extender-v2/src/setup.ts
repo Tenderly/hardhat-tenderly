@@ -1,3 +1,4 @@
+import "@nomicfoundation/hardhat-ethers";
 import "@openzeppelin/hardhat-upgrades";
 import { lazyObject } from "hardhat/plugins";
 import { extendConfig, extendEnvironment } from "hardhat/config";
@@ -54,21 +55,8 @@ export function setup(cfg: { automaticVerifications: boolean } = { automaticVeri
       networkName: hre.network.name,
     });
     
-    // check if the ethers and hardhat-tenderly versions are compatible
-    const versionCompatibilityChecker = new VersionCompatibilityChecker();
-    const [areCompatible, ethersVersion] = versionCompatibilityChecker.areEthersAndHardhatTenderlyVersionsCompatible(
-      hre,
-      hardhatTenderlyVersion,
-    );
-    if (!areCompatible) {
-      const compatibleHardhatTenderlyVersion = versionCompatibilityChecker.compatibleHardhatTenderlyVersionForEthersVersion(
-        ethersVersion,
-      );
-      console.log(
-        "\x1b[31m%s%s\x1b[0m", // print in red color
-        `Wrong '@tenderly/hardhat-tenderly' version '${hardhatTenderlyVersion}' used with ethers version '${ethersVersion}'.\n`,
-        `Please use the correct version of latest '@tenderly/hardhat-tenderly@${compatibleHardhatTenderlyVersion}' plugin.\n`
-      );
+    if (hre.ethers !== undefined) {
+      printErrorIfEthersAndHardhatTenderlyVersionsArentCompatible(hre, hardhatTenderlyVersion);
     }
 
     const shouldCheckForOutdatedVersion = (process.env.TENDERLY_ENABLE_OUTDATED_VERSION_CHECK === undefined ||
@@ -196,6 +184,24 @@ const populateNetworks = (): void => {
       logger.error("Error encountered while fetching public networks");
     });
 };
+
+function printErrorIfEthersAndHardhatTenderlyVersionsArentCompatible(hre: HardhatRuntimeEnvironment, hardhatTenderlyVersion: string) {
+  const versionCompatibilityChecker = new VersionCompatibilityChecker();
+  const [areCompatible, ethersVersion] = versionCompatibilityChecker.areEthersAndHardhatTenderlyVersionsCompatible(
+    hre,
+    hardhatTenderlyVersion,
+  );
+  if (!areCompatible) {
+    const compatibleHardhatTenderlyVersion = versionCompatibilityChecker.compatibleHardhatTenderlyVersionForEthersVersion(
+      ethersVersion,
+    );
+    console.log(
+      "\x1b[31m%s%s\x1b[0m", // print in red color
+      `The '@tenderly/hardhat-tenderly@${hardhatTenderlyVersion}' doesn't support 'ethers@${ethersVersion}'.\n`,
+      `Please update the plugin to the latest '@tenderly/hardhat-tenderly@${compatibleHardhatTenderlyVersion}'\n`,
+    );
+  }
+}
 
 async function printWarningIfVersionIsOutdated(hre: HardhatRuntimeEnvironment, hardhatTenderlyVersion: string) {
   const outdatedVersionChecker = new OutdatedVersionChecker();
