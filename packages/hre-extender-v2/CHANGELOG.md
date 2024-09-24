@@ -1,5 +1,12 @@
 # @tenderly/hardhat-tenderly
 
+## 2.3.2-beta.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tenderly/hardhat-integration@1.0.2-beta.0
+
 ## 2.3.1
 
 ### Patch Changes

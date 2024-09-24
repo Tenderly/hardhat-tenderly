@@ -1,5 +1,14 @@
 # @tenderly/hardhat-tenderly
 
+## 1.0.2-beta.0
+
+### Patch Changes
+
+- Added alerts if ethers and hardhat-tenderly versions are not compatible for each other (ethersv5 and hardhat-tenderly@2.x.x, or ethersv6 and hardhat-tenderly@1.x.x. Also added alerts if there's a new hardhat-tenderly version available.
+
+- Updated dependencies []:
+  - @tenderly/api-client@1.0.2-beta.0
+
 ## 1.0.1
 
 ### Patch Changes
