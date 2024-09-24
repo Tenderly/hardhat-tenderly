@@ -28,10 +28,10 @@ export class VersionCompatibilityChecker {
     const ethersMajorVersion = this._majorVersion(ethersVersion);
 
     if (ethersMajorVersion === 5) {
-      return "1.x.x.";
+      return "^1.0.0.";
     }
     if (ethersMajorVersion === 6) {
-      return "2.x.x";
+      return "^2.0.0";
     }
 
     throw new Error(`Unsupported ethers version: ${ethersVersion}`);
