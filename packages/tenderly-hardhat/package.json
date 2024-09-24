@@ -44,7 +44,8 @@
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.7.1",
     "ts-node": "^10.9.1",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "@types/npm-registry-fetch": "^8.0.7"
   },
   "dependencies": {
     "axios": "^1.6.7",
@@ -54,7 +55,9 @@
     "tslog": "^4.3.1",
     "typescript": "^5.5.4",
     "dotenv": "^16.4.5",
-    "@tenderly/api-client": "^1.0.0"
+    "@tenderly/api-client": "^1.0.0",
+    "npm-registry-fetch": "^17.1.0",
+    "semver": "^7.6.3"
   },
   "peerDependencies": {
     "hardhat": "^2.22.6"
