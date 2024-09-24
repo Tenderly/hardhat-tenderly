@@ -15,7 +15,12 @@ import{ TenderlyNetwork as TenderlyNetworkInterface } from "@tenderly/api-client
 
 import { logger } from "./logger";
 import { TenderlyService } from "@tenderly/api-client";
-import { Tenderly, TenderlyNetwork } from "@tenderly/hardhat-integration";
+import {
+  OutdatedVersionChecker,
+  Tenderly,
+  TenderlyNetwork,
+  VersionCompatibilityChecker,
+} from "@tenderly/hardhat-integration";
 import { extendEthers } from "./extenders/extend-ethers";
 import { extendHardhatDeploy } from "./extenders/extend-hardhat-deploy";
 import { isTenderlyNetworkConfig } from "./extenders/tenderly-network-resolver";
@@ -26,12 +31,12 @@ export function setup(cfg: { automaticVerifications: boolean } = { automaticVeri
   extendEnvironment(async (hre: HardhatRuntimeEnvironment) => {
     process.env.TENDERLY_AUTOMATIC_VERIFICATION = cfg.automaticVerifications ? "true": "false"
     process.env.AUTOMATIC_VERIFICATION_ENABLED = cfg.automaticVerifications ? "true": "false"
-    process.env.HARDHAT_TENDERLY_VERSION = require("../package.json").version;
+    const hardhatTenderlyVersion = require("../package.json").version;
+    process.env.HARDHAT_TENDERLY_VERSION = hardhatTenderlyVersion;
     
     hre.tenderly = lazyObject(() => new Tenderly(hre));
 
-    const pjson = require("../package.json");
-    logger.info("@tenderly/hardhat-tenderly version:", pjson.version);
+    logger.info("@tenderly/hardhat-tenderly version:", hardhatTenderlyVersion);
 
     logger.info("Tenderly running configuration: ", {
       username: hre.config.tenderly?.username,
@@ -40,6 +45,14 @@ export function setup(cfg: { automaticVerifications: boolean } = { automaticVeri
       privateVerification: hre.config.tenderly?.privateVerification,
       networkName: hre.network.name,
     });
+    
+    printErrorIfEthersAndHardhatTenderlyVersionsArentCompatible(hre, hardhatTenderlyVersion);
+
+    const shouldCheckForOutdatedVersion = (process.env.TENDERLY_ENABLE_OUTDATED_VERSION_CHECK === undefined ||
+      process.env.TENDERLY_ENABLE_OUTDATED_VERSION_CHECK === "true");
+    if (shouldCheckForOutdatedVersion) {
+      await printWarningIfVersionIsOutdated(hre, hardhatTenderlyVersion);
+    }
 
     extendProvider(hre);
     populateNetworks();
@@ -140,5 +153,32 @@ const populateNetworks = (): void => {
     });
 };
 
+function printErrorIfEthersAndHardhatTenderlyVersionsArentCompatible(hre: HardhatRuntimeEnvironment, hardhatTenderlyVersion: string) {
+  const versionCompatibilityChecker = new VersionCompatibilityChecker();
+  const [areCompatible, ethersVersion] = versionCompatibilityChecker.areEthersAndHardhatTenderlyVersionsCompatible(
+    hre,
+    hardhatTenderlyVersion,
+  );
+  if (!areCompatible) {
+    const compatibleHardhatTenderlyVersion = versionCompatibilityChecker.compatibleHardhatTenderlyVersionForEthersVersion(
+      ethersVersion,
+    );
+    console.log(
+      "\x1b[31m%s%s\x1b[0m", // print in red color
+      `Wrong '@tenderly/hardhat-tenderly' version '${hardhatTenderlyVersion}' used with ethers version '${ethersVersion}'.\n`,
+      `Please use the correct version of latest '@tenderly/hardhat-tenderly@${compatibleHardhatTenderlyVersion}' plugin.\n`,
+    );
+  }
+}
 
-
+async function printWarningIfVersionIsOutdated(hre: HardhatRuntimeEnvironment, hardhatTenderlyVersion: string) {
+  const outdatedVersionChecker = new OutdatedVersionChecker();
+  const [isVersionOutdated, latestHardhatTenderlyVersion] = await outdatedVersionChecker.isVersionOutdated(hardhatTenderlyVersion);
+  if (isVersionOutdated) {
+    console.log(
+      "\x1b[33m%s%s\x1b[0m", // print in yellow color
+      `There's a newer version of '@tenderly/hardhat-tenderly@${latestHardhatTenderlyVersion}' plugin available. Please update the plugin.\n`,
+      "If you wish to disable this warning, set the 'TENDERLY_ENABLE_OUTDATED_VERSION_CHECK=false' environment variable.\n",
+    );
+  }
+}
