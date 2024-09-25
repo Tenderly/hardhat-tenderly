@@ -20,8 +20,9 @@ console.log("Using automatic verification?", automaticVerifications);
 const config: HardhatUserConfig = {
   solidity: "0.8.23",
   networks: {
-    tenderly: {
-      url: `${process.env.TENDERLY_FORK_RPC_URL ?? ""}`,
+    my_tenderly_testnet: {
+      // or any other custom network name
+      url: `${process.env.TENDERLY_TESTNET_RPC_URL ?? ""}`,
     },
     sepolia: {
       url: `${process.env.SEPOLIA_URL ?? ""}`,
