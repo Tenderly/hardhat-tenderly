@@ -1,3 +1,4 @@
+import "@nomiclabs/hardhat-ethers";
 import { lazyObject } from "hardhat/plugins";
 import { extendConfig, extendEnvironment } from "hardhat/config";
 import {
@@ -46,7 +47,9 @@ export function setup(cfg: { automaticVerifications: boolean } = { automaticVeri
       networkName: hre.network.name,
     });
     
-    printErrorIfEthersAndHardhatTenderlyVersionsArentCompatible(hre, hardhatTenderlyVersion);
+    if (hre.ethers !== undefined) {
+      printErrorIfEthersAndHardhatTenderlyVersionsArentCompatible(hre, hardhatTenderlyVersion);
+    }
 
     const shouldCheckForOutdatedVersion = (process.env.TENDERLY_ENABLE_OUTDATED_VERSION_CHECK === undefined ||
       process.env.TENDERLY_ENABLE_OUTDATED_VERSION_CHECK === "true");
@@ -165,8 +168,8 @@ function printErrorIfEthersAndHardhatTenderlyVersionsArentCompatible(hre: Hardha
     );
     console.log(
       "\x1b[31m%s%s\x1b[0m", // print in red color
-      `Wrong '@tenderly/hardhat-tenderly' version '${hardhatTenderlyVersion}' used with ethers version '${ethersVersion}'.\n`,
-      `Please use the correct version of latest '@tenderly/hardhat-tenderly@${compatibleHardhatTenderlyVersion}' plugin.\n`,
+      `The '@tenderly/hardhat-tenderly@${hardhatTenderlyVersion}' doesn't support 'ethers@${ethersVersion}'.\n`,
+      `Please update the plugin to the latest '@tenderly/hardhat-tenderly@${compatibleHardhatTenderlyVersion}'\n`,
     );
   }
 }
@@ -176,9 +179,9 @@ async function printWarningIfVersionIsOutdated(hre: HardhatRuntimeEnvironment, h
   const [isVersionOutdated, latestHardhatTenderlyVersion] = await outdatedVersionChecker.isVersionOutdated(hardhatTenderlyVersion);
   if (isVersionOutdated) {
     console.log(
-      "\x1b[33m%s%s\x1b[0m", // print in yellow color
-      `There's a newer version of '@tenderly/hardhat-tenderly@${latestHardhatTenderlyVersion}' plugin available. Please update the plugin.\n`,
-      "If you wish to disable this warning, set the 'TENDERLY_ENABLE_OUTDATED_VERSION_CHECK=false' environment variable.\n",
+      "\x1b[33m%s\x1b[0m%s", // print in yellow color
+      `Please update the plugin to the new version: '@tenderly/hardhat-tenderly@${latestHardhatTenderlyVersion}'\n`,
+      "You can disable this message by setting the ‘TENDERLY_ENABLE_OUTDATED_VERSION_CHECK=false’ environment variable.",
     );
   }
 }
