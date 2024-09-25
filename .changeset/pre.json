@@ -8,6 +8,7 @@
     "@tenderly/hre-extender-v2": "2.3.1"
   },
   "changesets": [
+    "grumpy-ants-dance",
     "late-meals-jam"
   ]
 }
