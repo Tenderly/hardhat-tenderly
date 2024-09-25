@@ -10,6 +10,7 @@
     "prettier": "prettier \"**/*.{js,md,json}\"",
     "build": "tsc -b",
     "clean": "rm -rf node_modules && rm -rf dist",
+    "link-local-hardhat-tenderly": "node --loader ts-node/esm link-local-hardhat-tenderly.js",
     "public:greeter:automatic": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=true npx hardhat run scripts/greeter/automatic.ts",
     "public:greeter:manual-simple": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=false npx hardhat run scripts/greeter/manual-simple.ts",
     "public:greeter:manual-advanced": "TENDERLY_PRIVATE_VERIFICATION=false TENDERLY_AUTOMATIC_VERIFICATION=false npx hardhat run scripts/greeter/manual-advanced.ts",
