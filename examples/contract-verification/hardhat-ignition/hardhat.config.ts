@@ -11,9 +11,14 @@ tdly.setup();
 const config: HardhatUserConfig = {
   solidity: "0.8.24",
   networks: {
-    testnet: {
-      url: `${process.env.TENDERLY_TESTNET_RPC_URL ?? ""}`
-    }
+    my_tenderly_testnet: {
+      // or any other custom network name
+      url: `${process.env.TENDERLY_TESTNET_RPC_URL ?? ""}`,
+    },
+    sepolia: {
+      url: `${process.env.SEPOLIA_URL ?? ""}`,
+      accounts: [process.env.SEPOLIA_PRIVATE_KEY ?? ""],
+    },
   },
   tenderly: {
     project: process.env.TENDERLY_PROJECT ?? "",
