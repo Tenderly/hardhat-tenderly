@@ -2,11 +2,12 @@
   "name": "hardhat-project",
   "license": "MIT",
   "scripts": {
-    "clean": "rm -rf node_modules"
+    "clean": "rm -rf node_modules",
+    "link-local-hardhat-tenderly": "node --loader ts-node/esm link-local-hardhat-tenderly.js"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
-    "@tenderly/hardhat-tenderly": "2.3.0",
+    "@tenderly/hardhat-tenderly": "^2.3.0",
     "hardhat": "^2.22.11",
     "dotenv": "^16.4.5"
   },
