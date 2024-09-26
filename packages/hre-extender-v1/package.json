@@ -1,11 +1,11 @@
 {
-  "name": "@tenderly/hre-extender-v1",
+  "name": "@tenderly/hardhat-tenderly",
   "author": "Tenderly",
-  "private": true,
+  "private": false,
   "license": "MIT",
   "homepage": "https://tenderly.co",
   "description": "Package for overloading some of the HardhatRuntimeEnvironment components",
-  "version": "1.9.1",
+  "version": "1.10.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
