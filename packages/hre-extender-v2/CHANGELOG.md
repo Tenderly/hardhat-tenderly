@@ -1,10 +1,21 @@
 # @tenderly/hardhat-tenderly
 
+## 2.4.0
+
+### Minor Changes
+
+Removed the need to call `tdly.setup()` function in `hardhat.config.ts` file.
+From now, it’s enough to call `import "@tenderly/hardhat-tenderly";` after importing `hardhat-ethers` and `hardhat-upgrades`.
+
+Modified `examples/` to not use the `tdly.setup()` function.
+
+Fixed the error that has been showing during populating the networks step.
+
 ## 2.3.2
 
 ### Patch Changes
 
-[#225](https://github.com/Tenderly/hardhat-tenderly/pull/225) [`5cc3346825ad3f7d48eabe069a6c61835b26e3b7`](https://github.com/Tenderly/hardhat-tenderly/commit/5cc3346825ad3f7d48eabe069a6c61835b26e3b7) Thanks [@dule-git](https://github.com/dule-git)! 
+[#225](https://github.com/Tenderly/hardhat-tenderly/pull/225) [`5cc3346825ad3f7d48eabe069a6c61835b26e3b7`](https://github.com/Tenderly/hardhat-tenderly/commit/5cc3346825ad3f7d48eabe069a6c61835b26e3b7) Thanks [@dule-git](https://github.com/dule-git)!
 
 Added error messages if `ethers` and `hardhat-tenderly` versions are not compatible for each other
 (`ethersv5` and `@tenderly/hardhat-tenderly@^2.0.0`, or `ethersv6` and `@tenderly/hardhat-tenderly@^1.0.0`.
