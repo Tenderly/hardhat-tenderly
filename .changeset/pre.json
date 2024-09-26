@@ -9,6 +9,7 @@
     "@tenderly/hre-extender-v1": "1.9.1-beta.0"
   },
   "changesets": [
+    "kind-buses-collect",
     "late-meals-jam",
     "pink-camels-appear"
   ]
