@@ -198,7 +198,7 @@ function printErrorIfEthersAndHardhatTenderlyVersionsArentCompatible(hre: Hardha
     console.log(
       "\x1b[31m%s%s\x1b[0m", // print in red color
       `The '@tenderly/hardhat-tenderly@${hardhatTenderlyVersion}' doesn't support 'ethers@${ethersVersion}'.\n`,
-      `Please update the plugin to the latest '@tenderly/hardhat-tenderly@${compatibleHardhatTenderlyVersion}'\n`,
+      `Please update the plugin to the latest hardhat-tenderly version: 'npm install @tenderly/hardhat-tenderly@${compatibleHardhatTenderlyVersion}'\n`,
     );
   }
 }
@@ -209,7 +209,7 @@ async function printWarningIfVersionIsOutdated(hre: HardhatRuntimeEnvironment, h
   if (isVersionOutdated) {
     console.log(
       "\x1b[33m%s\x1b[0m%s", // print in yellow color
-      `Please update the plugin to the new version: '@tenderly/hardhat-tenderly@${latestHardhatTenderlyVersion}'\n`,
+      `Please update the plugin to the new version: 'npm install @tenderly/hardhat-tenderly@^${latestHardhatTenderlyVersion}'\n`,
       "You can disable this message by setting the ‘TENDERLY_ENABLE_OUTDATED_VERSION_CHECK=false’ environment variable.",
     );
   }
