@@ -34,74 +34,75 @@ import {
 const tenderlyService = new TenderlyService(PLUGIN_NAME);
 
 export function setup(cfg: { automaticVerifications: boolean } = { automaticVerifications: true }) {
-  extendEnvironment((hre: HardhatRuntimeEnvironment) => {
-    process.env.TENDERLY_AUTOMATIC_VERIFICATION = cfg.automaticVerifications ? "true": "false"
-    process.env.AUTOMATIC_VERIFICATION_ENABLED = cfg.automaticVerifications ? "true": "false"
-    const hardhatTenderlyVersion = require("../package.json").version;
-    process.env.HARDHAT_TENDERLY_VERSION = hardhatTenderlyVersion;
-    
-    hre.tenderly = lazyObject(() => new Tenderly(hre));
-
-    logger.info("@tenderly/hardhat-tenderly version:", hardhatTenderlyVersion);
-
-    logger.info("Tenderly running configuration: ", {
-      username: hre.config.tenderly?.username,
-      project: hre.config.tenderly?.project,
-      automaticVerification: process.env.AUTOMATIC_VERIFICATION_ENABLED,
-      privateVerification: hre.config.tenderly?.privateVerification,
-      networkName: hre.network.name,
-    });
-    
-    if (hre.ethers !== undefined) {
-      printErrorIfEthersAndHardhatTenderlyVersionsArentCompatible(hre, hardhatTenderlyVersion);
-    }
-
-    const shouldCheckForOutdatedVersion = (process.env.TENDERLY_ENABLE_OUTDATED_VERSION_CHECK === undefined ||
-      process.env.TENDERLY_ENABLE_OUTDATED_VERSION_CHECK === "true");
-    if (shouldCheckForOutdatedVersion) {
-      printWarningIfVersionIsOutdated(hre, hardhatTenderlyVersion).then();
-    }
-
-    extendProvider(hre);
-    populateNetworks();
-    if (process.env.AUTOMATIC_VERIFICATION_ENABLED === "true" || process.env.TENDERLY_AUTOMATIC_VERIFICATION === "true") {
-      logger.debug(
-        "Automatic verification is enabled, proceeding to extend ethers library.",
-      );
-      extendEthers(hre);
-      extendUpgrades(hre);
-      extendHardhatDeploy(hre);
-      logger.debug("Wrapping ethers library finished.");
-    }
-    
-    if (shouldPopulateHardhatVerifyConfig(hre)) {
-      logger.info(
-        "Automatic population of hardhat-verify `etherscan` configuration is enabled.",
-      );
-      // If the config already exists, we should not overwrite it, either remove it or turn off automatic population.
-      const etherscanConfig = findEtherscanConfig(hre);
-      if (etherscanConfig !== undefined) {
-        throw new Error(
-          `Hardhat-verify's 'etherscan' configuration with network '${
-            hre.network.name
-          }' is already populated. Please remove the following configuration:\n${JSON.stringify(
-            etherscanConfig,
-            null,
-            2,
-          )}\nOr set 'TENDERLY_AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG' environment variable to 'false'`,
-        );
-      }
-      populateHardhatVerifyConfig(hre).then();
-    }
-    
-    logger.debug("Setup finished.");
-  });
+  console.log(
+    "\x1b[31m%s\x1b[0m",
+    "tdly.setup() function is no longer needed in hardhat.config.ts, you can set automatic verification through TENDERLY_AUTOMATIC_VERIFICATION=true variable",
+  ); // print in red color
 }
 
 extendEnvironment((hre: HardhatRuntimeEnvironment) => {
+  if (process.env.TENDERLY_AUTOMATIC_VERIFICATION === undefined) {
+    process.env.TENDERLY_AUTOMATIC_VERIFICATION = "true";
+  } 
+  
+  const hardhatTenderlyVersion = require("../package.json").version;
+  process.env.HARDHAT_TENDERLY_VERSION = hardhatTenderlyVersion;
+
   hre.tenderly = lazyObject(() => new Tenderly(hre));
+
+  logger.info("@tenderly/hardhat-tenderly version:", hardhatTenderlyVersion);
+
+  logger.info("Tenderly running configuration: ", {
+    username: hre.config.tenderly?.username,
+    project: hre.config.tenderly?.project,
+    automaticVerification: process.env.AUTOMATIC_VERIFICATION_ENABLED === "true" || process.env.TENDERLY_AUTOMATIC_VERIFICATION === "true",
+    privateVerification: hre.config.tenderly?.privateVerification,
+    networkName: hre.network.name,
+  });
+
+  if (hre.ethers !== undefined) {
+    printErrorIfEthersAndHardhatTenderlyVersionsArentCompatible(hre, hardhatTenderlyVersion);
+  }
+
+  const shouldCheckForOutdatedVersion = (process.env.TENDERLY_ENABLE_OUTDATED_VERSION_CHECK === undefined ||
+    process.env.TENDERLY_ENABLE_OUTDATED_VERSION_CHECK === "true");
+  if (shouldCheckForOutdatedVersion) {
+    printWarningIfVersionIsOutdated(hre, hardhatTenderlyVersion).then();
+  }
+
   extendProvider(hre);
   populateNetworks();
+  if (process.env.AUTOMATIC_VERIFICATION_ENABLED === "true" || process.env.TENDERLY_AUTOMATIC_VERIFICATION === "true") {
+    logger.debug(
+      "Automatic verification is enabled, proceeding to extend ethers library.",
+    );
+    extendEthers(hre);
+    extendUpgrades(hre);
+    extendHardhatDeploy(hre);
+    logger.debug("Wrapping ethers library finished.");
+  }
+
+  if (shouldPopulateHardhatVerifyConfig(hre)) {
+    logger.info(
+      "Automatic population of hardhat-verify `etherscan` configuration is enabled.",
+    );
+    // If the config already exists, we should not overwrite it, either remove it or turn off automatic population.
+    const etherscanConfig = findEtherscanConfig(hre);
+    if (etherscanConfig !== undefined) {
+      throw new Error(
+        `Hardhat-verify's 'etherscan' configuration with network '${
+          hre.network.name
+        }' is already populated. Please remove the following configuration:\n${JSON.stringify(
+          etherscanConfig,
+          null,
+          2,
+        )}\nOr set 'TENDERLY_AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG' environment variable to 'false'`,
+      );
+    }
+    populateHardhatVerifyConfig(hre).then();
+  }
+
+  logger.debug("Setup finished.");
 });
 
 extendConfig((resolvedConfig: HardhatConfig) => {
