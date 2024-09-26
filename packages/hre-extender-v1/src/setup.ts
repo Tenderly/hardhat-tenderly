@@ -27,7 +27,8 @@ import { extendUpgrades } from "./extenders/extend-upgrades";
 import { extendHardhatDeploy } from "./extenders/extend-hardhat-deploy";
 import { isTenderlyNetworkConfig } from "./extenders/tenderly-network-resolver";
 import {
-  findEtherscanConfig, populateHardhatVerifyConfig,
+  findEtherscanConfig, 
+  populateHardhatVerifyConfig,
   shouldPopulateHardhatVerifyConfig,
 } from "./extenders/populate-hardhat-verify-config";
 
@@ -169,8 +170,10 @@ const populateNetworks = (): void => {
 
         CHAIN_ID_NETWORK_NAME_MAP[network.ethereum_network_id] = network.slug;
 
-        for (slug of network.metadata.secondary_slugs) {
-          NETWORK_NAME_CHAIN_ID_MAP[slug] = network.ethereum_network_id;
+        if (network?.metadata?.secondary_slugs !== undefined) {
+          for (slug of network.metadata.secondary_slugs) {
+            NETWORK_NAME_CHAIN_ID_MAP[slug] = network.ethereum_network_id;
+          }
         }
       }
       logger.silly(
@@ -178,8 +181,8 @@ const populateNetworks = (): void => {
         NETWORK_NAME_CHAIN_ID_MAP,
       );
     })
-    .catch((_) => {
-      logger.error("Error encountered while fetching public networks");
+    .catch((e) => {
+      logger.error("Error encountered while fetching public networks:", e);
     });
 };
 
