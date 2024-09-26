@@ -27,7 +27,8 @@ import { extendUpgrades } from "./extenders/extend-upgrades";
 import { extendHardhatDeploy } from "./extenders/extend-hardhat-deploy";
 import { isTenderlyNetworkConfig } from "./extenders/tenderly-network-resolver";
 import {
-  findEtherscanConfig, populateHardhatVerifyConfig,
+  findEtherscanConfig, 
+  populateHardhatVerifyConfig,
   shouldPopulateHardhatVerifyConfig,
 } from "./extenders/populate-hardhat-verify-config";
 
@@ -70,36 +71,16 @@ extendEnvironment((hre: HardhatRuntimeEnvironment) => {
     printWarningIfVersionIsOutdated(hre, hardhatTenderlyVersion).then();
   }
 
-    extendProvider(hre);
-    populateNetworks();
-    if (process.env.AUTOMATIC_VERIFICATION_ENABLED === "true" || process.env.TENDERLY_AUTOMATIC_VERIFICATION === "true") {
-      logger.debug(
-        "Automatic verification is enabled, proceeding to extend ethers library.",
-      );
-      extendEthers(hre);
-      extendUpgrades(hre);
-      extendHardhatDeploy(hre);
-      logger.debug("Wrapping ethers library finished.");
-    }
-    
-    if (shouldPopulateHardhatVerifyConfig(hre)) {
-      logger.info(
-        "Automatic population of hardhat-verify `etherscan` configuration is enabled.",
-      );
-      // If the config already exists, we should not overwrite it, either remove it or turn off automatic population.
-      const etherscanConfig = findEtherscanConfig(hre);
-      if (etherscanConfig !== undefined) {
-        throw new Error(
-          `Hardhat-verify's 'etherscan' configuration with network '${
-            hre.network.name
-          }' is already populated. Please remove the following configuration:\n${JSON.stringify(
-            etherscanConfig,
-            null,
-            2,
-          )}\nOr set 'TENDERLY_AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG' environment variable to 'false'`,
-        );
-      }
-      populateHardhatVerifyConfig(hre).then();
+  extendProvider(hre);
+  populateNetworks();
+  if (process.env.AUTOMATIC_VERIFICATION_ENABLED === "true" || process.env.TENDERLY_AUTOMATIC_VERIFICATION === "true") {
+    logger.debug(
+      "Automatic verification is enabled, proceeding to extend ethers library.",
+    );
+    extendEthers(hre);
+    extendUpgrades(hre);
+    extendHardhatDeploy(hre);
+    logger.debug("Wrapping ethers library finished.");
   }
 
   if (shouldPopulateHardhatVerifyConfig(hre)) {
@@ -189,8 +170,10 @@ const populateNetworks = (): void => {
 
         CHAIN_ID_NETWORK_NAME_MAP[network.ethereum_network_id] = network.slug;
 
-        for (slug of network.metadata.secondary_slugs) {
-          NETWORK_NAME_CHAIN_ID_MAP[slug] = network.ethereum_network_id;
+        if (network?.metadata?.secondary_slugs !== undefined) {
+          for (slug of network.metadata.secondary_slugs) {
+            NETWORK_NAME_CHAIN_ID_MAP[slug] = network.ethereum_network_id;
+          }
         }
       }
       logger.silly(
@@ -198,8 +181,8 @@ const populateNetworks = (): void => {
         NETWORK_NAME_CHAIN_ID_MAP,
       );
     })
-    .catch((_) => {
-      logger.error("Error encountered while fetching public networks");
+    .catch((e) => {
+      logger.error("Error encountered while fetching public networks:", e);
     });
 };
 
