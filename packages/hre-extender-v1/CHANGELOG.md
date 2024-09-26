@@ -1,10 +1,25 @@
 # @tenderly/hardhat-tenderly
 
+## 1.10.0
+
+### Minor Changes
+
+Implement automatic verification for proxies via the `@openzeppelin/hardhat-upgrades` library for `@tenderly/hardhat-tenderly@^1.0.0`.
+
+Added examples in `ethers-v5` directory to show how this automatic verification of proxies works.
+
+Removed the need to call `tdly.setup()` function in `hardhat.config.ts` file.
+From now, it’s enough to call `import "@tenderly/hardhat-tenderly";` after importing `hardhat-ethers` and `hardhat-upgrades`.
+
+Modified `examples/` to not use the `tdly.setup()` function.
+
+Fixed the error that has been showing during populating the networks step.
+
 ## 1.9.1
 
 ### Patch Changes
 
-[#223](https://github.com/Tenderly/hardhat-tenderly/pull/223) [`51fc3b8d9a66d0f1913f77de424c3afe7d5dc472`](https://github.com/Tenderly/hardhat-tenderly/commit/51fc3b8d9a66d0f1913f77de424c3afe7d5dc472) Thanks [@dule-git](https://github.com/dule-git)! 
+[#223](https://github.com/Tenderly/hardhat-tenderly/pull/223) [`51fc3b8d9a66d0f1913f77de424c3afe7d5dc472`](https://github.com/Tenderly/hardhat-tenderly/commit/51fc3b8d9a66d0f1913f77de424c3afe7d5dc472) Thanks [@dule-git](https://github.com/dule-git)!
 
 Added error messages if `ethers` and `hardhat-tenderly` versions are not compatible for each other
 (`ethersv5` and `@tenderly/hardhat-tenderly@^2.0.0`, or `ethersv6` and `@tenderly/hardhat-tenderly@^1.0.0`.
