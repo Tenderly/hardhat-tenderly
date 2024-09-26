@@ -90,18 +90,18 @@ extendEnvironment((hre: HardhatRuntimeEnvironment) => {
     );
     // If the config already exists, we should not overwrite it, either remove it or turn off automatic population.
     const etherscanConfig = findEtherscanConfig(hre);
-    if (etherscanConfig !== undefined) {
-      throw new Error(
-        `Hardhat-verify's 'etherscan' configuration with network '${
-          hre.network.name
-        }' is already populated. Please remove the following configuration:\n${JSON.stringify(
-          etherscanConfig,
-          null,
-          2,
-        )}\nOr set 'TENDERLY_AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG' environment variable to 'false'`,
-      );
-    }
-    populateHardhatVerifyConfig(hre).then();
+      if (etherscanConfig !== undefined) {
+        throw new Error(
+          `Hardhat-verify's 'etherscan' configuration with network '${
+            hre.network.name
+          }' is already populated. Please remove the following configuration:\n${JSON.stringify(
+            etherscanConfig,
+            null,
+            2,
+          )}\nOr set 'TENDERLY_AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG' environment variable to 'false'`,
+        );
+      }
+      populateHardhatVerifyConfig(hre).then();
   }
 
   logger.debug("Setup finished.");
