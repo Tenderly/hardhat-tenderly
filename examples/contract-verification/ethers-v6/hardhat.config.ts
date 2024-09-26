@@ -1,6 +1,6 @@
 import "@openzeppelin/hardhat-upgrades";
 import "@nomicfoundation/hardhat-toolbox";
-import * as tdly from "@tenderly/hardhat-tenderly";
+import "@tenderly/hardhat-tenderly";
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -12,8 +12,6 @@ const { TENDERLY_PRIVATE_VERIFICATION, TENDERLY_AUTOMATIC_VERIFICATION } =
 
 const privateVerification = TENDERLY_PRIVATE_VERIFICATION === "true";
 const automaticVerifications = TENDERLY_AUTOMATIC_VERIFICATION === "true";
-
-tdly.setup({ automaticVerifications });
 
 console.log("Using private verification?", privateVerification);
 console.log("Using automatic verification?", automaticVerifications);
