@@ -1,5 +1,14 @@
 # @tenderly/hardhat-integration
 
+## 1.0.3-beta.0
+
+### Patch Changes
+
+- ac
+
+- Updated dependencies []:
+  - @tenderly/api-client@1.0.2-beta.2
+
 ## 1.0.2
 
 ### Patch Changes

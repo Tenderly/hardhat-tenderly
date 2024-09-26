@@ -1,10 +1,17 @@
 # @tenderly/hardhat-tenderly
 
+## 2.3.3-beta.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tenderly/hardhat-integration@1.0.3-beta.0
+
 ## 2.3.2
 
 ### Patch Changes
 
-[#225](https://github.com/Tenderly/hardhat-tenderly/pull/225) [`5cc3346825ad3f7d48eabe069a6c61835b26e3b7`](https://github.com/Tenderly/hardhat-tenderly/commit/5cc3346825ad3f7d48eabe069a6c61835b26e3b7) Thanks [@dule-git](https://github.com/dule-git)! 
+[#225](https://github.com/Tenderly/hardhat-tenderly/pull/225) [`5cc3346825ad3f7d48eabe069a6c61835b26e3b7`](https://github.com/Tenderly/hardhat-tenderly/commit/5cc3346825ad3f7d48eabe069a6c61835b26e3b7) Thanks [@dule-git](https://github.com/dule-git)!
 
 Added error messages if `ethers` and `hardhat-tenderly` versions are not compatible for each other
 (`ethersv5` and `@tenderly/hardhat-tenderly@^2.0.0`, or `ethersv6` and `@tenderly/hardhat-tenderly@^1.0.0`.

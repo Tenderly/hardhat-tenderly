@@ -1,5 +1,11 @@
 # tenderly
 
+## 1.0.2-beta.2
+
+### Patch Changes
+
+- ac
+
 ## 1.0.2-beta.1
 
 ### Patch Changes
