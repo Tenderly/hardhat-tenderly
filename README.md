@@ -1,11 +1,11 @@
 # Hardhat-Tenderly Plugin
 
-The **Hardhat-Tenderly plugin** integrates your Hardhat projects seamlessly with [Tenderly](https://tenderly.co/). This plugin allows you to verify contracts, simulate transactions, debug issues, and monitor your deployments effortlessly.
+The **Hardhat-Tenderly plugin** integrates your Hardhat projects seamlessly with Tenderly. This plugin allows you to verify contracts, simulate transactions, debug issues, and monitor your deployments.
 
-With Tenderly, contract verification makes the verification information visible within your Tenderly project. You can verify contracts on public networks or choose private verification, which keeps the code visible only within your Tenderly project. Contracts deployed to Tenderly Virtual TestNets are also visible only within the Virtual TestNet. 
+With Tenderly, contract verification makes the source and compiler information visible within your Tenderly project. You can verify contracts on public networks or choose private verification, which keeps the code visible only within your Tenderly project. Contracts deployed to Tenderly Virtual TestNets are also visible only within the Virtual TestNet. 
 
 >[!NOTE]
-> Verification enables the Debugger, Simulator UI, and most Alerts and Web3 actions.
+> Verification enables the Debugger, Simulator UI, and most Alerts and Web3 Actions.
 
 ## Setup and Configuration
 
@@ -25,7 +25,8 @@ const tenderly = require("@tenderly/hardhat-tenderly");
 import * as tenderly from "@tenderly/hardhat-tenderly";
 ```
 
-Make sure to import `@tenderly/hardhat-tenderly` after other packages, such as `@nomicfoundation/hardhat-toolbox`, `@nomiclabs/hardhat-ethers`, `@openzeppelin/hardhat-upgrades`, etc.
+>[!IMPORTANT]
+> Make sure to import `@tenderly/hardhat-tenderly` after other packages, such as `@nomicfoundation/hardhat-toolbox`, `@nomiclabs/hardhat-ethers`, `@openzeppelin/hardhat-upgrades`, etc.
 
 ### Plugin Setup
 
@@ -34,13 +35,7 @@ For versions `>=1.10.0` and `>=2.4.0`, calling the `setup` method is not needed.
 For versions `<1.10.0` and `<2.4.0`, you must call the `tenderly.setup` method:
 
 ```javascript
-tenderly.setup({ automaticVerifications: process.env.TENDERLY_AUTOMATIC_VERIFICATION });
-```
-
-Automatic verification of proxy contracts works out of the box with versions `>= 2.1.0` and `>= 1.10.0`. For versions `< 2.4.0` and `< 1.10.0`, follow the [automatic proxy verification workaround](/contract-verification/hardhat-proxy-contracts). To avoid the workaround, upgrade the plugin:
-
-```bash
-npm update @tenderly/hardhat-tenderly
+tenderly.setup({ automaticVerifications: !!process.env.TENDERLY_AUTOMATIC_VERIFICATION });
 ```
 
 ### Configuration
@@ -84,10 +79,22 @@ npx hardhat run scripts/deploy.ts --network mainnet_base
 
 You can also automatically verify contracts during deployment without adding any additional code.
 
->[!TIP]  
-> With automatic verification, you must wait for the contract deployment to be confirmed by calling [`deployed()`](https://docs.ethers.org/v5/api/contract/contract/#Contract-deployed) in the case of Ethers 5, or [`waitForDeployment()`](https://docs.ethers.org/v5/api/contract/contract/#Contract-deployed) in the case of Ethers 6.
+Control automatic verification with `TENDERLY_AUTOMATIC_VERIFICATION` environment variable when calling deployment scripts:
 
-```javascript
+```bash
+# Will verify publicly. 
+# If omitted, verification is private.
+TENDERLY_PUBLIC_VERIFICATION=false \
+TENDERLY_AUTOMATIC_VERIFICATION=true \
+npx hardhat run scripts/deploy.ts --network mainnet_base
+```
+
+>[!TIP]  
+> With automatic verification, you must wait for the contract deployment to be confirmed.
+> 
+> Use the reference returned by [`deployed()`](https://docs.ethers.org/v5/api/contract/contract/#Contract-deployed) in the case of Ethers 5, or [`waitForDeployment()`](https://docs.ethers.org/v5/api/contract/contract/#Contract-deployed) in the case of Ethers 6.
+
+```javascript 
 const { ethers } = require("hardhat");
 
 async function main() {
@@ -103,30 +110,44 @@ main().catch((error) => {
 });
 ```
 
-Use the `TENDERLY_AUTOMATIC_VERIFICATION` environment variable when calling deployment scripts to enable automatic verification:
+### Versions `>=2.4.0 & >=1.10.0`
+
+The plugin recognizes the `TENDERLY_AUTOMATIC_VERIFICATION` environment variable to control automatic verification.
+
+### Versions `<2.4.0 & <1.10.0`
+
+You must enable automatic verification for all deployments by adding the following configuration to your Hardhat config and setting the required environment variables when you run Hardhat scripts:
+
+```javascript
+tenderly.setup({ automaticVerifications: !!process.env.TENDERLY_AUTOMATIC_VERIFICATION });
+```
+
+### Automatic verification of proxy contracts
+Automatic verification of proxy contracts works out of the box with versions `>= 2.1.0` and `>= 1.10.0`. 
+
+For versions `< 2.4.0` and `< 1.10.0`, follow the [automatic proxy verification workaround](/contract-verification/hardhat-proxy-contracts). To avoid the workaround, upgrade the plugin:
 
 ```bash
-TENDERLY_PUBLIC_VERIFICATION=false \ # Will verify publicly. If omitted, verification is private.
-TENDERLY_AUTOMATIC_VERIFICATION=true \
-npx hardhat run scripts/deploy.ts --network mainnet_base
+npm update @tenderly/hardhat-tenderly
 ```
 
 ## Manual Verification
 
-The Hardhat-Tenderly plugin allows you to explicitly verify contracts in your deployment scripts by using `tenderly.verify`:
+The Hardhat-Tenderly plugin allows you to explicitly verify contracts in your deployment scripts by using `tenderly.verify`.
+
+Use manual verification to:
+
+- Verify previously deployed contracts
+- Verify contracts created by factories
+- Be explicit about the verification process
 
 ```javascript
 const { ethers } = require("hardhat");
 
 async function main() {
-  const MyContract = await ethers.getContractFactory("MyContract");
-  const myContract = await MyContract.deploy();
-
-  console.log("Contract deployed to:", myContract.address);
-
   await hre.tenderly.verify({
     name: "MyContract",
-    address: myContract.address,
+    address: "0x...",
   });
 }
 
@@ -136,32 +157,9 @@ main().catch((error) => {
 });
 ```
 
-Use manual verification to:
-
-- Verify deployed contracts
-- Verify contracts created by factories
-- Be explicit about the verification process
-
-## Version Compatibility
-
-### Versions `>=2.4.0 & >=1.10.0`
-
-The plugin recognizes the `TENDERLY_AUTOMATIC_VERIFICATION` flag and will enable or disable automatic verification accordingly.
-
-### Versions `<2.4.0 & <1.10.0`
-
-You must enable automatic verification for all deployments by adding the following configuration to your Hardhat config and setting the required environment variables when you run Hardhat scripts:
-
-```javascript
-tenderly.setup({ automaticVerifications: process.env.TENDERLY_AUTOMATIC_VERIFICATION });
-```
-
 ## Automatic Proxy Contract Verification
 
-Automatic verification of proxy contracts deployed and upgraded with `hardhat-upgrades` is possible with the following versions of `@tenderly/hardhat-tenderly`:
-
-- **>= 1.10.0**
-- **>= 2.1.0**
+Automatic verification of proxy contracts deployed and upgraded with `hardhat-upgrades` is possible with versions `>= 1.10.0` and `>= 2.1.0`of `@tenderly/hardhat-tenderly`:
 
 For versions `<2.4.0` and `<1.10.0`, follow the [automatic proxy verification workaround](/contract-verification/hardhat-proxy-contracts) or upgrade the plugin:
 
