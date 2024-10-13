@@ -49,7 +49,7 @@
     "@nomicfoundation/hardhat-ethers": "^3.0.4"
   },
   "dependencies": {
-    "axios": "^0.27.2",
+    "axios": "^1.6.8",
     "cli-table3": "^0.6.2",
     "commander": "^9.4.0",
     "js-yaml": "^4.1.0",
