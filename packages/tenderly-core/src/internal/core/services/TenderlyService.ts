@@ -22,7 +22,7 @@ import {
   TenderlyContractUploadRequest,
   TenderlyForkContractUploadRequest,
   TenderlyNetwork,
-  TenderlyVerifyContractsRequest,
+  TenderlyVerifyContractsRequest, VERIFICATION_TYPES,
   VerifyContractABIRequest,
   VerifyContractABIResponse,
 } from "../types";
@@ -253,9 +253,10 @@ export class TenderlyService {
   public async verifyContractABI(
     username: string,
     project: string,
+    verificationType: string,
     request: VerifyContractABIRequest
   ): Promise<VerifyContractABIResponse>{
-    logger.debug("Verifying contract with ABI.");
+    logger.debug(`Verifying contract with ABI on ${verificationType}`);
     if (!TenderlyApiService.isAuthenticated()) {
       logger.error(
         `Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`,
@@ -263,6 +264,18 @@ export class TenderlyService {
       throw new UnauthorizedError();
     }
     
+    if (verificationType === VERIFICATION_TYPES.PUBLIC || verificationType === VERIFICATION_TYPES.PRIVATE) {
+      return this.verifyContractABIOnProject(username, project, request);
+    }
+    
+    return this.verifyContractABIOnVnet(username, project, request);
+  }
+
+  private async verifyContractABIOnProject(
+    username: string,
+    project: string,
+    request: VerifyContractABIRequest,
+  ) :Promise<VerifyContractABIResponse> {
     const tenderlyApi = TenderlyApiService.configureInstance();
 
     const res = await tenderlyApi.post(
@@ -272,16 +285,43 @@ export class TenderlyService {
         abi: request.abi,
       },
     );
-    
+
     if (res.data === undefined || res.data === null) {
-      throw new InvalidResponseError("verifyContractABI", res.data); 
+      throw new InvalidResponseError("verifyContractABIOnProject", res.data);
     }
-    
+
     const response = res.data as VerifyContractABIResponse;
     if (response.error) {
       throw new BytecodeMissingMethodSignaturesError(response.error);
     }
-    
+
+    return response;
+  }
+  
+  private async verifyContractABIOnVnet(
+    username: string,
+    project: string,
+    request: VerifyContractABIRequest,
+  ) :Promise<VerifyContractABIResponse> {
+    const tenderlyApi = TenderlyApiService.configureInstance();
+
+    const res = await tenderlyApi.post(
+      `/api/v1/account/${username}/project/${project}/testnet/${request.networkId}/contract/${request.address}/abi`,
+      {
+        contract_name: request.contractName,
+        abi: request.abi,
+      },
+    );
+
+    if (res.data === undefined || res.data === null) {
+      throw new InvalidResponseError("verifyContractABIOnVnet", res.data);
+    }
+
+    const response = res.data as VerifyContractABIResponse;
+    if (response.error) {
+      throw new BytecodeMissingMethodSignaturesError(response.error);
+    }
+
     return response;
   }
 
