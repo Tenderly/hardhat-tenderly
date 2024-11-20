@@ -4,5 +4,6 @@ import { TenderlyService } from "../core/services/TenderlyService";
 export { TenderlyService };
 export { 
   VerifyContractABIRequest,
-  VerifyContractABIResponse
+  VerifyContractABIResponse,
+  VERIFICATION_TYPES,
 } from "../core/types";
