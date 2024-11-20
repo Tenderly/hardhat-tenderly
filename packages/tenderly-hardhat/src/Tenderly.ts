@@ -18,7 +18,7 @@ import {
   NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG,
 } from "./tenderly/errors";
 import {
-  extractCompilerVersion,
+  extractCompilerVersion, getChainId,
   getCompilerDataFromContracts,
   getContracts,
   isTenderlyNetworkConfig,
@@ -28,24 +28,39 @@ import {
 import { DEFAULT_CHAIN_ID, PLUGIN_NAME, VERIFICATION_TYPES } from "./constants";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 import { ProxyPlaceholderName } from "./index";
+import { VerificationService } from "./verification";
+import { throwIfUsernameOrProjectNotSet, UndefinedChainIdError } from "./errors";
 
 export class Tenderly {
   public env: HardhatRuntimeEnvironment;
   public tenderlyNetwork: TenderlyNetwork;
 
   private tenderlyService = new TenderlyService(PLUGIN_NAME);
+  private readonly verificationService;
 
   constructor(hre: HardhatRuntimeEnvironment) {
     logger.debug("Creating Tenderly plugin.");
 
     this.env = hre;
     this.tenderlyNetwork = new TenderlyNetwork(hre);
+    this.verificationService = new VerificationService(this.tenderlyService);
 
     logger.debug("Created Tenderly plugin.");
   }
 
   public async verify(...contracts: any[]): Promise<void> {
     logger.info("Verification invoked.");
+    
+    if (await this._isZkSyncNetwork(this.env)) {
+      for (let contract of contracts) {
+        contract = contract as ContractByName;
+        this.verificationService.verifyContractABI(
+          this.env,
+          contract.address,
+          contract.name,
+        );
+      }
+    }
 
     // If there are proxy contracts, we can run the task without further processing.
     const proxyContracts = contracts.filter(
@@ -96,7 +111,7 @@ export class Tenderly {
       logger.info(
         `Network parameter is set to '${this.getNetworkName()}', redirecting to ${verificationType} verification.`,
       );
-      await this._throwIfUsernameOrProjectNotSet();
+      await throwIfUsernameOrProjectNotSet(this.env);
 
       return this.tenderlyNetwork.verify(requestData);
     }
@@ -105,7 +120,7 @@ export class Tenderly {
       logger.info(
         "Private verification flag is set to true, redirecting to private verification.",
       );
-      await this._throwIfUsernameOrProjectNotSet();
+      await throwIfUsernameOrProjectNotSet(this.env);
 
       return this.tenderlyService.pushContractsMultiCompiler(
         requestData,
@@ -164,6 +179,18 @@ export class Tenderly {
         break;
     }
   }
+  
+  private async _isZkSyncNetwork(hre: HardhatRuntimeEnvironment): Promise<boolean> {
+    let chainId;
+    try {
+      chainId = await getChainId(hre)
+    } catch(e) {
+      if (e instanceof UndefinedChainIdError) {}
+      else throw e;
+    }
+    
+    return chainId === 300 || chainId === 324 || chainId === 37111
+  }
 
   public async verifyForkMultiCompilerAPI(
     request: TenderlyVerifyContractsRequest,
@@ -180,7 +207,7 @@ export class Tenderly {
       );
       return;
     }
-    await this._throwIfUsernameOrProjectNotSet();
+    await throwIfUsernameOrProjectNotSet(this.env);
 
     await this.tenderlyNetwork.verifyMultiCompilerAPI(
       request,
@@ -205,7 +232,7 @@ export class Tenderly {
       );
       return;
     }
-    await this._throwIfUsernameOrProjectNotSet();
+    await throwIfUsernameOrProjectNotSet(this.env);
 
     await this.tenderlyNetwork.verifyDevnetMultiCompilerAPI(
       request,
@@ -251,19 +278,6 @@ export class Tenderly {
 
   public async push(...contracts: any[]): Promise<void> {
     return this.verify(...contracts);
-  }
-
-  private async _throwIfUsernameOrProjectNotSet(): Promise<void> {
-    if (this.env.config.tenderly?.project === undefined) {
-      throw Error(
-        `Error in ${PLUGIN_NAME}: Please provide the project field in the tenderly object in hardhat.config.js`,
-      );
-    }
-    if (this.env.config.tenderly?.username === undefined) {
-      throw Error(
-        `Error in ${PLUGIN_NAME}: Please provide the username field in the tenderly object in hardhat.config.js`,
-      );
-    }
   }
 
   public async verifyAPI(
