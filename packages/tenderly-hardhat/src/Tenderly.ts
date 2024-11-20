@@ -2,7 +2,7 @@ import { sep } from "path";
 import * as fs from "fs-extra";
 import { HardhatPluginError } from "hardhat/plugins";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { TenderlyService } from "@tenderly/api-client";
+import { TenderlyService, VERIFICATION_TYPES } from "@tenderly/api-client";
 import {
   TenderlyArtifact,
   TenderlyContractUploadRequest,
@@ -25,7 +25,7 @@ import {
   makeVerifyContractsRequest,
   resolveDependencies,
 } from "./utils/util";
-import { DEFAULT_CHAIN_ID, PLUGIN_NAME, VERIFICATION_TYPES } from "./constants";
+import { DEFAULT_CHAIN_ID, PLUGIN_NAME } from "./constants";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 import { ProxyPlaceholderName } from "./index";
 import { VerificationService } from "./verification";
@@ -44,7 +44,10 @@ export class Tenderly {
 
     this.env = hre;
     this.tenderlyNetwork = new TenderlyNetwork(hre);
-    this.verificationService = new VerificationService(this.tenderlyService);
+    this.verificationService = new VerificationService(
+      this.tenderlyService, 
+      this.tenderlyNetwork,
+    );
 
     logger.debug("Created Tenderly plugin.");
   }
@@ -61,6 +64,7 @@ export class Tenderly {
           contract.name,
         );
       }
+      return;
     }
 
     // If there are proxy contracts, we can run the task without further processing.
@@ -191,7 +195,7 @@ export class Tenderly {
       else throw e;
     }
     
-    return chainId === 300 || chainId === 324 || chainId === 37111
+    return (chainId === 300 || chainId === 324 || chainId === 37111)
   }
 
   public async verifyForkMultiCompilerAPI(
