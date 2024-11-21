@@ -330,8 +330,8 @@ export class TenderlyService {
       throw new BytecodeMissingMethodSignaturesError(response.error);
     }
     
-    if (response.display_link) {
-      console.log(`Contract ${request.address} verified with ABI on Vnet. You can view the contract at:`, response.display_link);
+    if ((response as any).display_link) {
+      console.log(`Contract ${request.address} verified with ABI on Vnet. You can view the contract at:`, (response as any).display_link);
     } else {
       console.log(`Contract ${request.address} verified with ABI on Vnet.`);
     }
