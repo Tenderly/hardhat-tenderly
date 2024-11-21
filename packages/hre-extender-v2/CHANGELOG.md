@@ -1,5 +1,16 @@
 # @tenderly/hardhat-tenderly
 
+## 2.5.0-beta.1
+
+### Minor Changes
+
+- Implemented private and public ABI verification for Lens Testnet
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tenderly/hardhat-integration@1.1.0-beta.3
+
 ## 2.5.0-beta.0
 
 ### Minor Changes

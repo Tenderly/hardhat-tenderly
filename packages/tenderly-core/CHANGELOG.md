@@ -1,5 +1,11 @@
 # tenderly
 
+## 1.1.0-beta.5
+
+### Minor Changes
+
+- Implemented private and public ABI verification for Lens Testnet
+
 ## 1.1.0-beta.4
 
 ### Minor Changes
