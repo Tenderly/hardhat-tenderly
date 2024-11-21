@@ -312,8 +312,6 @@ export class TenderlyService {
     request: VerifyContractABIRequest,
   ) :Promise<VerifyContractABIResponse> {
     const tenderlyApi = TenderlyApiService.configureInstance();
-
-    const isPublicVerification = 
     
     const res = await tenderlyApi.post(
       `/api/v1/account/${username}/project/${project}/testnet/${request.networkId}/contract/${request.address}/abi`,
