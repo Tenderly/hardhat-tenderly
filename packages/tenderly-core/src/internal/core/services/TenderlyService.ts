@@ -6,13 +6,13 @@ import {
   ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG,
   API_ADD_CONTRACT_REQUEST_ERR_MSG,
   API_VERIFICATION_REQUEST_ERR_MSG,
-  BYTECODE_MISMATCH_ERR_MSG,
+  BYTECODE_MISMATCH_ERR_MSG, BytecodeMissingMethodSignaturesError, InvalidResponseError,
   LATEST_BLOCK_NUMBER_FETCH_FAILED_ERR_MSG,
   NETWORK_FETCH_FAILED_ERR_MSG,
   NO_NEW_CONTRACTS_VERIFIED_ERR_MSG,
   NO_VERIFIABLE_CONTRACTS_ERR_MSG,
   PRINCIPAL_FETCH_FAILED_ERR_MSG,
-  PROJECTS_FETCH_FAILED_ERR_MSG,
+  PROJECTS_FETCH_FAILED_ERR_MSG, UnauthorizedError,
 } from "../common/errors";
 import {
   ContractResponse,
@@ -23,6 +23,8 @@ import {
   TenderlyForkContractUploadRequest,
   TenderlyNetwork,
   TenderlyVerifyContractsRequest,
+  VerifyContractABIRequest,
+  VerifyContractABIResponse,
 } from "../types";
 import { logger } from "../../../utils/logger";
 import {
@@ -246,6 +248,41 @@ export class TenderlyService {
         `Error in ${this.pluginName}: ${API_VERIFICATION_REQUEST_ERR_MSG}`,
       );
     }
+  }
+
+  public async verifyContractABI(
+    username: string,
+    project: string,
+    request: VerifyContractABIRequest
+  ): Promise<VerifyContractABIResponse>{
+    logger.debug("Verifying contract with ABI.");
+    if (!TenderlyApiService.isAuthenticated()) {
+      logger.error(
+        `Error in ${this.pluginName}: ${ACCESS_TOKEN_NOT_PROVIDED_ERR_MSG}`,
+      );
+      throw new UnauthorizedError();
+    }
+    
+    const tenderlyApi = TenderlyApiService.configureInstance();
+
+    const res = await tenderlyApi.post(
+      `/api/v1/account/${username}/project/${project}/contract/${request.networkId}/${request.address}/abi`,
+      {
+        contract_name: request.contractName,
+        abi: request.abi,
+      },
+    );
+    
+    if (res.data === undefined || res.data === null) {
+      throw new InvalidResponseError("verifyContractABI", res.data); 
+    }
+    
+    const response = res.data as VerifyContractABIResponse;
+    if (response.error) {
+      throw new BytecodeMissingMethodSignaturesError(response.error);
+    }
+    
+    return response;
   }
 
   public async verifyContractsMultiCompiler(
