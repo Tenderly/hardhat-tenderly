@@ -331,7 +331,7 @@ export class TenderlyService {
     }
     
     if (response.display_link) {
-      console.log("Contract verified with ABI on Vnet. You can view the contract at:", response.display_link);
+      console.log(`Contract ${request.address} verified with ABI on Vnet. You can view the contract at:`, response.display_link);
     } else {
       console.log(`Contract ${request.address} verified with ABI on Vnet.`);
     }
