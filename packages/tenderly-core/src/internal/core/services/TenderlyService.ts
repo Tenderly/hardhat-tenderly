@@ -265,7 +265,7 @@ export class TenderlyService {
     }
     
     if (verificationType === VERIFICATION_TYPES.PUBLIC || verificationType === VERIFICATION_TYPES.PRIVATE) {
-      return this.verifyContractABIOnProject(username, project, verificationType, request);
+       return this.verifyContractABIOnProject(username, project, verificationType, request);
     }
     
     return this.verifyContractABIOnVnet(username, project, request);
@@ -299,6 +299,10 @@ export class TenderlyService {
       throw new BytecodeMissingMethodSignaturesError(response.error);
     }
 
+    const contractLink = `${TENDERLY_DASHBOARD_BASE_URL}/${username}/${project}/contract/${request.networkId}/${request.address}`;
+    const logMsg = `Contract ${request.address} verified with ABI. You can view the contract at ${contractLink}`;
+    console.log(logMsg);
+
     return response;
   }
   
@@ -309,6 +313,8 @@ export class TenderlyService {
   ) :Promise<VerifyContractABIResponse> {
     const tenderlyApi = TenderlyApiService.configureInstance();
 
+    const isPublicVerification = 
+    
     const res = await tenderlyApi.post(
       `/api/v1/account/${username}/project/${project}/testnet/${request.networkId}/contract/${request.address}/abi`,
       {
@@ -325,7 +331,9 @@ export class TenderlyService {
     if (response.error) {
       throw new BytecodeMissingMethodSignaturesError(response.error);
     }
-
+    
+    console.log(`Contract ${request.address} verified with ABI on Vnet.`);
+    
     return response;
   }
 
