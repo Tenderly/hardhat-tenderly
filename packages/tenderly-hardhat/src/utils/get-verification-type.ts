@@ -1,7 +1,7 @@
 import { isTenderlyNetworkConfig } from "./util";
-import { VERIFICATION_TYPES } from "../constants";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { TenderlyNetwork } from "../TenderlyNetwork";
+import { VERIFICATION_TYPES } from "@tenderly/api-client";
 
 export async function getVerificationType(
   hre: HardhatRuntimeEnvironment,
