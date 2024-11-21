@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 2.5.1
+
+### Patch Changes
+
+- [#261](https://github.com/Tenderly/hardhat-tenderly/pull/261) [`b4160f919eeb10bcf0f35200b0256ee31e108cf8`](https://github.com/Tenderly/hardhat-tenderly/commit/b4160f919eeb10bcf0f35200b0256ee31e108cf8) Thanks [@ElaNej](https://github.com/ElaNej)! - Update README
+
 ## 2.5.0
 
 ### Minor Changes
