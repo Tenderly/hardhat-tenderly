@@ -28,6 +28,7 @@ import { CONTRACT_NAME_PLACEHOLDER, PLUGIN_NAME } from "../constants";
 import { CONTRACTS_NOT_DETECTED } from "../tenderly/errors";
 import { ContractByName, Metadata } from "../tenderly/types";
 import { logger } from "./logger";
+import { UndefinedChainIdError } from "../errors";
 
 export const makeVerifyContractsRequest = async (
   hre: HardhatRuntimeEnvironment,
@@ -66,21 +67,10 @@ export const makeVerifyContractsRequest = async (
       platformID !== undefined
     ) {
       chainId = platformID;
-    } else if (hre.network?.config?.chainId !== undefined) {
-      chainId = hre.network.config.chainId.toString();
-    } else if (
-      NETWORK_NAME_CHAIN_ID_MAP[networkName.toLowerCase()] !== undefined
-    ) {
-      chainId = NETWORK_NAME_CHAIN_ID_MAP[networkName.toLowerCase()].toString();
+    } else {
+      chainId = (await getChainId(hre)).toString();
     }
     logger.trace(`ChainId for network '${networkName}' is ${chainId}`);
-
-    if (chainId === undefined) {
-      logger.error(
-        `Error in ${PLUGIN_NAME}: Couldn't identify network. Please provide a chainId in the network config object`,
-      );
-      return null;
-    }
 
     const compiler = await insertLibraries(
       hre,
@@ -107,6 +97,27 @@ export const makeVerifyContractsRequest = async (
     contracts,
   };
 };
+
+export async function getChainId(
+  hre: HardhatRuntimeEnvironment,
+): Promise<number> {
+  let chainId;
+  const networkName = hre.network.name;
+  
+  if (hre.network?.config?.chainId !== undefined) {
+    chainId = hre.network.config.chainId.toString();
+  } else if (
+    NETWORK_NAME_CHAIN_ID_MAP[networkName.toLowerCase()] !== undefined
+  ) {
+    chainId = NETWORK_NAME_CHAIN_ID_MAP[networkName.toLowerCase()].toString();
+  }
+  
+  if (!chainId) {
+    throw new UndefinedChainIdError(networkName);
+  }
+
+  return parseInt(chainId);
+}
 
 async function extractSources(
   hre: HardhatRuntimeEnvironment,
