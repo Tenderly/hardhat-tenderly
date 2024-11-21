@@ -4,7 +4,7 @@
   "license": "MIT",
   "homepage": "https://tenderly.co",
   "description": "Hardhat plugin for integration with Tenderly",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
@@ -55,7 +55,7 @@
     "tslog": "^4.3.1",
     "typescript": "^5.5.4",
     "dotenv": "^16.4.5",
-    "@tenderly/api-client": "^1.0.0",
+    "@tenderly/api-client": "^1.1.0",
     "npm-registry-fetch": "^17.1.0",
     "semver": "^7.6.3"
   },
