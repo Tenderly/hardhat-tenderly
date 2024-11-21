@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 1.11.0
+
+### Minor Changes
+
+- Implemented private and public ABI verification for Lens Testnet
+
 ## 1.10.0
 
 ### Minor Changes
