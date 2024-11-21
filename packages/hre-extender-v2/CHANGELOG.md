@@ -1,5 +1,16 @@
 # @tenderly/hardhat-tenderly
 
+## 2.4.0
+
+### Minor Changes
+
+Removed the need to call `tdly.setup()` function in `hardhat.config.ts` file.
+From now, it’s enough to call `import "@tenderly/hardhat-tenderly";` after importing `hardhat-ethers` and `hardhat-upgrades`.
+
+Modified `examples/` to not use the `tdly.setup()` function.
+
+Fixed the error that has been showing during populating the networks step.
+
 ## 2.4.0-beta.1
 
 ### Minor Changes

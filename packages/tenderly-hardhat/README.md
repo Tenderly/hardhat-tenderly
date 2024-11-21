@@ -16,6 +16,9 @@ Here's a brief description. There are three modes you can configure to verify yo
 - **Fork verification mode** - Verify deployed contract on a <b>tenderly fork</b>.
 - **Devnet verification mode** - Verify deployed contract on a <b>tenderly devnet</b>.
 
+> [!IMPORTANT]
+> The Tenderly Hardhat plugin verifies contracts publicly by default, unless you [configure it to use the private mode.](https://docs.tenderly.co/monitoring/smart-contract-verification/verifying-contracts-using-the-tenderly-hardhat-plugin/private-contract-verification)
+
 Also, there are three ways of how you can actually do the verification based on the mode you configured in verification modes. These ways are called **Verification Approaches**:
 - **Automatic verification approach** - The plugin will automatically verify your contracts after each deployment.
 - **Manual verification approach** - You will have to manually verify the contracts via plugin method calls.
