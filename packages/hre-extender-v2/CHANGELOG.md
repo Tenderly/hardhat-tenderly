@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 2.5.0-beta.3
+
+### Patch Changes
+
+- test
+
 ## 2.5.0-beta.2
 
 ### Patch Changes
