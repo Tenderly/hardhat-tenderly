@@ -1,5 +1,11 @@
 # @tenderly/hardhat-tenderly
 
+## 2.5.0-beta.2
+
+### Patch Changes
+
+- Add README
+
 ## 2.5.1
 
 ### Patch Changes
