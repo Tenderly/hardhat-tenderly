@@ -8,7 +8,7 @@
   "exclude": ["./dist", "./node_modules"],
   "references": [
     {
-      "path": "../tenderly-core/src"
+      "path": "../tenderly-api-client/src"
     }
   ]
 }

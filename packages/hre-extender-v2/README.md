@@ -5,12 +5,12 @@
 [Hardhat](http://hardhat.org) plugin for integration with [Tenderly](https://tenderly.co).
 
 This repo represents the hardhat-tenderly plugin. With its functionalities, you can verify contracts on the Tenderly platform.
-Verification represents an entry point into Tenderly's functionalities. With verified contracts, you can use various features like [debugger](https://docs.tenderly.co/debugger/how-to-use-tenderly-debugger), [simulations and forks](https://docs.tenderly.co/simulations-and-forks/intro-to-simulations) or [devnets](https://docs.tenderly.co/devnets/intro-to-devnets).
+Verification represents an entry point into Tenderly's functionalities. With verified contracts, you can use various features like [debugger](https://docs.tenderly.co/debugger/how-to-use-tenderly-debugger), [simulations and forks](https://docs.tenderly.co/simulations-and-forks/intro-to-simulations) or [devnets](https://docs.tenderly.co/devnets/intro-to-devnets). 
 This repo will make it possible to verify your contracts with ease, so you can focus on building your dapp.
 
 You can read about hardhat-tenderly's verification features in detail [here](https://docs.tenderly.co/monitoring/smart-contract-verification/verifying-contracts-using-the-tenderly-hardhat-plugin).
 
-Here's a brief description. There are three modes you can configure to verify your contracts and these are called **Verification Modes**:
+Here's a brief description. There are three modes you can configure to verify your contracts and these are called **Verification Modes**: 
 - **Private verification mode** - Only you or people who share the project with you may see the source code of the contract and interact with it.
 - **Public verification mode** - Anyone can see the source code of the contract and interact with it.
 - **Fork verification mode** - Verify deployed contract on a <b>tenderly fork</b>.
@@ -61,7 +61,7 @@ Access key can be found under **Settings->Authorization->Generate new access key
 
 
 # Verification Modes
-This section explains three modes you can configure to verify your contracts.
+This section explains three modes you can configure to verify your contracts. 
 
 First, you need to add the `tenderly` field inside the `HardhatConfig` structure in `hardhat.config.ts`:
 ```ts
@@ -86,7 +86,7 @@ https://dashboard.tenderly.co/Tenderly/project/contracts.
 You can take the username and project from there. In this case the username is Tenderly and the project is project.
 
 ### Private verification mode
-In order to configure private verification mode, set `privateVerification` to `true` inside the `tenderly` field inside `hardhat.config.ts`.
+In order to configure private verification mode, set `privateVerification` to `true` inside the `tenderly` field inside `hardhat.config.ts`. 
 Also, the `--network` flag must NOT be set to `tenderly` or `devnet` when running `npx hardhat run` command, or fork/devnet verification mode will be configured.
 ### Public verification mode
 In order to configure public verification mode, set `privateVerification` to `false` inside the `tenderly` field inside `hardhat.config.ts`.
