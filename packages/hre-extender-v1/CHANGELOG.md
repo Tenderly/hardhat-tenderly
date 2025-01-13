@@ -1,26 +1,10 @@
 # @tenderly/hardhat-tenderly
 
-## 1.11.0-beta.1
+## 1.11.0
 
 ### Minor Changes
 
 - Implemented private and public ABI verification for Lens Testnet
-
-### Patch Changes
-
-- Updated dependencies []:
-  - @tenderly/hardhat-integration@1.1.0-beta.3
-
-## 1.11.0-beta.0
-
-### Minor Changes
-
-- Implemented private and public ABI verification for Lens Testnet
-
-### Patch Changes
-
-- Updated dependencies []:
-  - @tenderly/hardhat-integration@1.1.0-beta.2
 
 ## 1.10.0
 
@@ -37,26 +21,6 @@ Modified `examples/` to not use the `tdly.setup()` function.
 
 Fixed the error that has been showing during populating the networks step.
 
-## 1.10.0-beta.0
-
-### Minor Changes
-
-Implement automatic verification for proxies via the `@openzeppelin/hardhat-upgrades` library for `@tenderly/hardhat-tenderly@^1.0.0`.
-
-Added examples in `ethers-v5` directory to show how this automatic verification of proxies works.
-
-Removed the need to call `tdly.setup()` function in `hardhat.config.ts` file.
-From now, it’s enough to call `import "@tenderly/hardhat-tenderly";` after importing `hardhat-ethers` and `hardhat-upgrades`.
-
-Modified `examples/` to not use the `tdly.setup()` function.
-
-Fixed the error that has been showing during populating the networks step.
-
-### Patch Changes
-
-- Updated dependencies []:
-  - @tenderly/hardhat-integration@1.0.3-beta.0
-
 ## 1.9.1
 
 ### Patch Changes
@@ -67,15 +31,6 @@ Added error messages if `ethers` and `hardhat-tenderly` versions are not compati
 (`ethersv5` and `@tenderly/hardhat-tenderly@^2.0.0`, or `ethersv6` and `@tenderly/hardhat-tenderly@^1.0.0`.
 
 Also added info log if there's a new `@tenderly/hardhat-tenderly` version available.
-
-## 1.9.1-beta.0
-
-### Patch Changes
-
-- Added alerts if ethers and hardhat-tenderly versions are not compatible for each other (ethersv5 and hardhat-tenderly@2.x.x, or ethersv6 and hardhat-tenderly@1.x.x. Also added alerts if there's a new hardhat-tenderly version available.
-
-- Updated dependencies []:
-  - @tenderly/hardhat-integration@1.0.2-beta.0
 
 ## 1.9.0
 

@@ -12,7 +12,7 @@
       "path": "../tenderly-hardhat"
     },
     {
-      "path": "../tenderly-core"
+      "path": "../tenderly-api-client"
     }
   ]
 }

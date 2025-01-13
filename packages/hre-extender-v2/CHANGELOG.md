@@ -1,26 +1,16 @@
 # @tenderly/hardhat-tenderly
 
-## 2.5.0-beta.1
+## 2.5.1
+
+### Patch Changes
+
+- [#261](https://github.com/Tenderly/hardhat-tenderly/pull/261) [`b4160f919eeb10bcf0f35200b0256ee31e108cf8`](https://github.com/Tenderly/hardhat-tenderly/commit/b4160f919eeb10bcf0f35200b0256ee31e108cf8) Thanks [@ElaNej](https://github.com/ElaNej)! - Update README
+
+## 2.5.0
 
 ### Minor Changes
 
 - Implemented private and public ABI verification for Lens Testnet
-
-### Patch Changes
-
-- Updated dependencies []:
-  - @tenderly/hardhat-integration@1.1.0-beta.3
-
-## 2.5.0-beta.0
-
-### Minor Changes
-
-- Implemented private and public ABI verification for Lens Testnet
-
-### Patch Changes
-
-- Updated dependencies []:
-  - @tenderly/hardhat-integration@1.1.0-beta.2
 
 ## 2.4.0
 
@@ -33,28 +23,6 @@ Modified `examples/` to not use the `tdly.setup()` function.
 
 Fixed the error that has been showing during populating the networks step.
 
-## 2.4.0-beta.1
-
-### Minor Changes
-
-Implement automatic verification for proxies via the `@openzeppelin/hardhat-upgrades` library for `@tenderly/hardhat-tenderly@^1.0.0`.
-
-Added examples in `ethers-v5` directory to show how this automatic verification of proxies works.
-
-Removed the need to call `tdly.setup()` function in `hardhat.config.ts` file.
-From now, it’s enough to call `import "@tenderly/hardhat-tenderly";` after importing `hardhat-ethers` and `hardhat-upgrades`.
-
-Modified `examples/` to not use the `tdly.setup()` function.
-
-Fixed the error that has been showing during populating the networks step.
-
-## 2.3.3-beta.0
-
-### Patch Changes
-
-- Updated dependencies []:
-  - @tenderly/hardhat-integration@1.0.3-beta.0
-
 ## 2.3.2
 
 ### Patch Changes
@@ -65,19 +33,6 @@ Added error messages if `ethers` and `hardhat-tenderly` versions are not compati
 (`ethersv5` and `@tenderly/hardhat-tenderly@^2.0.0`, or `ethersv6` and `@tenderly/hardhat-tenderly@^1.0.0`.
 
 Also added info log if there's a new `@tenderly/hardhat-tenderly` version available.
-
-## 2.3.2-beta.1
-
-### Patch Changes
-
-- Added alerts if ethers and hardhat-tenderly versions are not compatible for each other (ethersv5 and hardhat-tenderly@2.x.x, or ethersv6 and hardhat-tenderly@1.x.x. Also added alerts if there's a new hardhat-tenderly version available.
-
-## 2.3.2-beta.0
-
-### Patch Changes
-
-- Updated dependencies []:
-  - @tenderly/hardhat-integration@1.0.2-beta.0
 
 ## 2.3.1
 

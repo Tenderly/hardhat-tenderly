@@ -9,10 +9,10 @@
   "exclude": ["./dist", "./node_modules"],
   "references": [
     {
-      "path": "../tenderly-hardhat"
+      "path": "../hardhat-integration"
     },
     {
-      "path": "../tenderly-core"
+      "path": "../tenderly-api-client"
     }
   ]
 }

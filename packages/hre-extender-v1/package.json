@@ -1,11 +1,11 @@
 {
-  "name": "@tenderly/hardhat-tenderly",
+  "name": "@tenderly/hre-extender-v1",
   "author": "Tenderly",
-  "private": false,
+  "private": true,
   "license": "MIT",
   "homepage": "https://tenderly.co",
   "description": "Package for overloading some of the HardhatRuntimeEnvironment components",
-  "version": "1.11.0-beta.1",
+  "version": "1.11.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
@@ -38,7 +38,7 @@
     "ethers": "^5.7.2",
     "@ethersproject/bignumber": "^5.7.0",
     "@nomiclabs/hardhat-ethers": "^2.1.1",
-    "@tenderly/hardhat-integration": "^1.1.0-beta.3",
+    "@tenderly/hardhat-integration": "^1.1.0",
     "@openzeppelin/hardhat-upgrades": "^1.0.0",
     "@openzeppelin/upgrades-core": "^1.32.2",
     "@nomiclabs/hardhat-etherscan": "^3.1.0"

@@ -1,49 +1,12 @@
 # tenderly
 
-## 1.1.0-beta.5
+## 1.1.0
 
 ### Minor Changes
 
-- Implemented private and public ABI verification for Lens Testnet
+- [#255](https://github.com/Tenderly/hardhat-tenderly/pull/255) [`d26fc6660acadd680c65f3a18bbf4c367ddf8893`](https://github.com/Tenderly/hardhat-tenderly/commit/d26fc6660acadd680c65f3a18bbf4c367ddf8893) Thanks [@dule-git](https://github.com/dule-git)! - Implemented private and public ABI verification for Lens Testnet
 
-## 1.1.0-beta.4
-
-### Minor Changes
-
-- Implemented private and public ABI verification for Lens Testnet
-
-## 1.0.2-beta.3
-
-### Patch Changes
-
-- Implement automatic verification for proxies via the `@openzeppelin/hardhat-upgrades` library for `@tenderly/hardhat-tenderly@^1.0.0`.
-
-  Added examples in `ethers-v5` directory to show how this automatic verification of proxies works.
-
-  Removed the need to call `tdly.setup()` function in `hardhat.config.ts` file.
-  From now, it’s enough to call `import "@tenderly/hardhat-tenderly";` after importing `hardhat-ethers` and `hardhat-upgrades`.
-
-  Modified `examples/` to not use the `tdly.setup()` function.
-
-  Fixed the error that has been showing during populating the networks step.
-
-## 1.0.2-beta.2
-
-### Patch Changes
-
-- ac
-
-## 1.0.2-beta.1
-
-### Patch Changes
-
-- Added alerts if ethers and hardhat-tenderly versions are not compatible for each other (ethersv5 and hardhat-tenderly@2.x.x, or ethersv6 and hardhat-tenderly@1.x.x. Also added alerts if there's a new hardhat-tenderly version available.
-
-## 1.0.2-beta.0
-
-### Patch Changes
-
-- Added alerts if ethers and hardhat-tenderly versions are not compatible for each other (ethersv5 and hardhat-tenderly@2.x.x, or ethersv6 and hardhat-tenderly@1.x.x. Also added alerts if there's a new hardhat-tenderly version available.
+- [#256](https://github.com/Tenderly/hardhat-tenderly/pull/256) [`e4a292637fdff554c8e4015374fee53d6fb0902b`](https://github.com/Tenderly/hardhat-tenderly/commit/e4a292637fdff554c8e4015374fee53d6fb0902b) Thanks [@dule-git](https://github.com/dule-git)! - Implemented private and public ABI verification for Lens Testnet
 
 ## 1.0.1
 
@@ -57,29 +20,11 @@
 
 - [#184](https://github.com/Tenderly/hardhat-tenderly/pull/184) [`2485b9c568a5520ed42928d2f6b99fa86c58b54b`](https://github.com/Tenderly/hardhat-tenderly/commit/2485b9c568a5520ed42928d2f6b99fa86c58b54b) Thanks [@dule-git](https://github.com/dule-git)! - Added hardhat example project for ethers-5 and changed AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG to TENDERLY_AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG
 
-## 0.9.1-beta.0
-
-### Patch Changes
-
-- Added hardhat example project for ethers-5 and changed AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG to TENDERLY_AUTOMATIC_POPULATE_HARDHAT_VERIFY_CONFIG.
-
 ## 0.9.0
 
 ### Minor Changes
 
 - [#176](https://github.com/Tenderly/hardhat-tenderly/pull/176) [`b96d3a8f9a1c934f90ed488260956b826f5c5a20`](https://github.com/Tenderly/hardhat-tenderly/commit/b96d3a8f9a1c934f90ed488260956b826f5c5a20) Thanks [@dule-git](https://github.com/dule-git)! - Implement manual and automatic verification of proxies deployed with `@openzeppelin/hardhat-upgrades`.
-
-## 0.9.0-beta.0
-
-### Minor Changes
-
-- Implement manual and automatic verification of proxies deployed with `@openzeppelin/hardhat-upgrades`.
-
-## 0.8.1-beta.0
-
-### Patch Changes
-
-- Extend the recognition of Tenderly networks via the RPC url
 
 ## 0.8.0
 
@@ -108,41 +53,6 @@
   npx hardhat run scripts/deploy.ts --network my_tenderly_network_1
   ```
 
-## 0.8.0-beta.1
-
-### Minor Changes
-
-- [#169](https://github.com/Tenderly/hardhat-tenderly/pull/169) [`f9ca615`](https://github.com/Tenderly/hardhat-tenderly/commit/f9ca6151924750d6ab27f706bba96c19c1e0c742) Thanks [@dule-git](https://github.com/dule-git)! - Enable multiple tenderly networks in hardhat.config.ts
-
-  From now on, you can put multiple networks in your `hardhat.config.ts` file in the `networks` property without the need name the network `tenderly` or `devnet`.
-
-  Just put:
-
-  ```ts
-  networks: {
-    my_tenderly_network_1: {
-      url: "https://rpc.tenderly.co/fork/<forkId>",
-    },
-    my_tenderly_network_2: {
-      url: "https://rpc.tenderly.co/fork/<forkId>",
-    },
-  }
-  ```
-
-  After that you can do:
-
-  ```bash
-  npx hardhat run scripts/deploy.ts --network my_tenderly_network_1
-  ```
-
-- Beta testing
-
-## 0.8.0-beta.0
-
-### Minor Changes
-
-- Enable muliple tenderly networks in hardhat.config.ts
-
 ## 0.7.0
 
 ### Minor Changes
@@ -167,23 +77,11 @@
 
   You can check out our updated [examples/contract-verification](https://github.com/Tenderly/hardhat-tenderly/tree/master/examples/contract-verification) folder that has examples that work with the new package versions.
 
-## 0.7.0-beta.0
-
-### Minor Changes
-
-- Enable @tenderly/hardhat-tenderly to work with @nomicfoundation/hardhat-ethers and ethers-v6
-
 ## 0.6.0
 
 ### Minor Changes
 
 - [#161](https://github.com/Tenderly/hardhat-tenderly/pull/161) [`a563356`](https://github.com/Tenderly/hardhat-tenderly/commit/a5633566b33ac7f3a808d4206201c11c443b04d5) Thanks [@veljko-matic](https://github.com/veljko-matic)! - Return valid display link
-
-## 0.6.0-beta.0
-
-### Minor Changes
-
-- Return valid display link
 
 ## 0.5.3
 
@@ -191,37 +89,11 @@
 
 - [#147](https://github.com/Tenderly/hardhat-tenderly/pull/147) [`4326062`](https://github.com/Tenderly/hardhat-tenderly/commit/4326062a176d220ead5cdc810d8e49f903aaa9f6) Thanks [@dule-git](https://github.com/dule-git)! - Added x-user-agent header to request
 
-## 0.5.3-beta.1
-
-### Patch Changes
-
-- Fixed prebuild.js script
-
-## 0.5.3-beta.0
-
-### Patch Changes
-
-- Added x-user-agent header
-
 ## 0.5.2
 
 ### Patch Changes
 
 - [#143](https://github.com/Tenderly/hardhat-tenderly/pull/143) [`f2f90f6`](https://github.com/Tenderly/hardhat-tenderly/commit/f2f90f60c531a5b12a0d10eb48cd492c64f01fea) Thanks [@dule-git](https://github.com/dule-git)! - Fixed a bug that took hardhat's compiler configuration and passed it by reference instead of by value during the verification process.
-
-## 0.5.2-beta.1
-
-### Patch Changes
-
-- Another test
-
-- [#143](https://github.com/Tenderly/hardhat-tenderly/pull/143) [`3609782`](https://github.com/Tenderly/hardhat-tenderly/commit/360978244335e2a9e2160e05b871034abd299aea) Thanks [@dule-git](https://github.com/dule-git)! - Fixed a bug that took hardhat's compiler configuration and passed it by reference instead of by value during the verification process.
-
-## 0.5.2-beta.0
-
-### Patch Changes
-
-- Testing beta version packages
 
 ## 0.5.1
 
