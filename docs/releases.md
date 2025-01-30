@@ -10,7 +10,7 @@ A prerelease workflow might look something like this:
 Checkout to the `beta` branch and merge your branch to `beta` to include your changes in the prerelease.
 ```bash
 git checkout beta
-git merge <your branch> // recomended to use develep branch
+git merge <your branch> // recommended to use develep branch
 ```
 
 Enter the prerelease versioning mode:
