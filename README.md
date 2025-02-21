@@ -5,7 +5,7 @@
 [Hardhat](http://hardhat.org) plugin for integration with [Tenderly](https://tenderly.co).
 
 This repo represents the hardhat-tenderly plugin. With its functionalities, you can verify contracts on the Tenderly platform.
-Verification represents an entry point into Tenderly's functionalities. With verified contracts, you can use various features like [debugger](https://docs.tenderly.co/debugger/how-to-use-tenderly-debugger), [simulations and forks](https://docs.tenderly.co/simulations-and-forks/intro-to-simulations) or [devnets](https://docs.tenderly.co/devnets/intro-to-devnets). 
+Verification represents an entry point into Tenderly's functionalities. With verified contracts, you can use various features like [debugger](https://docs.tenderly.co/debugger), [simulations and forks](https://docs.tenderly.co/simulations-and-forks/intro-to-simulations) or [devnets](https://docs.tenderly.co/devnets/intro-to-devnets). 
 This repo will make it possible to verify your contracts with ease, so you can focus on building your dapp.
 
 You can read about hardhat-tenderly's verification features in detail [here](https://docs.tenderly.co/monitoring/smart-contract-verification/verifying-contracts-using-the-tenderly-hardhat-plugin).
