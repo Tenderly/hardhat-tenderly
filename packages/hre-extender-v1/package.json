@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "dotenv": "^16.4.5",
-    "ethers": "^5.7.2",
+    "ethers": "^6.0.0",
     "@ethersproject/bignumber": "^5.7.0",
     "@nomiclabs/hardhat-ethers": "^2.1.1",
     "@tenderly/hardhat-integration": "^1.1.0",
