@@ -1,0 +1,22 @@
+import {HardhatUserConfig} from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
+ 
+ import * as tdly from "@tenderly/hardhat-tenderly";
+  
+  const config: HardhatUserConfig = {
+    solidity: "0.8.19",
+    tenderly: {
+        username: "Your account slug" ?? "error",
+        project: "Your project slug",
+         
+         // Contract visible only in Tenderly.
+         // Omitting or setting to `false` makes it visible to the whole world.
+         // Alternatively, configure verification visibility using
+         // an environment variable `TENDERLY_PUBLIC_VERIFICATION`.
+         privateVerification: process.env.TENDERLY_PUBLIC_VERIFICATION !== 'true',
+    },
+  };
+   
+   export default config;
+    }
+  }

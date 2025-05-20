@@ -1,0 +1,4 @@
+const greeter = await (
+    await Greeter.deploy("Hello, Hardhat!")
+).deployed();
+)
