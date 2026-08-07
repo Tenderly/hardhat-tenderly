@@ -1,0 +1,13 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "@tenderly/hardhat-integration": "1.1.1",
+    "@tenderly/hre-extender-v1": "1.11.0",
+    "@tenderly/hardhat-tenderly": "2.5.2",
+    "@tenderly/api-client": "1.1.0"
+  },
+  "changesets": [
+    "env-path-url-verification"
+  ]
+}

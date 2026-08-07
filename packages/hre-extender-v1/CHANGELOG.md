@@ -1,5 +1,12 @@
 # @tenderly/hardhat-tenderly
 
+## 1.11.1-beta.0
+
+### Patch Changes
+
+- Updated dependencies [[`68a71dcbb256f45d31e7ceafa4ebc88cc8c7479c`](https://github.com/Tenderly/hardhat-tenderly/commit/68a71dcbb256f45d31e7ceafa4ebc88cc8c7479c)]:
+  - @tenderly/hardhat-integration@1.2.0-beta.0
+
 ## 1.11.0
 
 ### Minor Changes
