@@ -1,10 +1,10 @@
 # @tenderly/hardhat-tenderly
 
-## 2.6.0-beta.0
+## 2.6.0
 
 ### Minor Changes
 
-- [#285](https://github.com/Tenderly/hardhat-tenderly/pull/285) [`68a71dcbb256f45d31e7ceafa4ebc88cc8c7479c`](https://github.com/Tenderly/hardhat-tenderly/commit/68a71dcbb256f45d31e7ceafa4ebc88cc8c7479c) Thanks [@bokirly](https://github.com/bokirly)! - Support Virtual Environment RPC URLs in the region and environment-path forms
+- [`92c67b67a691dba6a4c94800a5af744cdaddcc88`](https://github.com/Tenderly/hardhat-tenderly/commit/92c67b67a691dba6a4c94800a5af744cdaddcc88) Thanks [@bokirly](https://github.com/bokirly)! - Support Virtual Environment RPC URLs in the region and environment-path forms
   (`virtual.<network>.<region>.rpc.tenderly.co/<org>/<project>/<env-slug>`).
 
   Previously the plugin only recognized the legacy
@@ -25,8 +25,8 @@
 
 ### Patch Changes
 
-- Updated dependencies [[`68a71dcbb256f45d31e7ceafa4ebc88cc8c7479c`](https://github.com/Tenderly/hardhat-tenderly/commit/68a71dcbb256f45d31e7ceafa4ebc88cc8c7479c)]:
-  - @tenderly/hardhat-integration@1.2.0-beta.0
+- Updated dependencies [[`92c67b67a691dba6a4c94800a5af744cdaddcc88`](https://github.com/Tenderly/hardhat-tenderly/commit/92c67b67a691dba6a4c94800a5af744cdaddcc88)]:
+  - @tenderly/hardhat-integration@1.2.0
 
 ## 2.5.2
 
