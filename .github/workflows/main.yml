@@ -1,0 +1,2 @@
+mkdir -p .github/workflows
+touch ci-cd.yaml
