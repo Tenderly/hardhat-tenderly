@@ -18,18 +18,24 @@ import {
   NO_COMPILER_FOUND_FOR_CONTRACT_ERR_MSG,
 } from "./tenderly/errors";
 import {
-  extractCompilerVersion, getChainId,
+  extractCompilerVersion,
+  getChainId,
   getCompilerDataFromContracts,
   getContracts,
   isTenderlyNetworkConfig,
+  isTenderlyEnvironmentPathConfig,
   makeVerifyContractsRequest,
   resolveDependencies,
 } from "./utils/util";
+import { verifyOnTenderlyEnvironment } from "./utils/environment-verification";
 import { DEFAULT_CHAIN_ID, PLUGIN_NAME } from "./constants";
 import { TenderlyNetwork } from "./TenderlyNetwork";
 import { ProxyPlaceholderName } from "./index";
 import { VerificationService } from "./verification";
-import { throwIfUsernameOrProjectNotSet, UndefinedChainIdError } from "./errors";
+import {
+  throwIfUsernameOrProjectNotSet,
+  UndefinedChainIdError,
+} from "./errors";
 import { getVerificationType, isVerificationOnVnet } from "./utils";
 
 export class Tenderly {
@@ -45,7 +51,7 @@ export class Tenderly {
     this.env = hre;
     this.tenderlyNetwork = new TenderlyNetwork(hre);
     this.verificationService = new VerificationService(
-      this.tenderlyService, 
+      this.tenderlyService,
       this.tenderlyNetwork,
     );
 
@@ -54,7 +60,7 @@ export class Tenderly {
 
   public async verify(...contracts: any[]): Promise<void> {
     logger.info("Verification invoked.");
-    
+
     if (await this._isZkSyncNetwork(this.env)) {
       for (let contract of contracts) {
         contract = contract as ContractByName;
@@ -95,7 +101,20 @@ export class Tenderly {
       return;
     }
 
-    const verificationType = await getVerificationType(this.env, this.tenderlyNetwork);
+    // Environment-path RPC URLs (virtual.<network>[.<region>].rpc.tenderly.co/
+    // <org>/<project>/<env-slug>) carry no endpoint ID, so they verify through
+    // the Etherscan-compatible verifier served on the RPC URL itself.
+    if (isTenderlyEnvironmentPathConfig(this.env.network.config)) {
+      logger.info(
+        "Network RPC URL is a Virtual Environment endpoint, verifying through the environment RPC verifier.",
+      );
+      return verifyOnTenderlyEnvironment(this.env, flatContracts);
+    }
+
+    const verificationType = await getVerificationType(
+      this.env,
+      this.tenderlyNetwork,
+    );
     const platformID =
       verificationType === VERIFICATION_TYPES.FORK
         ? this.tenderlyNetwork.forkID
@@ -144,7 +163,10 @@ export class Tenderly {
     logger.info("Invoked verification (multi compiler version) through API.");
     logger.trace("Request data:", request);
 
-    const verificationType = await getVerificationType(this.env, this.tenderlyNetwork);
+    const verificationType = await getVerificationType(
+      this.env,
+      this.tenderlyNetwork,
+    );
     switch (verificationType) {
       case VERIFICATION_TYPES.FORK:
         logger.error(
@@ -185,17 +207,19 @@ export class Tenderly {
         break;
     }
   }
-  
-  private async _isZkSyncNetwork(hre: HardhatRuntimeEnvironment): Promise<boolean> {
+
+  private async _isZkSyncNetwork(
+    hre: HardhatRuntimeEnvironment,
+  ): Promise<boolean> {
     let chainId;
     try {
-      chainId = await getChainId(hre)
-    } catch(e) {
-      if (e instanceof UndefinedChainIdError) {}
-      else throw e;
+      chainId = await getChainId(hre);
+    } catch (e) {
+      if (e instanceof UndefinedChainIdError) {
+      } else throw e;
     }
-    
-    return (chainId === 300 || chainId === 324 || chainId === 37111)
+
+    return chainId === 300 || chainId === 324 || chainId === 37111;
   }
 
   public async verifyForkMultiCompilerAPI(
@@ -272,7 +296,10 @@ export class Tenderly {
   ): Promise<void> {
     logger.info("Invoked public verification through API request.");
 
-    const verificationType = await getVerificationType(this.env, this.tenderlyNetwork);
+    const verificationType = await getVerificationType(
+      this.env,
+      this.tenderlyNetwork,
+    );
     if (isTenderlyNetworkConfig(this.env.network.config)) {
       if (verificationType === VERIFICATION_TYPES.DEVNET) {
         logger.error(
@@ -318,7 +345,10 @@ export class Tenderly {
   ): Promise<void> {
     logger.info("Invoked pushing contracts through API.");
 
-    const verificationType = await getVerificationType(this.env, this.tenderlyNetwork);
+    const verificationType = await getVerificationType(
+      this.env,
+      this.tenderlyNetwork,
+    );
     if (isTenderlyNetworkConfig(this.env.network.config)) {
       if (verificationType === VERIFICATION_TYPES.DEVNET) {
         logger.error(

@@ -3,12 +3,16 @@
 import { HardhatRuntimeEnvironment, Network } from "hardhat/types";
 import {
   isHttpNetworkConfig,
+  isTenderlyEnvironmentPathConfig,
   isTenderlyGatewayNetworkConfig,
   isTenderlyNetworkConfig,
 } from "./tenderly-network-resolver";
 import { getAccessToken } from "@tenderly/api-client/utils/config";
 import { logger } from "../logger";
-import { getVnetTypeByEndpointId, VnetType } from "@tenderly/hardhat-integration/dist/tenderly/vnet-type";
+import {
+  getVnetTypeByEndpointId,
+  VnetType,
+} from "@tenderly/hardhat-integration/dist/tenderly/vnet-type";
 import * as URLComposer from "@tenderly/hardhat-integration/dist/utils/url-composer";
 
 export function shouldPopulateHardhatVerifyConfig(
@@ -66,6 +70,23 @@ export async function populateHardhatVerifyConfig(
 
   const chainId = await getChainId(hre.network);
 
+  // Environment-path RPC URLs (virtual.<network>[.<region>].rpc.tenderly.co/
+  // <org>/<project>/<env-slug>) are served by the RPC verifier directly at
+  // `<rpc>/verify` (the URL itself authenticates), so no vnet-type lookup or
+  // API URL composition is needed.
+  if (isTenderlyEnvironmentPathConfig(hre.network.config)) {
+    const environmentURL = hre.network.config.url.replace(/\/+$/, "");
+    (hre.config as any).etherscan.customChains.push({
+      network: hre.network.name,
+      chainId,
+      urls: {
+        apiURL: `${environmentURL}/verify`,
+        browserURL: environmentURL,
+      },
+    });
+    return;
+  }
+
   const endpointId = hre.network.config.url.split("/").pop();
   if (endpointId === undefined) {
     throw new Error(
@@ -110,7 +131,6 @@ export function findEtherscanConfig(
   );
 }
 
-
 function isRecord(value: any): value is Record<string, string> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -122,4 +142,3 @@ async function getChainId(network: Network): Promise<number> {
 
   return Number(await network.provider.send("eth_chainId", []));
 }
-
