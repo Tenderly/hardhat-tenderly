@@ -12,7 +12,7 @@ function main() {
     throw new Error("Version to release must be a number.");
   }
   if (versionToRelease < 1 || versionToRelease > 2) {
-    throw new Error("Version to release must be between 0 and 2.");
+    throw new Error("Version to release must be between 1 and 2.");
   }
 
   if (versionToRelease == 1) {
