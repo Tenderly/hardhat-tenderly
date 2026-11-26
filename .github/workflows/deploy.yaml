@@ -1,0 +1,24 @@
+# .github/workflows/deploy.yml
+name: Deploy to Tenderly VNets
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        network:
+          - { name: 'polygon', rpc_secret: 'TENDERLY_RPC_POLYGON' }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - name: Deploy to ${{ matrix.network.name }}
+        run: |
+          forge script script/Deploy.s.sol \
+            --rpc-url ${{ secrets[matrix.network.rpc_secret] }} \
+            --private-key ${{ secrets.DEPLOYER_KEY }} \
+            --broadcast
